@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -9,8 +11,19 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  FirebaseAuth auth = FirebaseAuth.instance;
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  FirebaseAuth.instance
+      .authStateChanges()
+      .listen((User? user) {
+  if (user == null) {
+  print('User is currently signed out!');
+  } else {
+  print('User is signed in!');
+  }
+  });
 
   @override
   Widget build(BuildContext context) {
