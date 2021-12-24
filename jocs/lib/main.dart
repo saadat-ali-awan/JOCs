@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'firebase_options.dart';
 
@@ -21,5 +22,28 @@ Future<void> main() async {
 
   // Entry Point For App
   // Firebase will go to Login Page initially
-  runApp(const GetMaterialApp(home: Login()));
+  runApp(
+      GetMaterialApp(
+        /**
+         * Using GetX Library for advanced State Management
+         * getPages parameter is used to set all the Routes of the Application
+         *
+        * */
+        getPages: [
+          GetPage(
+
+            /**
+             * name parameter is the name That will be used to refer the page
+             * page parameter contains reference to the page
+             * binding parameter binds All the Services or Class Instances so
+             * that we can easily recognize the page of a Class Instance
+             * **/
+            name: '/login',
+            page: ()=>const Login(),
+            binding: LoginBindings()
+          )
+        ],
+        initialRoute: '/login',
+      )
+  );
 }
