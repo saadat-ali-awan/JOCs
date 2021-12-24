@@ -24,8 +24,8 @@ class _LoginState extends State<Login> {
               children: <Widget>[
                 Container(
                     alignment: Alignment.center,
-                    padding: EdgeInsets.all(10),
-                    child: Text(
+                    padding: const EdgeInsets.all(10),
+                    child: const Text(
                       'JOC\'s',
                       style: TextStyle(
                           color: Colors.blue,
@@ -35,26 +35,26 @@ class _LoginState extends State<Login> {
                 Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10),
-                    child: Text(
+                    child: const Text(
                       'Sign in',
                       style: TextStyle(fontSize: 20),
                     )),
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: TextField(
                     controller: nameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'User Name',
                     ),
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                   child: TextField(
                     obscureText: true,
                     controller: passwordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Password',
                     ),
@@ -82,10 +82,10 @@ class _LoginState extends State<Login> {
                 Container(
                     child: Row(
                       children: <Widget>[
-                        Text('Does not have account?'),
+                        const Text('Does not have account?'),
                         FlatButton(
                           textColor: Colors.blue,
-                          child: Text(
+                          child: const Text(
                             'Sign in',
                             style: TextStyle(fontSize: 20),
                           ),
