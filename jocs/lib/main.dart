@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'Registration/login.dart';
+
 void main() {
-  runApp(const GetMaterialApp(home: Home()));
+  runApp(const GetMaterialApp(home: Login()));
 }
 
 class Controller extends GetxController{

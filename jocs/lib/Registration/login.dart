@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
   @override
   _LoginState createState() => _LoginState();
 
@@ -14,7 +16,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Sample App'),
+          title: Text('JOCs'),
         ),
         body: Padding(
             padding: EdgeInsets.all(10),
@@ -24,7 +26,7 @@ class _LoginState extends State<Login> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      'TutorialKart',
+                      'JOC\'s',
                       style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.w500,
