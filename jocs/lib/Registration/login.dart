@@ -91,9 +91,24 @@ class _LoginState extends State<Login> {
                       textColor: Colors.white,
                       color: Colors.blue,
                       child: Text('Login'),
-                      onPressed: () {
+                      onPressed: () async {
                         print(nameController.text);
                         print(passwordController.text);
+
+                        try {
+                          UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                              email: nameController.text,
+                              password: passwordController.text
+                          );
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'weak-password') {
+                            print('The password provided is too weak.');
+                          } else if (e.code == 'email-already-in-use') {
+                            print('The account already exists for that email.');
+                          }
+                        } catch (e) {
+                          print(e);
+                        }
                       },
                     )),
                 Container(
