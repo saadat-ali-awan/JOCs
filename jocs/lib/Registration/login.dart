@@ -15,15 +15,19 @@ class _LoginState extends State<Login> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  FirebaseAuth.instance
-      .authStateChanges()
-      .listen((User? user) {
-  if (user == null) {
-  print('User is currently signed out!');
-  } else {
-  print('User is signed in!');
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
   }
-  });
 
   @override
   Widget build(BuildContext context) {

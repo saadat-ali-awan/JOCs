@@ -58,6 +58,27 @@
             </list>
           </value>
         </entry>
+        <entry key="firebase_auth">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth-3.3.4/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="firebase_auth_platform_interface">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth_platform_interface-6.1.9/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="firebase_auth_web">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth_web-3.3.5/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="firebase_core">
           <value>
             <list>
@@ -111,6 +132,20 @@
           <value>
             <list>
               <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/get-4.6.1/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="http_parser">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/http_parser-4.0.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="intl">
+          <value>
+            <list>
+              <option value="$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/intl-0.17.0/lib" />
             </list>
           </value>
         </entry>
@@ -230,11 +265,16 @@
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/collection-1.15.0/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/cupertino_icons-1.0.4/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth-3.3.4/lib" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth_platform_interface-6.1.9/lib" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth_web-3.3.5/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core-1.10.6/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_platform_interface-4.2.3/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-1.5.3/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_lints-1.0.4/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/get-4.6.1/lib" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/http_parser-4.0.0/lib" />
+      <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/intl-0.17.0/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/js-0.6.3/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/lints-1.0.1/lib" />
       <root url="file://$USER_HOME$/Documents/flutter/.pub-cache/hosted/pub.dartlang.org/matcher-0.12.11/lib" />
