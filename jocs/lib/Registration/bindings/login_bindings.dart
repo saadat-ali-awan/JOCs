@@ -7,8 +7,7 @@ class LoginBindings implements Bindings{
   @override
   void dependencies() {
 
-
-    if (defaultTargetPlatform == TargetPlatform.windows) {
+    if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb) {
       Get.put<LoginControllerWindows>(LoginControllerWindows());
     }
     else {

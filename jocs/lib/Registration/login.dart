@@ -22,7 +22,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    if (defaultTargetPlatform == TargetPlatform.windows){
+    if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb){
       _loginController = Get.find<LoginControllerWindows>();
     }else {
       _loginController = Get.find<LoginController>();
@@ -77,40 +77,7 @@ class _LoginState extends State<Login> {
             ),
           ),
         )
-        // body: Padding(
-        //     padding: EdgeInsets.all(15),
-        //     child: Column(
-        //       children: <Widget>[
-        //         Padding(
-        //           padding: EdgeInsets.all(15),
-        //           child: TextField(
-        //             decoration: InputDecoration(
-        //               border: OutlineInputBorder(),
-        //               labelText: 'User Name',
-        //               hintText: 'Enter Your Name',
-        //             ),
-        //           ),
-        //         ),
-        //         Padding(
-        //           padding: EdgeInsets.all(15),
-        //           child: TextField(
-        //             obscureText: true,
-        //             decoration: InputDecoration(
-        //               border: OutlineInputBorder(),
-        //               labelText: 'Password',
-        //               hintText: 'Enter Password',
-        //             ),
-        //           ),
-        //         ),
-        //         RaisedButton(
-        //           textColor: Colors.white,
-        //           color: Colors.blue,
-        //           child: Text('Sign In'),
-        //           onPressed: (){},
-        //         )
-        //       ],
-        //     )
-        // )
+
     );
   }
 }

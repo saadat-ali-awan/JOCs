@@ -18,7 +18,7 @@ Future<void> main() async {
   // firebase_options.dart is generated automatically by flutterfire configure command
   // It contains all the details to connect with Firebase
 
-  if (defaultTargetPlatform != TargetPlatform.windows) {
+  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
