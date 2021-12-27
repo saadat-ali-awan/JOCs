@@ -5,6 +5,7 @@ import 'package:jocs/Dashboard/dashboard.dart';
 
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
+import 'Theme/custom_theme.dart';
 import 'firebase_options.dart';
 import 'package:flutter/foundation.dart';
 
@@ -34,6 +35,7 @@ Future<void> main() async {
          * getPages parameter is used to set all the Routes of the Application
          *
         * */
+        theme: CustomTheme.lightTheme,
         getPages: [
           GetPage(
 

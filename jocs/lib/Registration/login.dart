@@ -16,6 +16,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   late var _loginController;
 
@@ -29,11 +31,21 @@ class _LoginState extends State<Login> {
     }
     _loginController.initializeLogin();
   }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Flutter TextField Example'),
+          title: Text(
+              'Flutter TextField Example',
+            style: Theme.of(context).textTheme.headline4,
+          ),
         ),
         body: SafeArea(
           child: Container(
@@ -43,34 +55,69 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(
-                  width: 350,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'User Name',
-                      hintText: 'Enter Your Name',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 350,
+                    child: TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        hintText: 'Enter Your Email',
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 350,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                      hintText: 'Enter Password'
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 350,
+                    child: TextField(
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        hintText: 'Enter Password'
+                      ),
                     ),
                   ),
                 ),
 
-                TextButton(
+                Container(
+                  margin: const EdgeInsets.only(top: 32.0),
+                  child: TextButton(
 
-                  onPressed: () {
+                    onPressed: () {
+                      String email = emailController.text;
+                      String password = passwordController.text;
+                      _loginController.login(email, password);
+                    },
+                    child: Text(
+                        "Login",
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
 
-                  },
-                  child: Text("Login"),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top:32.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
+                    crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Do not have account?", style: Theme.of(context).textTheme.bodyText2,),
+                      ),
+                      TextButton(
 
+                          onPressed: (){},
+                          child: Text("Register", style: Theme.of(context).textTheme.bodyText1,)
+                      )
+                    ],
+                  ),
                 )
 
               ],

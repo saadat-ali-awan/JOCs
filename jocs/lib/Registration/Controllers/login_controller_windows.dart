@@ -13,11 +13,21 @@ class LoginControllerWindows extends GetxController{
         .init(path);
     var firebaseAuth = FirebaseAuth.initialize('AIzaSyBqcQEfEXhRUn2Bn4900aOP7BZfxphsKss', await HiveStore.create());
 
-    if (firebaseAuth.isSignedIn){
-      Get.toNamed("/dashboard");
+    firebaseAuth.signInState.listen((state){
+      if (state){
+        Get.toNamed("/dashboard");
 
-    } else {
-      print('User is currently signed out!');
+      } else {
+        print('User is currently signed out!');
+      }
+    });
+
+  }
+
+  login(String email, String password) async {
+    await FirebaseAuth.instance.signIn(email, password);
+    if (FirebaseAuth.instance.isSignedIn){
+      Get.toNamed("/dashboard");
     }
   }
 }
