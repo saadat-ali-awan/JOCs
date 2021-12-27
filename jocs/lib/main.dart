@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jocs/Dashboard/dashboard.dart';
 
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
 
 Future<void> main() async {
 
@@ -15,9 +17,12 @@ Future<void> main() async {
   // Firebase is initialized using firebase_options.dart
   // firebase_options.dart is generated automatically by flutterfire configure command
   // It contains all the details to connect with Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  if (defaultTargetPlatform != TargetPlatform.windows) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
 
   // Entry Point For App
@@ -41,9 +46,14 @@ Future<void> main() async {
             name: '/login',
             page: ()=>const Login(),
             binding: LoginBindings()
+          ),
+          GetPage(
+            name: '/dashboard',
+            page: ()=> const Dashboard()
           )
         ],
         initialRoute: '/login',
+        initialBinding: LoginBindings(),
       )
   );
 }

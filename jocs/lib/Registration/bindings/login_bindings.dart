@@ -1,11 +1,19 @@
 import 'package:get/get.dart';
-
-import '../Controllers/LoginController.dart';
+import 'package:jocs/Registration/Controllers/login_controller_windows.dart';
+import 'package:flutter/foundation.dart';
+import '../Controllers/login_controller.dart';
 
 class LoginBindings implements Bindings{
   @override
   void dependencies() {
-    Get.put(() => LoginController());
+
+
+    if (defaultTargetPlatform == TargetPlatform.windows) {
+      Get.put<LoginControllerWindows>(LoginControllerWindows());
+    }
+    else {
+      Get.put<LoginController>(LoginController());
+    }
   }
 
 }
