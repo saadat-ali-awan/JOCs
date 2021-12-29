@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class Colors {
   static Color mainColor = const Color(0xFF002A2B);
   static Color secondaryColor = const Color(0xFFFFFFFF);
@@ -36,7 +37,7 @@ class CustomTheme {
         headline5: TextStyle(color: Colors.secondaryColor),
         headline6: TextStyle(color: Colors.secondaryColor),
         subtitle1: TextStyle(color: Colors.mainColor),
-        subtitle2: TextStyle(color: Colors.secondaryColor),
+        subtitle2: TextStyle(color: Colors.errorColor),
         bodyText1: TextStyle(
             color: Colors.secondaryColor,
           fontSize: 24

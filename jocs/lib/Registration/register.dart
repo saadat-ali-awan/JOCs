@@ -1,38 +1,34 @@
 import 'package:flutter/material.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
-import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:flutter/foundation.dart';
-import 'package:jocs/Theme/custom_theme.dart' as custom_colors;
+import 'package:get/get.dart';
+import 'package:jocs/Registration/Controllers/register_controller.dart';
+import 'package:jocs/Registration/Controllers/register_controller_windows.dart';
 
-import 'Controllers/login_controller_windows.dart';
-
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
-
+class _RegisterState extends State<Register> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  late var _loginController;
+  TextEditingController confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  late var _registerController;
 
   @override
   void initState() {
     super.initState();
     if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb){
-      _loginController = Get.find<LoginControllerWindows>();
+      _registerController = Get.find<RegisterControllerWindows>();
     }else {
-      _loginController = Get.find<LoginController>();
+      _registerController = Get.find<RegisterController>();
     }
-    _loginController.initializeLogin();
+    //_registerController.initializeLogin();
   }
 
   @override
@@ -41,12 +37,13 @@ class _LoginState extends State<Login> {
     passwordController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-              'Flutter TextField Example',
+            'Flutter TextField Example',
             style: Theme.of(context).textTheme.headline4,
           ),
         ),
@@ -89,8 +86,8 @@ class _LoginState extends State<Login> {
                         autocorrect: false,
                         controller: passwordController,
                         decoration: const InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter Password'
+                            labelText: 'Password',
+                            hintText: 'Enter Password'
                         ),
                         validator: (value){
                           // RegExp regex =
@@ -110,7 +107,28 @@ class _LoginState extends State<Login> {
                             // }
                           }
                         },
-
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 350,
+                      child: TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: confirmPasswordController,
+                        decoration: const InputDecoration(
+                            labelText: 'Password',
+                            hintText: 'Confirm Password',
+                        ),
+                        validator: (value){
+                          if (value != passwordController.text){
+                            return 'Password do not match';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                   ),
@@ -120,17 +138,19 @@ class _LoginState extends State<Login> {
                     child: TextButton(
 
                       onPressed: () {
+                        String email = emailController.text;
+                        String password = passwordController.text;
+                        String confirmPassword = confirmPasswordController.text;
                         if (_formKey.currentState!.validate()){
-                          String email = emailController.text;
-                          String password = passwordController.text;
-                          _loginController.login(email, password);
+
                           emailController.clear();
                           passwordController.clear;
+                          confirmPasswordController.clear;
                         }
 
                       },
                       child: Text(
-                          "Login",
+                        "Register",
                         style: Theme.of(context).textTheme.bodyText1,
                       ),
 
@@ -144,29 +164,16 @@ class _LoginState extends State<Login> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text("Do not have account?", style: Theme.of(context).textTheme.bodyText2,),
+                          child: Text("Have an account?", style: Theme.of(context).textTheme.bodyText2,),
                         ),
                         TextButton(
 
                             onPressed: (){
-                              Get.offNamed('/register');
+                              Get.offNamed("/login");
                             },
-                            child: Text("Register", style: Theme.of(context).textTheme.bodyText1,)
+                            child: Text("Login", style: Theme.of(context).textTheme.bodyText1,)
                         )
                       ],
-                    ),
-                  ),
-                  Obx( () => Container(
-                      margin: const EdgeInsets.only(top: 32.0),
-                      child: _loginController.loginErrorMessage == "" ?  const SizedBox(width: 0, height: 0):Container(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "${_loginController.loginErrorMessage}",
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
-                        ),
-                      ),
                     ),
                   )
 
@@ -179,4 +186,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-

@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/dashboard.dart';
+import 'package:jocs/Registration/bindings/register_bindings.dart';
+import 'package:jocs/Registration/register.dart';
 
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
@@ -48,6 +50,11 @@ Future<void> main() async {
             name: '/login',
             page: ()=>const Login(),
             binding: LoginBindings()
+          ),
+          GetPage(
+              name: '/register',
+              page: ()=> const Register(),
+            binding: RegisterBindings()
           ),
           GetPage(
             name: '/dashboard',
