@@ -24,7 +24,7 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Flutter TextField Example',
+            'JOCs',
             style: Theme
                 .of(context)
                 .textTheme
