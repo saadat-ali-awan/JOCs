@@ -125,7 +125,7 @@ class _LoginState extends State<Login> {
                           String password = passwordController.text;
                           _loginController.login(email, password);
                           emailController.clear();
-                          passwordController.clear;
+                          passwordController.clear();
                         }
 
                       },

@@ -15,16 +15,28 @@ class LoginControllerWindows extends GetxController{
     var path = Directory.current.path;
     Hive
         .init(path);
-    var firebaseAuth = FirebaseAuth.initialize('AIzaSyBqcQEfEXhRUn2Bn4900aOP7BZfxphsKss', await HiveStore.create());
+    try {
+      Hive.registerAdapter(TokenAdapter());
+    }on HiveError catch(e){
+      print(e.message);
+    }
+    try {
+      FirebaseAuth.initialize('AIzaSyBqcQEfEXhRUn2Bn4900aOP7BZfxphsKss', await HiveStore.create());
+    }on Exception catch (e){
+      print("Already Initialized");
+    }
 
-    firebaseAuth.signInState.listen((state){
-      if (state){
-        Get.toNamed("/dashboard");
-
-      } else {
-        print('User is currently signed out!');
-      }
-    });
+    try {
+      FirebaseAuth.instance.signInState.listen((state) {
+        if (state) {
+          Get.toNamed("/dashboard");
+        } else {
+          print('User is currently signed out!');
+        }
+      });
+    }on StateError catch(e){
+      print("Listen Stream Created Already");
+    }
 
   }
 

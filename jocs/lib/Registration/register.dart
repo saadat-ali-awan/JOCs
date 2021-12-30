@@ -142,10 +142,10 @@ class _RegisterState extends State<Register> {
                         String password = passwordController.text;
                         String confirmPassword = confirmPasswordController.text;
                         if (_formKey.currentState!.validate()){
-
+                          _registerController.register(email, password);
                           emailController.clear();
-                          passwordController.clear;
-                          confirmPasswordController.clear;
+                          passwordController.clear();
+                          confirmPasswordController.clear();
                         }
 
                       },
@@ -175,6 +175,19 @@ class _RegisterState extends State<Register> {
                         )
                       ],
                     ),
+                  ),
+                  Obx( () => Container(
+                    margin: const EdgeInsets.only(top: 32.0),
+                    child: _registerController.registerErrorMessage == "" ?  const SizedBox(width: 0, height: 0):Container(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "${_registerController.registerErrorMessage}",
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ),
+                    ),
+                  ),
                   )
 
                 ],

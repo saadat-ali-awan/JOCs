@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jocs/Dashboard/Bindings/dashboard_bindings.dart';
 import 'package:jocs/Dashboard/dashboard.dart';
 import 'package:jocs/Registration/bindings/register_bindings.dart';
 import 'package:jocs/Registration/register.dart';
@@ -58,10 +59,11 @@ Future<void> main() async {
           ),
           GetPage(
             name: '/dashboard',
-            page: ()=> const Dashboard()
+            page: ()=> const Dashboard(),
+            binding: DashboardBindings()
           )
         ],
-        initialRoute: '/login',
+        initialRoute: '/dashboard',
         initialBinding: LoginBindings(),
       )
   );

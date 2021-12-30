@@ -1,92 +1,96 @@
 import 'package:flutter/material.dart';
 
 
-class Colors {
+class ThemeColors {
   static Color mainColor = const Color(0xFF002A2B);
   static Color secondaryColor = const Color(0xFFFFFFFF);
   static Color errorColor = const Color(0xFF84000A);
+  static Color hoverColor = const Color(0xff016d70);
 }
 
 class CustomTheme {
   static ThemeData get lightTheme {
     return ThemeData(
-      primaryColor: Colors.mainColor,
-      scaffoldBackgroundColor: Colors.secondaryColor,
+      primaryColor: ThemeColors.mainColor,
+      scaffoldBackgroundColor: ThemeColors.secondaryColor,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.mainColor,
-        foregroundColor: Colors.secondaryColor
+        backgroundColor: ThemeColors.mainColor,
+        foregroundColor: ThemeColors.secondaryColor
       ),
       buttonTheme: ButtonThemeData(
-        buttonColor: Colors.mainColor
+        buttonColor: ThemeColors.mainColor
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          backgroundColor: Colors.mainColor,
+          backgroundColor: ThemeColors.mainColor,
           textStyle: TextStyle(
-            color: Colors.secondaryColor,
+            color: ThemeColors.secondaryColor,
           ),
           minimumSize: const Size(150, 50)
 
         )
       ),
       textTheme: TextTheme(
-        headline1: TextStyle(color: Colors.secondaryColor),
-        headline2: TextStyle(color: Colors.secondaryColor),
-        headline3: TextStyle(color: Colors.secondaryColor),
-        headline4: TextStyle(color: Colors.secondaryColor),
-        headline5: TextStyle(color: Colors.secondaryColor),
-        headline6: TextStyle(color: Colors.secondaryColor),
-        subtitle1: TextStyle(color: Colors.mainColor),
-        subtitle2: TextStyle(color: Colors.errorColor),
+        headline1: TextStyle(color: ThemeColors.secondaryColor),
+        headline2: TextStyle(color: ThemeColors.secondaryColor),
+        headline3: TextStyle(color: ThemeColors.secondaryColor),
+        headline4: TextStyle(color: ThemeColors.secondaryColor),
+        headline5: TextStyle(color: ThemeColors.secondaryColor),
+        headline6: TextStyle(color: ThemeColors.secondaryColor),
+        subtitle1: TextStyle(color: ThemeColors.mainColor),
+        subtitle2: TextStyle(color: ThemeColors.errorColor),
         bodyText1: TextStyle(
-            color: Colors.secondaryColor,
+            color: ThemeColors.secondaryColor,
           fontSize: 24
         ),
         bodyText2: TextStyle(
-            color: Colors.mainColor,
+            color: ThemeColors.mainColor,
           fontSize: 24
         ),
-        caption: TextStyle(color: Colors.secondaryColor),
-        overline: TextStyle(color: Colors.secondaryColor),
-        button: TextStyle(color: Colors.secondaryColor),
+        caption: TextStyle(color: ThemeColors.secondaryColor),
+        overline: TextStyle(color: ThemeColors.secondaryColor),
+        button: TextStyle(color: ThemeColors.secondaryColor),
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: UnderlineInputBorder(
           borderSide: BorderSide(
             style: BorderStyle.solid,
-            color: Colors.mainColor
+            color: ThemeColors.mainColor
           ),
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(
             style: BorderStyle.solid,
-            color: Colors.secondaryColor
+            color: ThemeColors.secondaryColor
           )
         ),
         enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
                 style: BorderStyle.solid,
-                color: Colors.mainColor
+                color: ThemeColors.mainColor
             )
         ),
         errorBorder: UnderlineInputBorder(
             borderSide: BorderSide(
                 style: BorderStyle.solid,
-                color: Colors.errorColor
+                color: ThemeColors.errorColor
             )
         ),
         labelStyle: TextStyle(
-          color: Colors.mainColor,
+          color: ThemeColors.mainColor,
         ),
-        fillColor: Colors.mainColor,
+        fillColor: ThemeColors.mainColor,
         helperStyle: TextStyle(
-          color: Colors.mainColor
+          color: ThemeColors.mainColor
         )
 
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: Colors.mainColor
-      )
+        cursorColor: ThemeColors.mainColor
+      ),
+      iconTheme: IconThemeData(
+        color: ThemeColors.secondaryColor
+      ),
     );
   }
 }
