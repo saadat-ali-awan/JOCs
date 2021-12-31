@@ -31,7 +31,7 @@ class _DashboardGeneralState extends State<DashboardGeneral> {
           Expanded(
               child: Container(
                   color: _dashboardController.iconColor,
-                  child: const ScreensLayout()),
+                  child: ScreensLayout()),
           )
         ],
       )

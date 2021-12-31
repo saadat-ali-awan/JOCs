@@ -14,9 +14,8 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
-    if (width > 500){
+    if (width > 600){
       _dashboardController.changeBody(false);
     }else {
       _dashboardController.changeBody(true);

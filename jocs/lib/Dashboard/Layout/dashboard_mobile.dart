@@ -25,7 +25,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
               flex: 10,
               child: Container(
                   color: Colors.blueAccent,
-                  child: const ScreensLayout())
+                  child: ScreensLayout())
           )
         ],
       ),
@@ -41,18 +41,6 @@ class _DashboardMobileState extends State<DashboardMobile> {
         width: 0,
         height: 0,
       )),
-      Obx(
-            () => IconButton(
-            onPressed: () {
-              _dashboardController.showMenu.value =
-              !_dashboardController.showMenu.value;
-              _dashboardController.menuIcon.value =
-              _dashboardController.showMenu.value
-                  ? const Icon(Icons.clear)
-                  : const Icon(Icons.menu);
-            },
-            icon: _dashboardController.menuIcon.value),
-      ),
     ]);
   }
 }

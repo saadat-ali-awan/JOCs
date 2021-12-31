@@ -12,7 +12,25 @@ class NavItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
-      _dashboardController.mobileDisplay? Container(height: 50, color: _dashboardController.tileColor):Container(
+      _dashboardController.mobileDisplay.value?
+      Container(
+          height: 50,
+          color: _dashboardController.tileColor,
+        child: Obx(
+              () => IconButton(
+              onPressed: () {
+                _dashboardController.showMenu.value =
+                !_dashboardController.showMenu.value;
+                _dashboardController.menuIcon.value =
+                _dashboardController.showMenu.value
+                    ? const Icon(Icons.clear)
+                    : const Icon(Icons.menu);
+              },
+              icon: _dashboardController.menuIcon.value),
+        ),
+      )
+          :
+      Container(
           decoration: BoxDecoration(
               border: Border.symmetric(
                   horizontal:
@@ -53,20 +71,18 @@ class NavItems extends StatelessWidget {
                     ? Container(
                     color: _dashboardController.tileColor,
                     child: IconButton(
-                      icon: const Icon(Icons.dashboard),
+                      icon: _dashboardController.menuList[0][1],
                       color: _dashboardController.iconColor,
                       onPressed: () {
-                        _dashboardController.showPanel.value = false;
+                        _dashboardController.selectedMenuItem.value = 0;
                       },
                     ))
                     : ListTile(
                   tileColor: _dashboardController.tileColor,
                   hoverColor: ThemeColors.hoverColor,
-                  onTap: () {},
-                  leading: Icon(Icons.dashboard,
-                      color: _dashboardController.iconColor),
-                  title: Text("DASHBOARD",
-                      style: _dashboardController.menuItemStyle),
+                  onTap: () { _dashboardController.selectedMenuItem.value = 0;},
+                  leading: _dashboardController.menuList[0][1],
+                  title: _dashboardController.menuList[0][0],
                 )),
           )),
       Container(
@@ -79,20 +95,18 @@ class NavItems extends StatelessWidget {
                   ? Container(
                   color: _dashboardController.tileColor,
                   child: IconButton(
-                    icon: const Icon(Icons.all_inbox_sharp),
+                    icon: _dashboardController.menuList[1][1],
                     color: _dashboardController.iconColor,
                     onPressed: () {
-                      _dashboardController.showPanel.value = false;
+                      _dashboardController.selectedMenuItem.value = 1;
                     },
                   ))
                   : ListTile(
                 tileColor: _dashboardController.tileColor,
                 hoverColor: ThemeColors.hoverColor,
-                onTap: () {},
-                leading: Icon(Icons.all_inbox_sharp,
-                    color: _dashboardController.iconColor),
-                title: Text("TICKETS",
-                    style: _dashboardController.menuItemStyle),
+                onTap: () { _dashboardController.selectedMenuItem.value = 1;},
+                leading: _dashboardController.menuList[1][1],
+                title: _dashboardController.menuList[1][0],
               )),
         ),
       ),
@@ -106,20 +120,18 @@ class NavItems extends StatelessWidget {
                   ? Container(
                   color: _dashboardController.tileColor,
                   child: IconButton(
-                    icon: const Icon(Icons.clear),
+                    icon: _dashboardController.menuList[2][1],
                     color: _dashboardController.iconColor,
                     onPressed: () {
-                      _dashboardController.showPanel.value = false;
+                      _dashboardController.selectedMenuItem.value = 2;
                     },
                   ))
                   : ListTile(
                 tileColor: _dashboardController.tileColor,
                 hoverColor: ThemeColors.hoverColor,
-                onTap: () {},
-                leading: Icon(Icons.clear,
-                    color: _dashboardController.iconColor),
-                title: Text("PROBLEMS",
-                    style: _dashboardController.menuItemStyle),
+                onTap: () { _dashboardController.selectedMenuItem.value = 2;},
+                leading: _dashboardController.menuList[2][1],
+                title: _dashboardController.menuList[2][0],
               )),
         ),
       ),
@@ -137,36 +149,32 @@ class NavItems extends StatelessWidget {
               child: _dashboardController.showPanel.value
                   ? Container(
                   color: _dashboardController.tileColor,
-                  child: IconButton(
-                    icon: const Icon(Icons.featured_play_list),
-                    color: _dashboardController.iconColor,
-                    onPressed: () {
-                      _dashboardController.showPanel.value = false;
-                    },
-                  ))
+                  child: _dashboardController.menuList[3][1],
+                // child: IconButton(
+                  //   icon: _dashboardController.menuList[3][1],
+                  //   color: _dashboardController.iconColor,
+                  //   onPressed: () {
+                  //     _dashboardController.selectedMenuItem.value = 32;
+                  //   },
+                  // )
+              )
                   : ListTile(
                 tileColor: _dashboardController.tileColor,
                 hoverColor: ThemeColors.hoverColor,
-                onTap: () {},
-                leading: Icon(Icons.featured_play_list,
-                    color: _dashboardController.iconColor),
-                title: Text("ASSETS",
-                    style: _dashboardController.menuItemStyle),
+                leading: _dashboardController.menuList[3][1],
+                title: _dashboardController.menuList[3][0],
               ))),
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _dashboardController.selectedMenuItem.value = 32;
+                    },
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Obx(()=>Text(
-                        "INVENTORY",
-                        style: _dashboardController.showPanel.value?_dashboardController.submenuItemStyle2:_dashboardController.submenuItemStyle,
-                        textAlign: TextAlign.left,
-                      ),
-                      ),
+                      child: _dashboardController.menuList[3][2],
                     )),
               ],
             ),
@@ -174,14 +182,12 @@ class NavItems extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _dashboardController.selectedMenuItem.value = 33;
+                    },
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        "PURCHASE ORDER",
-                        style: _dashboardController.showPanel.value?_dashboardController.submenuItemStyle2:_dashboardController.submenuItemStyle,
-                        textAlign: TextAlign.left,
-                      ),
+                      child: _dashboardController.menuList[3][3]
                     )),
               ],
             )
@@ -198,20 +204,18 @@ class NavItems extends StatelessWidget {
                     ? Container(
                     color: _dashboardController.tileColor,
                     child: IconButton(
-                      icon: const Icon(Icons.message),
+                      icon: _dashboardController.menuList[4][1],
                       color: _dashboardController.iconColor,
                       onPressed: () {
-                        _dashboardController.showPanel.value = false;
+                        _dashboardController.selectedMenuItem.value = 4;
                       },
                     ))
                     : ListTile(
                   tileColor: _dashboardController.tileColor,
                   hoverColor: ThemeColors.hoverColor,
-                  onTap: () {},
-                  leading: Icon(Icons.message,
-                      color: _dashboardController.iconColor),
-                  title: Text("CHAT",
-                      style: _dashboardController.menuItemStyle),
+                  onTap: () { _dashboardController.selectedMenuItem.value = 4;},
+                  leading: _dashboardController.menuList[4][1],
+                  title: _dashboardController.menuList[4][0],
                 )),
           )),
       Container(
@@ -224,20 +228,18 @@ class NavItems extends StatelessWidget {
                     ? Container(
                     color: _dashboardController.tileColor,
                     child: IconButton(
-                      icon: const Icon(Icons.attach_file),
+                      icon: _dashboardController.menuList[5][1],
                       color: _dashboardController.iconColor,
                       onPressed: () {
-                        _dashboardController.showPanel.value = false;
+                        _dashboardController.selectedMenuItem.value = 5;
                       },
                     ))
                     : ListTile(
                   tileColor: _dashboardController.tileColor,
                   hoverColor: ThemeColors.hoverColor,
-                  onTap: () {},
-                  leading: Icon(Icons.attach_file,
-                      color: _dashboardController.iconColor),
-                  title: Text("EXTERNAL KBS",
-                      style: _dashboardController.menuItemStyle),
+                  onTap: () { _dashboardController.selectedMenuItem.value = 5;},
+                  leading: _dashboardController.menuList[5][1],
+                  title: _dashboardController.menuList[5][0],
                 )),
           )),
       Container(
@@ -250,20 +252,18 @@ class NavItems extends StatelessWidget {
                 ? Container(
                 color: _dashboardController.tileColor,
                 child: IconButton(
-                  icon: const Icon(Icons.settings),
+                  icon: _dashboardController.menuList[6][1],
                   color: _dashboardController.iconColor,
                   onPressed: () {
-                    _dashboardController.showPanel.value = false;
+                    _dashboardController.selectedMenuItem.value = 6;
                   },
                 ))
                 : ListTile(
               tileColor: _dashboardController.tileColor,
               hoverColor: ThemeColors.hoverColor,
-              onTap: () {},
-              leading: Icon(Icons.settings,
-                  color: _dashboardController.iconColor),
-              title: Text("SETTINGS",
-                  style: _dashboardController.menuItemStyle),
+              onTap: () { _dashboardController.selectedMenuItem.value = 6;},
+              leading: _dashboardController.menuList[6][1],
+              title: _dashboardController.menuList[6][0],
             ),
           ),
         ),
