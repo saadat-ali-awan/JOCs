@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/Dashboard/Layout/screens_layout.dart';
 
 import 'navigation_menu.dart';
 
@@ -24,7 +25,8 @@ class _DashboardMobileState extends State<DashboardMobile> {
               flex: 10,
               child: Container(
                   color: Colors.blueAccent,
-                  child: Column(children: [Text("He")])))
+                  child: const ScreensLayout())
+          )
         ],
       ),
       Obx(() => _dashboardController.showMenu.value

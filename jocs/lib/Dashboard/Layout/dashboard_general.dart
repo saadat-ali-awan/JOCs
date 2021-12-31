@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/Dashboard/Layout/screens_layout.dart';
 
 import 'navigation_menu.dart';
 
@@ -30,8 +31,8 @@ class _DashboardGeneralState extends State<DashboardGeneral> {
           Expanded(
               child: Container(
                   color: _dashboardController.iconColor,
-                  child: Column(children: [Text("He")]))),
-          //)
+                  child: const ScreensLayout()),
+          )
         ],
       )
     ]);

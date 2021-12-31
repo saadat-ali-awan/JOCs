@@ -22,15 +22,15 @@ class _DashboardState extends State<Dashboard> {
       _dashboardController.changeBody(true);
     }
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'JOCs',
-            style: Theme
-                .of(context)
-                .textTheme
-                .headline4,
-          ),
-        ),
+        // appBar: AppBar(
+        //   title: Text(
+        //     'JOCs',
+        //     style: Theme
+        //         .of(context)
+        //         .textTheme
+        //         .headline4,
+        //   ),
+        // ),
         body: SafeArea(
             child: _dashboardController.body.value
         )
