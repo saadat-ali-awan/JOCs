@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 
 class ThemeColors {
-  static Color mainColor = const Color(0xFF002A2B);
+  static Color mainColor = const Color(0xFF00b694);
+  static Color hoverColor = const Color(0xff016d70);
   static Color secondaryColor = const Color(0xFFFFFFFF);
   static Color errorColor = const Color(0xFF84000A);
-  static Color hoverColor = const Color(0xff016d70);
 }
 
 class CustomTheme {
