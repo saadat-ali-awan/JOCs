@@ -39,6 +39,7 @@ dependencies:
   firebase_auth: ^3.3.4
   firedart: ^0.9.0+1
   hive: ^2.0.5
+  cloud_firestore: ^3.1.5
 
 dev_dependencies:
   flutter_test:

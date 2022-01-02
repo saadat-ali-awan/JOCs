@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Bindings/dashboard_bindings.dart';
 import 'package:jocs/Dashboard/dashboard.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 import 'package:jocs/Registration/bindings/register_bindings.dart';
 import 'package:jocs/Registration/register.dart';
 
@@ -23,9 +25,11 @@ Future<void> main() async {
   // It contains all the details to connect with Firebase
 
   if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    Get.put(FirebaseController());
+  }else {
+    if (defaultTargetPlatform == TargetPlatform.windows){
+      Get.put(FirebaseControllerWindows());
+    }
   }
 
 

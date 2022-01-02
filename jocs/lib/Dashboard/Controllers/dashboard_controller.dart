@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
 class DashboardController extends GetxController {
   var menuItemStyle = Get.theme.textTheme.headline5;
@@ -11,6 +14,8 @@ class DashboardController extends GetxController {
   var tileColor = Get.theme.appBarTheme.backgroundColor;
   late final List<Widget> menuItemWidgets;
   RxBool mobileDisplay = false.obs;
+
+  late var firebaseController;
 
   DashboardController() {
     menuList = [
@@ -106,7 +111,18 @@ class DashboardController extends GetxController {
         )
       ]
     ];
+
+
     body.value = Stack(children: const [DashboardGeneral()]);
+
+    if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
+      firebaseController = Get.find<FirebaseController>();
+    }else {
+      if (defaultTargetPlatform == TargetPlatform.windows){
+        firebaseController = Get.find<FirebaseControllerWindows>();
+      }
+    }
+
   }
 
   Rx<Widget> body = Stack(
@@ -129,4 +145,10 @@ class DashboardController extends GetxController {
       body.value = Stack(children: const [DashboardGeneral()]);
     }
   }
+
+  void addDataToFirebase(Map<String, String> data) {
+    firebaseController.addDataToFirebase(data);
+  }
+
+
 }

@@ -1,15 +1,18 @@
 import 'package:get/get.dart';
 import 'package:firedart/auth/exceptions.dart';
 import 'package:firedart/auth/firebase_auth.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
 class RegisterControllerWindows extends GetxController{
   RxString registerErrorMessage = "".obs;
-  register(String email, String password) async {
-    try {
-      await FirebaseAuth.instance.signUp(email, password);
-    }on AuthException catch(e){
-      registerErrorMessage.value = e.message;
-    }
+  final FirebaseControllerWindows _firebaseController = Get.find<FirebaseControllerWindows>();
 
+  initializeRegister(){
+    _firebaseController.initializeRegisterController();
+  }
+
+
+  register(String email, String password) {
+    _firebaseController.register(email, password);
   }
 }

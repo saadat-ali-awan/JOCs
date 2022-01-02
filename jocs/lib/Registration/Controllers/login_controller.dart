@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 
 class LoginController extends GetxController {
-  FirebaseAuth auth = FirebaseAuth.instance;
+
 
   RxString loginErrorMessage = "".obs;
+
+  final FirebaseController _firebaseController = Get.find<FirebaseController>();
 
   initializeLogin(){
     FirebaseAuth.instance
@@ -16,37 +19,11 @@ class LoginController extends GetxController {
         Get.toNamed("/dashboard");
       }
     });
+    _firebaseController.initializeLoginController();
   }
 
-  login(String email, String password) async {
-    try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: email,
-          password: password
-      ).then((value) {
-        print(value);
-        return Future.value(value);
-      });
-      if (auth.currentUser != null){
-        Get.toNamed("/dashboard");
-      }
-      print("success");
-      print(auth.currentUser);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-        loginErrorMessage.value = 'No user found for that email.';
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-        loginErrorMessage.value = 'Wrong password provided for that user.';
-      }
-    }
-  }
 
-  bool checkFirebaseLoggedIn(){
-      if (auth.currentUser != null){
-        return true;
-      }
-      return false;
-  }
+ login(String email, String password){
+   _firebaseController.login(email, password);
+ }
 }

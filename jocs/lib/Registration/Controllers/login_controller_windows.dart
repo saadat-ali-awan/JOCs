@@ -4,12 +4,14 @@ import 'package:firedart/auth/exceptions.dart';
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
 import 'hive_store.dart';
 
 class LoginControllerWindows extends GetxController{
 
   RxString loginErrorMessage = "".obs;
+  final FirebaseControllerWindows _firebaseControllerWindows = Get.find<FirebaseControllerWindows>();
 
   initializeLogin() async {
     var path = Directory.current.path;
@@ -37,24 +39,13 @@ class LoginControllerWindows extends GetxController{
     }on StateError catch(e){
       print("Listen Stream Created Already");
     }
+    _firebaseControllerWindows.initializeLoginController();
 
   }
 
-  login(String email, String password) async {
-    try {
-      await FirebaseAuth.instance.signIn(email, password);
-    }on AuthException catch (e){
-      print(e.message);
-      if (e.message == 'EMAIL_NOT_FOUND') {
-        print('No user found for that email.');
-        loginErrorMessage.value = 'No user found for that email.';
-      } else if (e.message == 'INVALID_PASSWORD') {
-        print('Wrong password provided for that user.');
-        loginErrorMessage.value = 'Wrong password provided for that user.';
-      }
-    }
-    if (FirebaseAuth.instance.isSignedIn){
-      Get.toNamed("/dashboard");
-    }
+  login(String email, String password){
+    _firebaseControllerWindows.login(email, password);
   }
+
+
 }
