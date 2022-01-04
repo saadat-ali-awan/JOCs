@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
+import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 
@@ -13,7 +14,9 @@ class FirebaseController {
   late LoginController _loginController;
   late RegisterController _registerController;
 
-  FirebaseAuth auth = FirebaseAuth.instance;
+  late var data;
+
+  late FirebaseAuth auth;
 
   FirebaseController(){
     initializeFirebase();
@@ -23,6 +26,7 @@ class FirebaseController {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    auth = FirebaseAuth.instance;
     tickets = FirebaseFirestore.instance.collection('tickets');
   }
 
@@ -66,7 +70,8 @@ class FirebaseController {
     return false;
   }
 
-  Future<void> addDataToFirebase(data) async {
+  Future<void> addDataToFirebase(data, String collectionName) async {
+    data["id"] = getLastId(collectionName);
     tickets
         .add(data)
         .then((value) => print("Ticket Added"))
@@ -91,5 +96,29 @@ class FirebaseController {
     } catch (e) {
       print(e);
     }
+  }
+
+  getData(String collectionName, int page, int length, {String filter = ""}) async {
+    // login("sa@gmail.com", "12345678");
+    print("Called F");
+    tickets = FirebaseFirestore.instance.collection(collectionName);
+    if (page > 1) {
+      data = await tickets.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
+    } else {
+      data = await tickets.orderBy("time", descending: true).limit(length).get();
+    }
+    print(data.docs);
+    return data;
+  }
+
+  Future<int> getLastId(String collectionName) async {
+    int lastId = 1;
+    tickets = FirebaseFirestore.instance.collection(collectionName);
+    var dataTemp = await tickets.orderBy("time", descending: true).limit(1).get();
+    for (var doc in dataTemp.docs) {
+      lastId = doc["id"];
+      lastId += 1;
+    }
+    return lastId;
   }
 }

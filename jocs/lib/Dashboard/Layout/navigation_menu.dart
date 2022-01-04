@@ -109,12 +109,16 @@ class NavItems extends StatelessWidget {
                         color: _dashboardController.iconColor,
                         onPressed: () {
                           _dashboardController.selectedMenuItem.value = 1;
+                          _dashboardController.getTicketsData();
                         },
                       ))
                       : ListTile(
                     tileColor: _dashboardController.tileColor,
                     hoverColor: ThemeColors.hoverColor,
-                    onTap: () { _dashboardController.selectedMenuItem.value = 1;},
+                    onTap: () {
+                      _dashboardController.selectedMenuItem.value = 1;
+                      _dashboardController.getTicketsData();
+                      },
                     leading: _dashboardController.menuList[1][1],
                     title: _dashboardController.menuList[1][0],
                   )),

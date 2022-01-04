@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
+import 'package:jocs/Dashboard/Modals/ticket_model.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
@@ -117,6 +118,7 @@ class DashboardController extends GetxController {
 
     if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
       firebaseController = Get.find<FirebaseController>();
+      // firebaseController.getData("Tickets", 1);
     }else {
       if (defaultTargetPlatform == TargetPlatform.windows){
         firebaseController = Get.find<FirebaseControllerWindows>();
@@ -146,9 +148,19 @@ class DashboardController extends GetxController {
     }
   }
 
-  void addDataToFirebase(Map<String, String> data) {
-    firebaseController.addDataToFirebase(data);
+  void addDataToFirebase(Map<String, dynamic> data, String collectionName) {
+    firebaseController.addDataToFirebase(data, collectionName);
   }
 
+
+  /// Tickets Screen Getx Logic
+  Rx<TicketModel> ticketModel = TicketModel().obs;
+  getTicketsData() async {
+    ticketModel.value.getTicketsData(firebaseController);
+    ticketModel.value.lastId.value = await firebaseController.getLastId("tickets");
+  }
+  /**
+  * Tickets Screen Getx Logic
+  **/
 
 }

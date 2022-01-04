@@ -201,14 +201,16 @@ class TicketItem extends StatelessWidget {
               // },
               onPressed: () {
 
+
                 _dashboardController.addDataToFirebase({
                   'issued_by': issuedByController.text, // John Doe
                   'topic': topicController.text, // Stokes and Sons
                   'status': statusController.text, // 42
                   'priority': priorityController.text,
                   'assigned_to': assignedToController.text,
-                  'comments': commentsController.text
-                });
+                  'comments': commentsController.text,
+                  'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                }, "tickets");
               },
               child: Text(
                 "Add Item",
