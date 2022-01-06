@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
 class ProblemsItem extends StatelessWidget {
   ProblemsItem({Key? key}) : super(key: key);
   final _formKey = GlobalKey<FormState>();
+
+  final DashboardController _dashboardController =
+  Get.find<DashboardController>();
+  final TextEditingController issuedByController = TextEditingController();
+  final TextEditingController topicController = TextEditingController();
+  final TextEditingController statusController = TextEditingController();
+  final TextEditingController priorityController = TextEditingController();
+  final TextEditingController assignedToController = TextEditingController();
+  final TextEditingController departmentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +30,7 @@ class ProblemsItem extends StatelessWidget {
               width: 350,
               child: Material(
                 child: TextFormField(
-                  //controller: emailController,
+                  controller: issuedByController,
                   decoration: const InputDecoration(
                     labelText: 'Issued By',
                     hintText: 'Mr. Abc',
@@ -43,7 +53,7 @@ class ProblemsItem extends StatelessWidget {
               width: 350,
               child: Material(
                 child: TextFormField(
-                  //controller: emailController,
+                  controller: topicController,
                   decoration: const InputDecoration(
                     labelText: 'Topic',
                     hintText: 'XYZ Problem',
@@ -66,10 +76,7 @@ class ProblemsItem extends StatelessWidget {
                 width: 350,
                 child: Material(
                   child: TextFormField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    //controller: passwordController,
+                    controller: statusController,
                     decoration: const InputDecoration(
                         labelText: 'Status',
                         hintText: 'Resolved'),
@@ -103,10 +110,7 @@ class ProblemsItem extends StatelessWidget {
                 width: 350,
                 child: Material(
                   child: TextFormField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    //controller: passwordController,
+                    controller: priorityController,
                     decoration: const InputDecoration(
                         labelText: 'Priority',
                         hintText: 'High'),
@@ -139,10 +143,7 @@ class ProblemsItem extends StatelessWidget {
                 width: 350,
                 child: Material(
                   child: TextFormField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    //controller: passwordController,
+                    controller: assignedToController,
                     decoration: const InputDecoration(
                         labelText: 'Assigned to',
                         hintText: 'Mr. XYZ'),
@@ -176,10 +177,7 @@ class ProblemsItem extends StatelessWidget {
                 width: 350,
                 child: Material(
                   child: TextFormField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    //controller: passwordController,
+                    controller: departmentController,
                     decoration: const InputDecoration(
                         labelText: 'Department',
                         hintText: 'Add Department for Problem'),
@@ -220,7 +218,17 @@ class ProblemsItem extends StatelessWidget {
               //   }
               //
               // },
-              onPressed: () {},
+              onPressed: () {
+                _dashboardController.addDataToFirebase({
+                  'issued_by': issuedByController.text, // John Doe
+                  'topic': topicController.text, // Stokes and Sons
+                  'status': statusController.text, // 42
+                  'priority': priorityController.text,
+                  'assigned_to': assignedToController.text,
+                  'department': departmentController.text,
+                  'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                }, "problems");
+              },
               child: Text(
                 "Add Item",
                 style: Get

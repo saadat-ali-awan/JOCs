@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
-class TicketsScreen extends StatelessWidget {
-  TicketsScreen({Key? key}) : super(key: key);
+class ProblemsScreen extends StatelessWidget {
+  ProblemsScreen({Key? key}) : super(key: key);
 
   final DashboardController _dashboardController =
-      Get.find<DashboardController>();
+  Get.find<DashboardController>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +16,21 @@ class TicketsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-                onPressed: (){
-                  _dashboardController.ticketModel.value.refreshCurrentPage(_dashboardController.firebaseController);
-                },
-                icon: const Icon(Icons.refresh),
+              onPressed: (){
+                _dashboardController.problemModel.value.refreshCurrentPage(_dashboardController.firebaseController);
+              },
+              icon: const Icon(Icons.refresh),
               color: Get.theme.appBarTheme.backgroundColor,
             ),
           ],
         ),
         Obx(
-          () => Table(
+              () => Table(
             border:
-                TableBorder.all(color: Colors.black, style: BorderStyle.solid),
+            TableBorder.all(color: Colors.black, style: BorderStyle.solid),
             children: _dashboardController
-                        .ticketModel.value.ticketsData.isEmpty ||
-                    _dashboardController.ticketModel.value.currentPage.value < 1
+                .problemModel.value.problemsData.isEmpty ||
+                _dashboardController.problemModel.value.currentPage.value < 1
                 ? [
               const TableRow(children: [
                 Padding(
@@ -55,10 +55,10 @@ class TicketsScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Comments")),
+                  child: Center(child: Text("Department")),
                 )
               ])
-                  ]
+            ]
                 : getRows(),
           ),
         ),
@@ -68,8 +68,8 @@ class TicketsScreen extends StatelessWidget {
             children: [
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketModel.value.currentPage.value <= 1 ? null:() {
-                      _dashboardController.ticketModel.value.getPreviousPage(
+                    onPressed: _dashboardController.problemModel.value.currentPage.value <= 1 ? null:() {
+                      _dashboardController.problemModel.value.getPreviousPage(
                           _dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -78,16 +78,16 @@ class TicketsScreen extends StatelessWidget {
                 );
               }),
               Obx(() {
-                return Text("${_dashboardController.ticketModel.value.currentPage.value} / ${(_dashboardController.ticketModel.value.lastId.value/_dashboardController.ticketModel.value.articlesOnOnePage).ceil()}");
+                return Text("${_dashboardController.problemModel.value.currentPage.value} / ${(_dashboardController.problemModel.value.lastId.value/_dashboardController.problemModel.value.articlesOnOnePage).ceil()}");
               }),
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketModel.value
+                    onPressed: _dashboardController.problemModel.value
                         .currentPage.value >=
-                        _dashboardController.ticketModel.value.lastId.value /
-                            _dashboardController.ticketModel.value
+                        _dashboardController.problemModel.value.lastId.value /
+                            _dashboardController.problemModel.value
                                 .articlesOnOnePage ? null : () {
-                      _dashboardController.ticketModel.value
+                      _dashboardController.problemModel.value
                           .getNextPage(_dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -127,21 +127,19 @@ class TicketsScreen extends StatelessWidget {
       ),
       Padding(
         padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Comments")),
+        child: Center(child: Text("Department")),
       )
     ]));
     try {
-      print (_dashboardController.ticketModel.value.ticketsData[
-      _dashboardController.ticketModel.value.currentPage.value-1][0].data());
-      for (var res in _dashboardController.ticketModel.value.ticketsData[
-          _dashboardController.ticketModel.value.currentPage.value-1]) {
+      for (var res in _dashboardController.problemModel.value.problemsData[
+      _dashboardController.problemModel.value.currentPage.value-1]) {
         onePageTableRows.add(TableRow(children: [
           Center(child: Text(res.data()["issued_by"])),
           Center(child: Text(res.data()["topic"])),
           Center(child: Text(res.data()["status"])),
           Center(child: Text(res.data()["priority"])),
           Center(child: Text(res.data()["assigned_to"])),
-          Center(child: Text(res.data()["comments"]))
+          Center(child: Text(res.data()["department"]))
         ]));
       }
     } on RangeError catch (e) {

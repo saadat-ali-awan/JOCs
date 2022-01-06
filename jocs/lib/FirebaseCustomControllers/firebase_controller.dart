@@ -71,7 +71,8 @@ class FirebaseController {
   }
 
   Future<void> addDataToFirebase(data, String collectionName) async {
-    data["id"] = getLastId(collectionName);
+    data["id"] = await getLastId(collectionName);
+    tickets = FirebaseFirestore.instance.collection(collectionName);
     tickets
         .add(data)
         .then((value) => print("Ticket Added"))

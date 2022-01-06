@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
+import 'package:jocs/Dashboard/Modals/problem_model.dart';
 import 'package:jocs/Dashboard/Modals/ticket_model.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
@@ -162,5 +163,15 @@ class DashboardController extends GetxController {
   /**
   * Tickets Screen Getx Logic
   **/
+
+  /// Tickets Screen Getx Logic
+  Rx<ProblemModel> problemModel = ProblemModel().obs;
+  getProblemsData() async {
+    problemModel.value.getProblemsData(firebaseController);
+    ticketModel.value.lastId.value = await firebaseController.getLastId("problems");
+  }
+  /**
+   * Tickets Screen Getx Logic
+   **/
 
 }

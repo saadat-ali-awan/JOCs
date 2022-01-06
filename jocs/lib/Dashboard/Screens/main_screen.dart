@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Screens/dashboard_screen.dart';
+import 'package:jocs/Dashboard/Screens/problems_screen.dart';
 import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
 
 class MainScreen extends StatelessWidget {
@@ -18,6 +19,8 @@ class MainScreen extends StatelessWidget {
           return DashboardScreen();
         case 1:
           return TicketsScreen();
+        case 2:
+          return ProblemsScreen();
         default:
           return Container(color: Colors.amber);
       }
