@@ -32,32 +32,7 @@ class TicketsScreen extends StatelessWidget {
                         .ticketAdapter.value.adapterData.isEmpty ||
                     _dashboardController.ticketAdapter.value.currentPage.value < 1
                 ? [
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Issued By")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Topic")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Status")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Priority")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Assigned To")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Comments")),
-                )
-              ])
+                  createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"])
                   ]
                 : getRows(),
           ),
@@ -104,49 +79,55 @@ class TicketsScreen extends StatelessWidget {
 
   List<TableRow> getRows() {
     List<TableRow> onePageTableRows = [];
-    onePageTableRows.add(const TableRow(children: [
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Issued By")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Topic")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Status")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Priority")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Assigned To")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Comments")),
-      )
-    ]));
+    onePageTableRows.add(createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"]));
     try {
-      print (_dashboardController.ticketAdapter.value.adapterData[
-      _dashboardController.ticketAdapter.value.currentPage.value-1][0].data());
       for (var res in _dashboardController.ticketAdapter.value.adapterData[
           _dashboardController.ticketAdapter.value.currentPage.value-1]) {
-        onePageTableRows.add(TableRow(children: [
-          Center(child: Text(res.data()["issued_by"])),
-          Center(child: Text(res.data()["topic"])),
-          Center(child: Text(res.data()["status"])),
-          Center(child: Text(res.data()["priority"])),
-          Center(child: Text(res.data()["assigned_to"])),
-          Center(child: Text(res.data()["comments"]))
-        ]));
+        onePageTableRows.add(
+          createRow([
+            res.data()["issued_by"],
+            res.data()["topic"],
+            res.data()["status"],
+            res.data()["priority"],
+            res.data()["assigned_to"],
+            res.data()["comments"]
+          ])
+        );
       }
     } on RangeError catch (e) {
       return onePageTableRows;
     }
     return onePageTableRows;
+  }
+
+  TableRow createRow(data){
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[0]),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[1]),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[2]),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[3]),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[4]),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(child: Text(data[5]),),
+        ),
+      ]
+    );
   }
 }
