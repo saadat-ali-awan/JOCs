@@ -9,7 +9,7 @@ class ScreenAdapter {
 
   ScreenAdapter(this.screenName);
 
-  getTicketsData(firebaseController, {String filter="", previous=false}) async {
+  getScreenData(firebaseController, {String filter="", previous=false}) async {
     if (previous){
 
     }
@@ -28,7 +28,7 @@ class ScreenAdapter {
 
   getNextPage(firebaseController){
     currentPage.value+=1;
-    getTicketsData(firebaseController, filter: adapterData[currentPage.value-2][articlesOnOnePage-1]["time"]);
+    getScreenData(firebaseController, filter: adapterData[currentPage.value-2][articlesOnOnePage-1]["time"]);
   }
   getPreviousPage(firebaseController){
     currentPage.value-=1;
@@ -41,6 +41,6 @@ class ScreenAdapter {
     adapterData = RxList();
     currentPage.value = 1;
     lastId.value = await firebaseController.getLastId(screenName);
-    getTicketsData(firebaseController);
+    getScreenData(firebaseController);
   }
 }

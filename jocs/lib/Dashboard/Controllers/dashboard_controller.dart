@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
 import 'package:jocs/Dashboard/Modals/problem_model.dart';
+import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/Dashboard/Modals/ticket_model.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
@@ -155,20 +156,20 @@ class DashboardController extends GetxController {
 
 
   /// Tickets Screen Getx Logic
-  Rx<TicketModel> ticketModel = TicketModel().obs;
+  Rx<ScreenAdapter> ticketAdapter = ScreenAdapter("tickets").obs;
   getTicketsData() async {
-    ticketModel.value.getTicketsData(firebaseController);
-    ticketModel.value.lastId.value = await firebaseController.getLastId("tickets");
+    ticketAdapter.value.getScreenData(firebaseController);
+    ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
   }
   /**
   * Tickets Screen Getx Logic
   **/
 
   /// Tickets Screen Getx Logic
-  Rx<ProblemModel> problemModel = ProblemModel().obs;
+  Rx<ScreenAdapter> problemAdapter = ScreenAdapter("problems").obs;
   getProblemsData() async {
-    problemModel.value.getProblemsData(firebaseController);
-    ticketModel.value.lastId.value = await firebaseController.getLastId("problems");
+    problemAdapter.value.getScreenData(firebaseController);
+    problemAdapter.value.lastId.value = await firebaseController.getLastId("problems");
   }
   /**
    * Tickets Screen Getx Logic

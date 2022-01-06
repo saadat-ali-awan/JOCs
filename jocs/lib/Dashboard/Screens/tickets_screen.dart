@@ -17,7 +17,7 @@ class TicketsScreen extends StatelessWidget {
           children: [
             IconButton(
                 onPressed: (){
-                  _dashboardController.ticketModel.value.refreshCurrentPage(_dashboardController.firebaseController);
+                  _dashboardController.ticketAdapter.value.refreshCurrentPage(_dashboardController.firebaseController);
                 },
                 icon: const Icon(Icons.refresh),
               color: Get.theme.appBarTheme.backgroundColor,
@@ -29,8 +29,8 @@ class TicketsScreen extends StatelessWidget {
             border:
                 TableBorder.all(color: Colors.black, style: BorderStyle.solid),
             children: _dashboardController
-                        .ticketModel.value.ticketsData.isEmpty ||
-                    _dashboardController.ticketModel.value.currentPage.value < 1
+                        .ticketAdapter.value.adapterData.isEmpty ||
+                    _dashboardController.ticketAdapter.value.currentPage.value < 1
                 ? [
               const TableRow(children: [
                 Padding(
@@ -68,8 +68,8 @@ class TicketsScreen extends StatelessWidget {
             children: [
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketModel.value.currentPage.value <= 1 ? null:() {
-                      _dashboardController.ticketModel.value.getPreviousPage(
+                    onPressed: _dashboardController.ticketAdapter.value.currentPage.value <= 1 ? null:() {
+                      _dashboardController.ticketAdapter.value.getPreviousPage(
                           _dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -78,16 +78,16 @@ class TicketsScreen extends StatelessWidget {
                 );
               }),
               Obx(() {
-                return Text("${_dashboardController.ticketModel.value.currentPage.value} / ${(_dashboardController.ticketModel.value.lastId.value/_dashboardController.ticketModel.value.articlesOnOnePage).ceil()}");
+                return Text("${_dashboardController.ticketAdapter.value.currentPage.value} / ${(_dashboardController.ticketAdapter.value.lastId.value/_dashboardController.ticketAdapter.value.articlesOnOnePage).ceil()}");
               }),
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketModel.value
+                    onPressed: _dashboardController.ticketAdapter.value
                         .currentPage.value >=
-                        _dashboardController.ticketModel.value.lastId.value /
-                            _dashboardController.ticketModel.value
+                        _dashboardController.ticketAdapter.value.lastId.value /
+                            _dashboardController.ticketAdapter.value
                                 .articlesOnOnePage ? null : () {
-                      _dashboardController.ticketModel.value
+                      _dashboardController.ticketAdapter.value
                           .getNextPage(_dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -131,10 +131,10 @@ class TicketsScreen extends StatelessWidget {
       )
     ]));
     try {
-      print (_dashboardController.ticketModel.value.ticketsData[
-      _dashboardController.ticketModel.value.currentPage.value-1][0].data());
-      for (var res in _dashboardController.ticketModel.value.ticketsData[
-          _dashboardController.ticketModel.value.currentPage.value-1]) {
+      print (_dashboardController.ticketAdapter.value.adapterData[
+      _dashboardController.ticketAdapter.value.currentPage.value-1][0].data());
+      for (var res in _dashboardController.ticketAdapter.value.adapterData[
+          _dashboardController.ticketAdapter.value.currentPage.value-1]) {
         onePageTableRows.add(TableRow(children: [
           Center(child: Text(res.data()["issued_by"])),
           Center(child: Text(res.data()["topic"])),

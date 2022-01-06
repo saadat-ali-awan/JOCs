@@ -17,7 +17,7 @@ class ProblemsScreen extends StatelessWidget {
           children: [
             IconButton(
               onPressed: (){
-                _dashboardController.problemModel.value.refreshCurrentPage(_dashboardController.firebaseController);
+                _dashboardController.problemAdapter.value.refreshCurrentPage(_dashboardController.firebaseController);
               },
               icon: const Icon(Icons.refresh),
               color: Get.theme.appBarTheme.backgroundColor,
@@ -29,8 +29,8 @@ class ProblemsScreen extends StatelessWidget {
             border:
             TableBorder.all(color: Colors.black, style: BorderStyle.solid),
             children: _dashboardController
-                .problemModel.value.problemsData.isEmpty ||
-                _dashboardController.problemModel.value.currentPage.value < 1
+                .problemAdapter.value.adapterData.isEmpty ||
+                _dashboardController.problemAdapter.value.currentPage.value < 1
                 ? [
               const TableRow(children: [
                 Padding(
@@ -68,8 +68,8 @@ class ProblemsScreen extends StatelessWidget {
             children: [
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.problemModel.value.currentPage.value <= 1 ? null:() {
-                      _dashboardController.problemModel.value.getPreviousPage(
+                    onPressed: _dashboardController.problemAdapter.value.currentPage.value <= 1 ? null:() {
+                      _dashboardController.problemAdapter.value.getPreviousPage(
                           _dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -78,16 +78,16 @@ class ProblemsScreen extends StatelessWidget {
                 );
               }),
               Obx(() {
-                return Text("${_dashboardController.problemModel.value.currentPage.value} / ${(_dashboardController.problemModel.value.lastId.value/_dashboardController.problemModel.value.articlesOnOnePage).ceil()}");
+                return Text("${_dashboardController.problemAdapter.value.currentPage.value} / ${(_dashboardController.problemAdapter.value.lastId.value/_dashboardController.problemAdapter.value.articlesOnOnePage).ceil()}");
               }),
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.problemModel.value
+                    onPressed: _dashboardController.problemAdapter.value
                         .currentPage.value >=
-                        _dashboardController.problemModel.value.lastId.value /
-                            _dashboardController.problemModel.value
+                        _dashboardController.problemAdapter.value.lastId.value /
+                            _dashboardController.problemAdapter.value
                                 .articlesOnOnePage ? null : () {
-                      _dashboardController.problemModel.value
+                      _dashboardController.problemAdapter.value
                           .getNextPage(_dashboardController.firebaseController);
                     },
                     icon: const Icon(
@@ -131,8 +131,8 @@ class ProblemsScreen extends StatelessWidget {
       )
     ]));
     try {
-      for (var res in _dashboardController.problemModel.value.problemsData[
-      _dashboardController.problemModel.value.currentPage.value-1]) {
+      for (var res in _dashboardController.problemAdapter.value.adapterData[
+      _dashboardController.problemAdapter.value.currentPage.value-1]) {
         onePageTableRows.add(TableRow(children: [
           Center(child: Text(res.data()["issued_by"])),
           Center(child: Text(res.data()["topic"])),
