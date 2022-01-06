@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,6 +44,7 @@ Future<void> main() async {
          * getPages parameter is used to set all the Routes of the Application
          *
         * */
+        scrollBehavior: MyCustomScrollBehavior(),
         theme: CustomTheme.lightTheme,
         getPages: [
           GetPage(
@@ -71,4 +74,14 @@ Future<void> main() async {
         initialBinding: LoginBindings(),
       )
   );
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    // etc.
+  };
 }

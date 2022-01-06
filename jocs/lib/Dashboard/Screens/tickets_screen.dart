@@ -16,25 +16,47 @@ class TicketsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-                onPressed: (){
-                  _dashboardController.ticketAdapter.value.refreshCurrentPage(_dashboardController.firebaseController);
-                },
-                icon: const Icon(Icons.refresh),
+              onPressed: () {
+                _dashboardController.ticketAdapter.value.refreshCurrentPage(
+                    _dashboardController.firebaseController);
+              },
+              icon: const Icon(Icons.refresh),
               color: Get.theme.appBarTheme.backgroundColor,
             ),
           ],
         ),
         Obx(
-          () => Table(
-            border:
-                TableBorder.all(color: Colors.black, style: BorderStyle.solid),
-            children: _dashboardController
-                        .ticketAdapter.value.adapterData.isEmpty ||
-                    _dashboardController.ticketAdapter.value.currentPage.value < 1
-                ? [
-                  createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"])
-                  ]
-                : getRows(),
+          () => Expanded(
+            child: Scrollbar(
+              isAlwaysShown: true,
+                child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text("Issued By")),
+                    DataColumn(label: Text("Topic")),
+                    DataColumn(label: Text("Status")),
+                    DataColumn(label: Text("Priority")),
+                    DataColumn(label: Text("Assigned To")),
+                    DataColumn(label: Text("Comments")),
+                  ],
+                  rows: getRows(),
+                ),
+              ),
+              // child: Table(
+              //   border:
+              //       TableBorder.all(color: Colors.black, style: BorderStyle.solid),
+              //   children: _dashboardController
+              //               .ticketAdapter.value.adapterData.isEmpty ||
+              //           _dashboardController.ticketAdapter.value.currentPage.value < 1
+              //       ? [
+              //         createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"])
+              //         ]
+              //       : getRows(),
+              // ),
+            )),
           ),
         ),
         Padding(
@@ -43,32 +65,42 @@ class TicketsScreen extends StatelessWidget {
             children: [
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketAdapter.value.currentPage.value <= 1 ? null:() {
-                      _dashboardController.ticketAdapter.value.getPreviousPage(
-                          _dashboardController.firebaseController);
-                    },
+                    onPressed: _dashboardController
+                                .ticketAdapter.value.currentPage.value <=
+                            1
+                        ? null
+                        : () {
+                            _dashboardController.ticketAdapter.value
+                                .getPreviousPage(
+                                    _dashboardController.firebaseController);
+                          },
                     icon: const Icon(
-                      Icons.arrow_back_ios_outlined,),
-                    color: Get.theme.appBarTheme.backgroundColor
-                );
+                      Icons.arrow_back_ios_outlined,
+                    ),
+                    color: Get.theme.appBarTheme.backgroundColor);
               }),
               Obx(() {
-                return Text("${_dashboardController.ticketAdapter.value.currentPage.value} / ${(_dashboardController.ticketAdapter.value.lastId.value/_dashboardController.ticketAdapter.value.articlesOnOnePage).ceil()}");
+                return Text(
+                    "${_dashboardController.ticketAdapter.value.currentPage.value} / ${(_dashboardController.ticketAdapter.value.lastId.value / _dashboardController.ticketAdapter.value.articlesOnOnePage).ceil()}");
               }),
               Obx(() {
                 return IconButton(
-                    onPressed: _dashboardController.ticketAdapter.value
-                        .currentPage.value >=
-                        _dashboardController.ticketAdapter.value.lastId.value /
+                    onPressed: _dashboardController
+                                .ticketAdapter.value.currentPage.value >=
+                            _dashboardController
+                                    .ticketAdapter.value.lastId.value /
+                                _dashboardController
+                                    .ticketAdapter.value.articlesOnOnePage
+                        ? null
+                        : () {
                             _dashboardController.ticketAdapter.value
-                                .articlesOnOnePage ? null : () {
-                      _dashboardController.ticketAdapter.value
-                          .getNextPage(_dashboardController.firebaseController);
-                    },
+                                .getNextPage(
+                                    _dashboardController.firebaseController);
+                          },
                     icon: const Icon(
-                      Icons.arrow_forward_ios_outlined,),
-                    color: Get.theme.appBarTheme.backgroundColor
-                );
+                      Icons.arrow_forward_ios_outlined,
+                    ),
+                    color: Get.theme.appBarTheme.backgroundColor);
               })
             ],
           ),
@@ -77,22 +109,19 @@ class TicketsScreen extends StatelessWidget {
     );
   }
 
-  List<TableRow> getRows() {
-    List<TableRow> onePageTableRows = [];
-    onePageTableRows.add(createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"]));
+  List<DataRow> getRows() {
+    List<DataRow> onePageTableRows = [];
     try {
       for (var res in _dashboardController.ticketAdapter.value.adapterData[
-          _dashboardController.ticketAdapter.value.currentPage.value-1]) {
-        onePageTableRows.add(
-          createRow([
-            res.data()["issued_by"],
-            res.data()["topic"],
-            res.data()["status"],
-            res.data()["priority"],
-            res.data()["assigned_to"],
-            res.data()["comments"]
-          ])
-        );
+          _dashboardController.ticketAdapter.value.currentPage.value - 1]) {
+        onePageTableRows.add(createRow([
+          res.data()["issued_by"],
+          res.data()["topic"],
+          res.data()["status"],
+          res.data()["priority"],
+          res.data()["assigned_to"],
+          res.data()["comments"]
+        ]));
       }
     } on RangeError catch (e) {
       return onePageTableRows;
@@ -100,34 +129,56 @@ class TicketsScreen extends StatelessWidget {
     return onePageTableRows;
   }
 
-  TableRow createRow(data){
-    return TableRow(
-      children: [
+  DataRow createRow(data) {
+    return DataRow(cells: [
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[0]),),
+          child: Center(
+            child: Text(data[0]),
+          ),
         ),
+      ),
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[1]),),
+          child: Center(
+            child: Text(data[1]),
+          ),
         ),
+      ),
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[2]),),
+          child: Center(
+            child: Text(data[2]),
+          ),
         ),
+      ),
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[3]),),
+          child: Center(
+            child: Text(data[3]),
+          ),
         ),
+      ),
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[4]),),
+          child: Center(
+            child: Text(data[4]),
+          ),
         ),
+      ),
+      DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(child: Text(data[5]),),
+          child: Center(
+            child: Text(data[5]),
+          ),
         ),
-      ]
-    );
+      ),
+    ]);
   }
 }
