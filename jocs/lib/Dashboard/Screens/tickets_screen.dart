@@ -27,36 +27,30 @@ class TicketsScreen extends StatelessWidget {
         ),
         Obx(
           () => Expanded(
-            child: Scrollbar(
-              isAlwaysShown: true,
-                child: SingleChildScrollView(
+            child: SingleChildScrollView(
+              controller: ScrollController(),
               scrollDirection: Axis.horizontal,
               child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text("Issued By")),
-                    DataColumn(label: Text("Topic")),
-                    DataColumn(label: Text("Status")),
-                    DataColumn(label: Text("Priority")),
-                    DataColumn(label: Text("Assigned To")),
-                    DataColumn(label: Text("Comments")),
-                  ],
-                  rows: getRows(),
-                ),
+                controller: ScrollController(),
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text("Issued By")),
+                DataColumn(label: VerticalDivider(color: Colors.black, width: 1.0)),
+                DataColumn(label: Text("Topic")),
+                DataColumn(label: VerticalDivider(color: Colors.black, width: 1.0)),
+                DataColumn(label: Text("Status")),
+                DataColumn(label: VerticalDivider(color: Colors.black, width: 1.0)),
+                DataColumn(label: Text("Priority")),
+                DataColumn(label: VerticalDivider(color: Colors.black, width: 1.0)),
+                DataColumn(label: Text("Assigned To")),
+                DataColumn(label: VerticalDivider(color: Colors.black, width: 1.0)),
+                DataColumn(label: Text("Comments")),
+              ],
+              rows: getRows(),
+            ),
               ),
-              // child: Table(
-              //   border:
-              //       TableBorder.all(color: Colors.black, style: BorderStyle.solid),
-              //   children: _dashboardController
-              //               .ticketAdapter.value.adapterData.isEmpty ||
-              //           _dashboardController.ticketAdapter.value.currentPage.value < 1
-              //       ? [
-              //         createRow(["Issued By","Topic","Status","Priority","Assigned To","Comments"])
-              //         ]
-              //       : getRows(),
-              // ),
-            )),
+            ),
           ),
         ),
         Padding(
@@ -139,6 +133,7 @@ class TicketsScreen extends StatelessWidget {
           ),
         ),
       ),
+      const DataCell(VerticalDivider(color: Colors.black, width: 1.0)),
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -147,6 +142,7 @@ class TicketsScreen extends StatelessWidget {
           ),
         ),
       ),
+      const DataCell(VerticalDivider(color: Colors.black, width: 1.0)),
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -155,6 +151,7 @@ class TicketsScreen extends StatelessWidget {
           ),
         ),
       ),
+      const DataCell(VerticalDivider(color: Colors.black, width: 1.0)),
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -163,6 +160,7 @@ class TicketsScreen extends StatelessWidget {
           ),
         ),
       ),
+      const DataCell(VerticalDivider(color: Colors.black, width: 1.0)),
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -171,6 +169,7 @@ class TicketsScreen extends StatelessWidget {
           ),
         ),
       ),
+      const DataCell(VerticalDivider(color: Colors.black, width: 1.0)),
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),

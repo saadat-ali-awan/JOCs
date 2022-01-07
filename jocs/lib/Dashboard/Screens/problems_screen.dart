@@ -25,41 +25,33 @@ class ProblemsScreen extends StatelessWidget {
           ],
         ),
         Obx(
-              () => Table(
-            border:
-            TableBorder.all(color: Colors.black, style: BorderStyle.solid),
-            children: _dashboardController
-                .problemAdapter.value.adapterData.isEmpty ||
-                _dashboardController.problemAdapter.value.currentPage.value < 1
-                ? [
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Issued By")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Topic")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Status")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Priority")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Assigned To")),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Center(child: Text("Department")),
-                )
-              ])
-            ]
-                : getRows(),
+              () => Expanded(
+            child: Scrollbar(
+                isAlwaysShown: true,
+                child: SingleChildScrollView(
+                  controller: ScrollController(),
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView(
+                    controller: ScrollController(),
+                    scrollDirection: Axis.vertical,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text("Issued By")),
+                        DataColumn(label: VerticalDivider(color: Colors.black,)),
+                        DataColumn(label: Text("Topic")),
+                        DataColumn(label: VerticalDivider(color: Colors.black,)),
+                        DataColumn(label: Text("Status")),
+                        DataColumn(label: VerticalDivider(color: Colors.black,)),
+                        DataColumn(label: Text("Priority")),
+                        DataColumn(label: VerticalDivider(color: Colors.black,)),
+                        DataColumn(label: Text("Assigned To")),
+                        DataColumn(label: VerticalDivider(color: Colors.black,)),
+                        DataColumn(label: Text("Department")),
+                      ],
+                      rows: getRows(),
+                    ),
+                  ),
+                )),
           ),
         ),
         Padding(
@@ -102,49 +94,81 @@ class ProblemsScreen extends StatelessWidget {
     );
   }
 
-  List<TableRow> getRows() {
-    List<TableRow> onePageTableRows = [];
-    onePageTableRows.add(const TableRow(children: [
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Issued By")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Topic")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Status")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Priority")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Assigned To")),
-      ),
-      Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Center(child: Text("Department")),
-      )
-    ]));
+  List<DataRow> getRows() {
+    List<DataRow> onePageTableRows = [];
     try {
       for (var res in _dashboardController.problemAdapter.value.adapterData[
-      _dashboardController.problemAdapter.value.currentPage.value-1]) {
-        onePageTableRows.add(TableRow(children: [
-          Center(child: Text(res.data()["issued_by"])),
-          Center(child: Text(res.data()["topic"])),
-          Center(child: Text(res.data()["status"])),
-          Center(child: Text(res.data()["priority"])),
-          Center(child: Text(res.data()["assigned_to"])),
-          Center(child: Text(res.data()["department"]))
+      _dashboardController.problemAdapter.value.currentPage.value - 1]) {
+        onePageTableRows.add(createRow([
+          res.data()["issued_by"],
+          res.data()["topic"],
+          res.data()["status"],
+          res.data()["priority"],
+          res.data()["assigned_to"],
+          res.data()["department"]
         ]));
       }
     } on RangeError catch (e) {
       return onePageTableRows;
     }
     return onePageTableRows;
+  }
+
+  DataRow createRow(data) {
+    return DataRow(cells: [
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[0]),
+          ),
+        ),
+      ),
+      const DataCell(VerticalDivider(color: Colors.black,)),
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[1]),
+          ),
+        ),
+      ),
+      const DataCell(VerticalDivider(color: Colors.black,)),
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[2]),
+          ),
+        ),
+      ),
+      const DataCell(VerticalDivider(color: Colors.black,)),
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[3]),
+          ),
+        ),
+      ),
+      const DataCell(VerticalDivider(color: Colors.black,)),
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[4]),
+          ),
+        ),
+      ),
+      const DataCell(VerticalDivider(color: Colors.black,)),
+      DataCell(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(data[5]),
+          ),
+        ),
+      ),
+    ]);
   }
 }

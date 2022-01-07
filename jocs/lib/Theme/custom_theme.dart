@@ -91,6 +91,15 @@ class CustomTheme {
       iconTheme: IconThemeData(
         color: ThemeColors.secondaryColor
       ),
+      dataTableTheme: DataTableThemeData(
+        headingTextStyle: TextStyle(color: ThemeColors.mainColor, fontSize: 24),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.black,
+          )
+        )
+      ),
+      dividerColor: Colors.black
     );
   }
 }
