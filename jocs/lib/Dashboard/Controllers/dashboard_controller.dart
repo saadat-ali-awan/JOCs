@@ -17,6 +17,10 @@ class DashboardController extends GetxController {
   var tileColor = Get.theme.appBarTheme.backgroundColor;
   late final List<Widget> menuItemWidgets;
   RxBool mobileDisplay = false.obs;
+  RxInt openTickets = 0.obs;
+  RxInt unresolvedTickets = 0.obs;
+  RxInt unassignedTickets = 0.obs;
+  RxInt ticketsAssignedToMe = 0.obs;
 
   late var firebaseController;
 
@@ -115,6 +119,10 @@ class DashboardController extends GetxController {
       ]
     ];
 
+    ticketAdapter = ScreenAdapter("tickets").obs;
+    problemAdapter = ScreenAdapter("problems").obs;
+
+
 
     body.value = Stack(children: const [DashboardGeneral()]);
 
@@ -126,6 +134,8 @@ class DashboardController extends GetxController {
         firebaseController = Get.find<FirebaseControllerWindows>();
       }
     }
+
+    getDashboardData();
 
   }
 
@@ -154,9 +164,19 @@ class DashboardController extends GetxController {
     firebaseController.addDataToFirebase(data, collectionName);
   }
 
+  /// Dashboard Screen Getx Logic
+  getDashboardData() async{
+    ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
+    openTickets.value = await firebaseController.getDashboardData("status", filter:"OPEN");
+    unresolvedTickets.value = await firebaseController.getDashboardData("status", filter: "RESOLVED");
+    print("${unresolvedTickets.value} - ${ticketAdapter.value.lastId.value}");
+    unresolvedTickets.value = ticketAdapter.value.lastId.value - unresolvedTickets.value - 1;
+    unassignedTickets.value = await firebaseController.getDashboardData("assigned_to");
+    unassignedTickets.value = ticketAdapter.value.lastId.value - unassignedTickets.value - 1;
+  }
 
   /// Tickets Screen Getx Logic
-  Rx<ScreenAdapter> ticketAdapter = ScreenAdapter("tickets").obs;
+  late Rx<ScreenAdapter> ticketAdapter;
   getTicketsData() async {
     ticketAdapter.value.getScreenData(firebaseController);
     ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
@@ -166,7 +186,7 @@ class DashboardController extends GetxController {
   **/
 
   /// Tickets Screen Getx Logic
-  Rx<ScreenAdapter> problemAdapter = ScreenAdapter("problems").obs;
+  late Rx<ScreenAdapter> problemAdapter;
   getProblemsData() async {
     problemAdapter.value.getScreenData(firebaseController);
     problemAdapter.value.lastId.value = await firebaseController.getLastId("problems");

@@ -10,7 +10,7 @@ import '../firebase_options.dart';
 
 class FirebaseController {
 
-  late CollectionReference tickets;
+  late CollectionReference collectionReference;
   late LoginController _loginController;
   late RegisterController _registerController;
 
@@ -27,7 +27,7 @@ class FirebaseController {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     auth = FirebaseAuth.instance;
-    tickets = FirebaseFirestore.instance.collection('tickets');
+    collectionReference = FirebaseFirestore.instance.collection('tickets');
   }
 
   initializeLoginController(){
@@ -72,8 +72,8 @@ class FirebaseController {
 
   Future<void> addDataToFirebase(data, String collectionName) async {
     data["id"] = await getLastId(collectionName);
-    tickets = FirebaseFirestore.instance.collection(collectionName);
-    tickets
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    collectionReference
         .add(data)
         .then((value) => print("Ticket Added"))
         .catchError((error) => print("Failed to add Ticket: $error"));
@@ -102,20 +102,33 @@ class FirebaseController {
   getData(String collectionName, int page, int length, {String filter = ""}) async {
     // login("sa@gmail.com", "12345678");
     print("Called F");
-    tickets = FirebaseFirestore.instance.collection(collectionName);
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
     if (page > 1) {
-      data = await tickets.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
+      data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
     } else {
-      data = await tickets.orderBy("time", descending: true).limit(length).get();
+      data = await collectionReference.orderBy("time", descending: true).limit(length).get();
     }
     print(data.docs);
     return data;
   }
 
+  Future<int> getDashboardData(String documentName, {String filter= ""}) async {
+    collectionReference = FirebaseFirestore.instance.collection("tickets");
+    QuerySnapshot<Object?> tempData;
+    if (filter == ""){
+      tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
+    }else{
+      tempData = await collectionReference.orderBy(documentName, descending: true).get();
+    }
+    print(documentName+ "${tempData.docs.length}");
+    return tempData.docs.length;
+
+  }
+
   Future<int> getLastId(String collectionName) async {
     int lastId = 1;
-    tickets = FirebaseFirestore.instance.collection(collectionName);
-    var dataTemp = await tickets.orderBy("time", descending: true).limit(1).get();
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
     for (var doc in dataTemp.docs) {
       lastId = doc["id"];
       lastId += 1;
