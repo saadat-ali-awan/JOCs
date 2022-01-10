@@ -101,14 +101,12 @@ class FirebaseController {
 
   getData(String collectionName, int page, int length, {String filter = ""}) async {
     // login("sa@gmail.com", "12345678");
-    print("Called F");
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
     if (page > 1) {
       data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
     } else {
       data = await collectionReference.orderBy("time", descending: true).limit(length).get();
     }
-    print(data.docs);
     return data;
   }
 

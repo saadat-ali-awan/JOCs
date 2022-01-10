@@ -13,7 +13,7 @@ class ScreenAdapter {
   late Rx<CustomDataTableSource> dataTableSource;
 
   ScreenAdapter(this.screenName) {
-    dataTableSource = CustomDataTableSource().obs;
+    dataTableSource = CustomDataTableSource(screenName).obs;
   }
 
   getScreenData(firebaseController, {String filter = ""}) async {
@@ -27,26 +27,41 @@ class ScreenAdapter {
         //adapterData.add([]);
         data.docs.forEach((res) {
           //adapterData[currentPage.value-1].add(res);
-          adapterData.add(res);
+          bool valueNotPresent = true;
+          for (var d in adapterData){
+            print(d["id"]);
+            print(res["id"]);
+            if (d["id"] == res["id"]){
+              valueNotPresent = false;
+            }
+          }
+          if (valueNotPresent) {
+            adapterData.add(res);
+          }
         });
       }
     }
 
     List<DataRow> tempRows = <DataRow>[];
     for (var d in adapterData) {
-      print(d["issued_by"]);
       var tempData = [
         d["issued_by"],
         d["topic"],
         d["status"],
         d["priority"],
         d["assigned_to"],
-        d["comments"],
       ];
+      if (screenName == "tickets"){
+        tempData.add(d["comments"]);
+      }else{
+        if (screenName == "problems"){
+          tempData.add(d["department"]);
+        }
+      }
       tempRows.add(createRow(tempData));
     }
 
-    dataTableSource.value = CustomDataTableSource(tempRows);
+    dataTableSource.value = CustomDataTableSource(screenName, tempRows);
     // if (filter == ""){
     //   getNextPage(firebaseController);
     // }

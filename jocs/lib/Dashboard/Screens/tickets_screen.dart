@@ -76,8 +76,9 @@ class TicketsScreen extends StatelessWidget {
 
 class CustomDataTableSource extends DataTableSource {
   List<DataRow>? data = <DataRow>[];
+  String screenName;
 
-  CustomDataTableSource([this.data]);
+  CustomDataTableSource(this.screenName,[this.data]);
 
   @override
   DataRow? getRow(int index) {
@@ -107,7 +108,15 @@ class CustomDataTableSource extends DataTableSource {
   int get rowCount {
     final DashboardController _dashboardController =
         Get.find<DashboardController>();
-    return _dashboardController.ticketAdapter.value.lastId.value - 1;
+    switch (screenName){
+      case "tickets":
+        return _dashboardController.ticketAdapter.value.lastId.value - 1;
+      case "problems":
+        return _dashboardController.problemAdapter.value.lastId.value - 1;
+      default:
+        return 0;
+    }
+
   }
 
   @override
