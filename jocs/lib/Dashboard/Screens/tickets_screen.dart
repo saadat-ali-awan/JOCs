@@ -11,65 +11,57 @@ class TicketsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: LayoutBuilder(builder: (context, constraints) {
-                return Column(
-                  children: [
-                    Container(
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        scrollDirection: Axis.vertical,
-                        child: Obx(
-                          () => Theme(
-                            data: Get.theme.copyWith(
-                                textTheme: TextTheme(
-                                    caption: TextStyle(
-                                        color: Get.theme.appBarTheme
-                                            .backgroundColor))),
-                            child: PaginatedDataTable(
-                              columns: const [
-                                DataColumn(label: Text("Issued By")),
-                                DataColumn(label: Text("Topic")),
-                                DataColumn(label: Text("Status")),
-                                DataColumn(label: Text("Priority")),
-                                DataColumn(label: Text("Assigned To")),
-                                DataColumn(label: Text("Comments")),
-                              ],
-                              source: _dashboardController
-                                  .ticketAdapter.value.dataTableSource.value,
-                              arrowHeadColor:
-                                  Get.theme.appBarTheme.backgroundColor,
-                              onPageChanged: (int? index) {
-                                if (index != null) {
-                                  if (((index+1)/10).ceil() > _dashboardController.ticketAdapter.value
-                                      .currentPaginatedPage){
-                                    _dashboardController.ticketAdapter.value
-                                        .getNextPage(_dashboardController
-                                        .firebaseController);
-                                  }
-                                  _dashboardController.ticketAdapter.value
-                                      .currentPaginatedPage = ((index+1)/10).ceil();
+    return SingleChildScrollView(
+      controller: ScrollController(),
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Obx(
+                      () => Theme(
+                    data: Get.theme.copyWith(
+                        textTheme: TextTheme(
+                            caption: TextStyle(
+                                color: Get.theme.appBarTheme
+                                    .backgroundColor))),
+                    child: PaginatedDataTable(
+                      columns: const [
+                        DataColumn(label: Text("Issued By")),
+                        DataColumn(label: Text("Topic")),
+                        DataColumn(label: Text("Status")),
+                        DataColumn(label: Text("Priority")),
+                        DataColumn(label: Text("Assigned To")),
+                        DataColumn(label: Text("Comments")),
+                      ],
+                      source: _dashboardController
+                          .ticketAdapter.value.dataTableSource.value,
+                      arrowHeadColor:
+                      Get.theme.appBarTheme.backgroundColor,
+                      onPageChanged: (int? index) {
+                        if (index != null) {
+                          if (((index+1)/10).ceil() > _dashboardController.ticketAdapter.value
+                              .currentPaginatedPage){
+                            _dashboardController.ticketAdapter.value
+                                .getNextPage(_dashboardController
+                                .firebaseController);
+                          }
+                          _dashboardController.ticketAdapter.value
+                              .currentPaginatedPage = ((index+1)/10).ceil();
 
-                                }
+                        }
 
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
+                      },
                     ),
-                  ],
-                );
-              }),
-            )
-          ],
-        )
-      ],
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }
@@ -78,7 +70,9 @@ class CustomDataTableSource extends DataTableSource {
   List<DataRow>? data = <DataRow>[];
   String screenName;
 
-  CustomDataTableSource(this.screenName,[this.data]);
+  CustomDataTableSource(this.screenName,[this.data]){
+    print(this.screenName);
+  }
 
   @override
   DataRow? getRow(int index) {
@@ -113,6 +107,10 @@ class CustomDataTableSource extends DataTableSource {
         return _dashboardController.ticketAdapter.value.lastId.value - 1;
       case "problems":
         return _dashboardController.problemAdapter.value.lastId.value - 1;
+      case "inventory":
+        return _dashboardController.inventoryAdapter.value.lastId.value - 1;
+      case "purchase":
+        return _dashboardController.purchaseAdapter.value.lastId.value;
       default:
         return 0;
     }

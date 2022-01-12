@@ -28,9 +28,8 @@ class ScreenAdapter {
         data.docs.forEach((res) {
           //adapterData[currentPage.value-1].add(res);
           bool valueNotPresent = true;
+
           for (var d in adapterData){
-            print(d["id"]);
-            print(res["id"]);
             if (d["id"] == res["id"]){
               valueNotPresent = false;
             }
@@ -43,19 +42,44 @@ class ScreenAdapter {
     }
 
     List<DataRow> tempRows = <DataRow>[];
+
+
     for (var d in adapterData) {
-      var tempData = [
-        d["issued_by"],
-        d["topic"],
-        d["status"],
-        d["priority"],
-        d["assigned_to"],
-      ];
-      if (screenName == "tickets"){
-        tempData.add(d["comments"]);
-      }else{
-        if (screenName == "problems"){
-          tempData.add(d["department"]);
+      var tempData;
+      if (screenName == "inventory"){
+        tempData = [
+          d["item_name"],
+          d["item_type"],
+          d["location"],
+          d["used_by"],
+          d["processed_by"],
+          d["comments"]
+        ];
+      }else {
+        if (screenName == "purchase"){
+          tempData = [
+            d["order_no"],
+            d["order_name"],
+            d["description"],
+            d["expected_delivery"],
+            d["status"],
+            d["comments"]
+          ];
+        }else {
+          tempData = [
+            d["issued_by"],
+            d["topic"],
+            d["status"],
+            d["priority"],
+            d["assigned_to"],
+          ];
+          if (screenName == "tickets") {
+            tempData.add(d["comments"]);
+          } else {
+            if (screenName == "problems") {
+              tempData.add(d["department"]);
+            }
+          }
         }
       }
       tempRows.add(createRow(tempData));

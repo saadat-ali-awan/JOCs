@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/problems_item.dart';
+import 'package:jocs/Dashboard/Dialog/purchase_item.dart';
 import 'package:jocs/Dashboard/Dialog/ticket_item.dart';
+
+import 'inventory_item.dart';
 
 class CustomDialog extends StatelessWidget {
   CustomDialog({Key? key}) : super(key: key);
@@ -57,6 +60,10 @@ class CustomDialog extends StatelessWidget {
         return TicketItem();
       case 2:
         return ProblemsItem();
+      case 32:
+        return InventoryItem();
+      case 33:
+        return PurchaseItem();
     }
     return Column();
   }

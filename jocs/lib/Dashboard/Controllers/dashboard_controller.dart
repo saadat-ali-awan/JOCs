@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
-import 'package:jocs/Dashboard/Modals/problem_model.dart';
 import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
-import 'package:jocs/Dashboard/Modals/ticket_model.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
@@ -121,6 +119,8 @@ class DashboardController extends GetxController {
 
     ticketAdapter = ScreenAdapter("tickets").obs;
     problemAdapter = ScreenAdapter("problems").obs;
+    inventoryAdapter = ScreenAdapter("inventory").obs;
+    purchaseAdapter = ScreenAdapter("purchase").obs;
 
 
 
@@ -185,14 +185,34 @@ class DashboardController extends GetxController {
   * Tickets Screen Getx Logic
   **/
 
-  /// Tickets Screen Getx Logic
+  /// Problems Screen Getx Logic
   late Rx<ScreenAdapter> problemAdapter;
   getProblemsData() async {
     problemAdapter.value.getScreenData(firebaseController);
     problemAdapter.value.lastId.value = await firebaseController.getLastId("problems");
   }
   /**
-   * Tickets Screen Getx Logic
+   * Problems Screen Getx Logic
+   **/
+
+  /// Inventory Screen Getx Logic
+  late Rx<ScreenAdapter> inventoryAdapter;
+  getInventoryData() async {
+    inventoryAdapter.value.getScreenData(firebaseController);
+    inventoryAdapter.value.lastId.value = await firebaseController.getLastId("inventory");
+  }
+  /**
+   * Inventory Screen Getx Logic
+   **/
+
+  /// Purchase Screen Getx Logic
+  late Rx<ScreenAdapter> purchaseAdapter;
+  getPurchaseData() async {
+    purchaseAdapter.value.getScreenData(firebaseController);
+    purchaseAdapter.value.lastId.value = await firebaseController.getLastId("purhase");
+  }
+  /**
+   * Problems Screen Getx Logic
    **/
 
 }

@@ -3,7 +3,10 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Screens/dashboard_screen.dart';
 import 'package:jocs/Dashboard/Screens/problems_screen.dart';
+import 'package:jocs/Dashboard/Screens/purchase_screen.dart';
 import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
+
+import 'inventory_screen.dart';
 
 class MainScreen extends StatelessWidget {
   MainScreen({Key? key}) : super(key: key);
@@ -21,6 +24,12 @@ class MainScreen extends StatelessWidget {
           return TicketsScreen();
         case 2:
           return ProblemsScreen();
+        case 32:
+          return InventoryScreen();
+        case 33:
+          return PurchaseScreen();
+        case 5:
+          return Container( color: Colors.black,);
         default:
           return Container(color: Colors.amber);
       }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
-class ProblemsScreen extends StatelessWidget {
-  ProblemsScreen({Key? key}) : super(key: key);
+class PurchaseScreen extends StatelessWidget {
+  PurchaseScreen({Key? key}) : super(key: key);
 
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
@@ -28,26 +28,26 @@ class ProblemsScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: const [
-                        DataColumn(label: Text("Issued By")),
-                        DataColumn(label: Text("Topic")),
-                        DataColumn(label: Text("Status")),
-                        DataColumn(label: Text("Priority")),
-                        DataColumn(label: Text("Assigned To")),
-                        DataColumn(label: Text("Department")),
+                        DataColumn(label: Text("ORDER NO.")),
+                        DataColumn(label: Text("ORDER NAME")),
+                        DataColumn(label: Text("DESCRIPTION")),
+                        DataColumn(label: Text("EXPECTED DELIVERY")),
+                        DataColumn(label: Text("STATUS")),
+                        DataColumn(label: Text("COMMENTS")),
                       ],
                       source: _dashboardController
-                          .problemAdapter.value.dataTableSource.value,
+                          .purchaseAdapter.value.dataTableSource.value,
                       arrowHeadColor:
                       Get.theme.appBarTheme.backgroundColor,
                       onPageChanged: (int? index) {
                         if (index != null) {
-                          if (((index+1)/10).ceil() > _dashboardController.problemAdapter.value
+                          if (((index+1)/10).ceil() > _dashboardController.purchaseAdapter.value
                               .currentPaginatedPage){
-                            _dashboardController.problemAdapter.value
+                            _dashboardController.purchaseAdapter.value
                                 .getNextPage(_dashboardController
                                 .firebaseController);
                           }
-                          _dashboardController.problemAdapter.value
+                          _dashboardController.purchaseAdapter.value
                               .currentPaginatedPage = ((index+1)/10).ceil();
 
                         }
@@ -55,7 +55,7 @@ class ProblemsScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                ),
+                )
               )
             ],
           )
@@ -64,34 +64,3 @@ class ProblemsScreen extends StatelessWidget {
     );
   }
 }
-
-// class CustomDataTableSource extends DataTableSource {
-//   List<DataRow>? data = <DataRow>[];
-//
-//   CustomDataTableSource([this.data]);
-//
-//   @override
-//   DataRow? getRow(int index) {
-//     final DashboardController _dashboardController =
-//     Get.find<DashboardController>();
-//     try {
-//       return data == null ? null : data![index];
-//     } on RangeError catch (e) {
-//       null;
-//     }
-//   }
-//
-//   @override
-//   bool get isRowCountApproximate => false;
-//
-//   @override
-//   int get rowCount {
-//     final DashboardController _dashboardController =
-//     Get.find<DashboardController>();
-//     return _dashboardController.problemAdapter.value.lastId.value - 1;
-//   }
-//
-//   @override
-//   int get selectedRowCount => 0;
-// }
-//

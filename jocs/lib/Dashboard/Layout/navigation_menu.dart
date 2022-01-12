@@ -203,6 +203,7 @@ class NavItems extends StatelessWidget {
                   TextButton(
                       onPressed: () {
                         _dashboardController.selectedMenuItem.value = 32;
+                        _dashboardController.getInventoryData();
                       },
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -216,6 +217,7 @@ class NavItems extends StatelessWidget {
                   TextButton(
                       onPressed: () {
                         _dashboardController.selectedMenuItem.value = 33;
+                        _dashboardController.getPurchaseData();
                       },
                       child: Align(
                         alignment: Alignment.centerLeft,

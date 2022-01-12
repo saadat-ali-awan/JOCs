@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
-class ProblemsScreen extends StatelessWidget {
-  ProblemsScreen({Key? key}) : super(key: key);
+class InventoryScreen extends StatelessWidget {
+  InventoryScreen({Key? key}) : super(key: key);
 
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
@@ -33,21 +33,21 @@ class ProblemsScreen extends StatelessWidget {
                         DataColumn(label: Text("Status")),
                         DataColumn(label: Text("Priority")),
                         DataColumn(label: Text("Assigned To")),
-                        DataColumn(label: Text("Department")),
+                        DataColumn(label: Text("Comments")),
                       ],
                       source: _dashboardController
-                          .problemAdapter.value.dataTableSource.value,
+                          .inventoryAdapter.value.dataTableSource.value,
                       arrowHeadColor:
                       Get.theme.appBarTheme.backgroundColor,
                       onPageChanged: (int? index) {
                         if (index != null) {
-                          if (((index+1)/10).ceil() > _dashboardController.problemAdapter.value
+                          if (((index+1)/10).ceil() > _dashboardController.inventoryAdapter.value
                               .currentPaginatedPage){
-                            _dashboardController.problemAdapter.value
+                            _dashboardController.inventoryAdapter.value
                                 .getNextPage(_dashboardController
                                 .firebaseController);
                           }
-                          _dashboardController.problemAdapter.value
+                          _dashboardController.inventoryAdapter.value
                               .currentPaginatedPage = ((index+1)/10).ceil();
 
                         }
@@ -64,34 +64,3 @@ class ProblemsScreen extends StatelessWidget {
     );
   }
 }
-
-// class CustomDataTableSource extends DataTableSource {
-//   List<DataRow>? data = <DataRow>[];
-//
-//   CustomDataTableSource([this.data]);
-//
-//   @override
-//   DataRow? getRow(int index) {
-//     final DashboardController _dashboardController =
-//     Get.find<DashboardController>();
-//     try {
-//       return data == null ? null : data![index];
-//     } on RangeError catch (e) {
-//       null;
-//     }
-//   }
-//
-//   @override
-//   bool get isRowCountApproximate => false;
-//
-//   @override
-//   int get rowCount {
-//     final DashboardController _dashboardController =
-//     Get.find<DashboardController>();
-//     return _dashboardController.problemAdapter.value.lastId.value - 1;
-//   }
-//
-//   @override
-//   int get selectedRowCount => 0;
-// }
-//
