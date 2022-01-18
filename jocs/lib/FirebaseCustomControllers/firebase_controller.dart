@@ -1,27 +1,257 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
-import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 
 import '../firebase_options.dart';
 
-class FirebaseController {
-
+class FirebaseController implements FirebaseControllerInterface{
   late CollectionReference collectionReference;
   late LoginController _loginController;
   late RegisterController _registerController;
 
   late var data;
 
+  @override
   late FirebaseAuth auth;
+
+  @override
+  List<StreamSubscription> chatScreenMainStreams = [];
 
   FirebaseController(){
     initializeFirebase();
   }
 
+  @override
+  Future<void> addDataToFirebase(data, String collectionName) async {
+    data["id"] = await getLastId(collectionName);
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    collectionReference
+        .add(data)
+        .then((value) => print("Ticket Added"))
+        .catchError((error) => print("Failed to add Ticket: $error"));
+  }
+
+  @override
+  Future<void> addFriend(List friendData) async {
+    String friendUniqueId = DateTime.now().toUtc().millisecondsSinceEpoch.toString() + auth.currentUser!.uid;
+    var tempData = <String, dynamic>{};
+    tempData["chatId"] = friendUniqueId;
+    tempData["unread"] = [];
+    tempData["friendName"] = friendData[0];
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference
+        .doc(auth.currentUser!.uid)
+        .collection("Friends").doc(friendData[1])
+        .set(tempData)
+        .then((value){
+          print("Group Created");
+          var tempData = <String, dynamic>{};
+          tempData["chatId"] = friendUniqueId;
+          tempData["unread"] = [];
+          tempData["friendName"] = auth.currentUser!.email;
+          collectionReference = FirebaseFirestore.instance.collection("Users");
+          collectionReference.
+          doc(friendData[1]).
+          collection("Friends").doc(auth.currentUser!.uid)
+              .set(tempData)
+              .then((value){
+            print("Group Created");
+            createNewChat(friendUniqueId);
+          })
+          .catchError((error) => print("Failed to add Group: $error"));
+        })
+        .catchError((error) => print("Failed to add Group: $error"));
+  }
+
+  @override
+  Future<void> addFriendToGroup(List friendData, groupId, String groupName) async {
+    var tempData = <String, dynamic>{};
+    tempData["chatId"] = groupId;
+    tempData["unread"] = [];
+    tempData["groupName"] = groupName;
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference
+        .doc(friendData[1])
+        .collection("Groups").doc(groupId)
+        .set(tempData)
+        .then((value){
+          print("Friend Added");
+        })
+        .catchError((error) => print("Failed to add Friend to group $error"));
+  }
+
+  @override
+  bool checkFirebaseLoggedIn(){
+    if (auth.currentUser != null){
+      return true;
+    }
+    return false;
+  }
+
+  createChatListener(String collectionName){
+    collectionReference.doc(auth.currentUser!.uid).collection(collectionName).get().then((value){
+      for (var element in value.docs) {
+        chatScreenMainStreams.add(collectionReference.doc(auth.currentUser!.uid).collection(collectionName).doc(element.id).
+        snapshots().listen((DocumentSnapshot snapshot){
+          print(snapshot.data());
+        })
+        );
+      }
+    });
+
+  }
+
+  @override
+  Future<void> createNewChat(id) async {
+    collectionReference = FirebaseFirestore.instance.collection("Chat");
+    collectionReference
+        .doc(id)
+        .set(<String, dynamic>{})
+        .then((value){
+          print("Chat Created");
+        })
+        .catchError((error) => print("Failed to add Chat Id: $error"));
+  }
+
+  @override
+  Future<void> createNewGroup(groupData) async {
+    String groupUniqueId = DateTime.now().toUtc().millisecondsSinceEpoch.toString() + auth.currentUser!.uid;
+    groupData["chatId"] = groupUniqueId;
+    groupData["unread"] = [];
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference
+        .doc(auth.currentUser!.uid)
+        .collection("Groups")
+        .doc(groupUniqueId)
+        .set(groupData)
+        .then((value){
+          print("Group Created");
+          createNewChat(groupUniqueId);
+        })
+        .catchError((error) => print("Failed to add Group: $error"));
+  }
+
+  @override
+  Stream<List<PersonModel>> friendListStream(){
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    return collectionReference.
+    doc(auth.currentUser!.uid)
+        .collection("Friends")
+        .snapshots()
+        .map((QuerySnapshot query){
+          List<PersonModel> retVal = [];
+          for (var element in query.docs) {
+            retVal.add(PersonModel(chatId: element["chatId"], unreadMessages: element["unread"], modelId: element.id, modelName: element["friendName"], modelType: "Friend"));
+          }
+          return retVal;
+        });
+  }
+
+  @override
+  Future<List<MessageModel>> getChat(String chatId, [MessageModel? lastMessage]) async {
+    List<MessageModel> temp = [];
+    collectionReference = FirebaseFirestore.instance.collection("Chat");
+    if (lastMessage!=null){
+      await collectionReference.doc(chatId).collection("messages").where("time", isLessThan:lastMessage.timeStamp).orderBy("time", descending: true).limit(2).get().then((value){
+        for (var element in value.docs) {
+          print(element["message"]);
+          temp.add(MessageModel(element["message"], element["sender"], element["time"], element["senderName"]));
+        }
+
+      }
+      );
+    }else{
+      await collectionReference.doc(chatId).collection("messages").orderBy("time", descending: true).limit(2).get().then((value){
+        for (var element in value.docs) {
+          print(element["message"]);
+          temp.add(MessageModel(element["message"], element["sender"], element["time"], element["senderName"]));
+        }
+
+      }
+      );
+    }
+
+    return temp;
+  }
+
+  @override
+  Future<int> getDashboardData(String documentName, {String filter= ""}) async {
+    collectionReference = FirebaseFirestore.instance.collection("tickets");
+    QuerySnapshot<Object?> tempData;
+    if (filter == ""){
+      tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
+    }else{
+      tempData = await collectionReference.orderBy(documentName, descending: true).get();
+    }
+    print(documentName+ "${tempData.docs.length}");
+    return tempData.docs.length;
+
+  }
+
+  @override
+  getData(String collectionName, int page, int length, {String filter = ""}) async {
+    // login("sa@gmail.com", "12345678");
+    print(collectionName);
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    if (page > 1) {
+      data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
+    } else {
+      data = await collectionReference.orderBy("time", descending: true).limit(length).get();
+    }
+    print(data.docs.length);
+    return data.docs;
+  }
+
+  @override
+  Future<int> getLastId(String collectionName) async {
+    int lastId = 1;
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
+    for (var doc in dataTemp.docs) {
+      lastId = doc["id"];
+      lastId += 1;
+    }
+    return lastId;
+  }
+
+  @override
+  Future<List<MessageModel>> getRecentChat(String chatId, String mostRecentMessageTimeStamp) async {
+    List<MessageModel> temp = [];
+    collectionReference = FirebaseFirestore.instance.collection("Chat");
+    await collectionReference.doc(chatId).collection("messages").where("time", isGreaterThan:mostRecentMessageTimeStamp).orderBy("time", descending: true).get().then((value){
+      for (var element in value.docs) {
+        print(element["message"]);
+        temp.add(MessageModel(element["message"], element["sender"], element["time"], element["senderName"]));
+      }
+
+    });
+    return temp;
+  }
+
+  @override
+  Stream<List<PersonModel>> groupListStream(){
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    return collectionReference.
+    doc(auth.currentUser!.uid).
+    collection("Groups").snapshots().map((QuerySnapshot query){
+      List<PersonModel> retVal = [];
+
+      for (var element in query.docs) {
+        retVal.add(PersonModel(chatId: element["chatId"], unreadMessages: element["unread"], modelId: element.id, modelName: element["groupName"], modelType: "Group"));
+      }
+      return retVal;
+    });
+  }
+
+  @override
   initializeFirebase() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -30,14 +260,18 @@ class FirebaseController {
     collectionReference = FirebaseFirestore.instance.collection('tickets');
   }
 
+  @override
   initializeLoginController(){
     _loginController = Get.find<LoginController>();
+    _loginController.initializeLogin();
   }
 
+  @override
   initializeRegisterController(){
     _registerController = Get.find<RegisterController>();
   }
 
+  @override
   login(String email, String password) async {
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
@@ -63,28 +297,24 @@ class FirebaseController {
     }
   }
 
-  bool checkFirebaseLoggedIn(){
-    if (auth.currentUser != null){
-      return true;
-    }
-    return false;
+  @override
+  void newChatListener(){
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    createChatListener("Friends");
+    createChatListener("Groups");
   }
 
-  Future<void> addDataToFirebase(data, String collectionName) async {
-    data["id"] = await getLastId(collectionName);
-    collectionReference = FirebaseFirestore.instance.collection(collectionName);
-    collectionReference
-        .add(data)
-        .then((value) => print("Ticket Added"))
-        .catchError((error) => print("Failed to add Ticket: $error"));
-  }
-
-  register(String email, String password) async {
+  @override
+  register(String username, String email, String password) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+        email: email,
+        password: password,
+      ).then((value) {
+        collectionReference = FirebaseFirestore.instance.collection("Users");
+        collectionReference.doc(value.user!.uid).set({"email": value.user!.email});
+        return value;
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -99,40 +329,33 @@ class FirebaseController {
     }
   }
 
-  getData(String collectionName, int page, int length, {String filter = ""}) async {
-    // login("sa@gmail.com", "12345678");
-    print(collectionName);
-    collectionReference = FirebaseFirestore.instance.collection(collectionName);
-    if (page > 1) {
-      data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
-    } else {
-      data = await collectionReference.orderBy("time", descending: true).limit(length).get();
+  @override
+  Future<List<String>> searchFriend(String email) async {
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    var foundUser = await collectionReference.where("email", isEqualTo: email).limit(1).get();
+    for (var element in foundUser.docs) {
+      return [element["email"], element.id];
     }
-    print(data.docs.length);
-    return data;
+    return ["", ""];
   }
 
-  Future<int> getDashboardData(String documentName, {String filter= ""}) async {
-    collectionReference = FirebaseFirestore.instance.collection("tickets");
-    QuerySnapshot<Object?> tempData;
-    if (filter == ""){
-      tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
-    }else{
-      tempData = await collectionReference.orderBy(documentName, descending: true).get();
-    }
-    print(documentName+ "${tempData.docs.length}");
-    return tempData.docs.length;
-
+  @override
+  sendMessage(String chatId, String messageText){
+    String uniqueMessageId = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
+    Map<String, dynamic> message = <String, dynamic>{
+      "sender": auth.currentUser!.uid,
+      "message": messageText,
+      "time": uniqueMessageId,
+      "senderName": auth.currentUser!.email
+    };
+    collectionReference = FirebaseFirestore.instance.collection("Chat");
+    collectionReference.doc(chatId).collection("messages").doc(uniqueMessageId).set(message);
   }
 
-  Future<int> getLastId(String collectionName) async {
-    int lastId = 1;
-    collectionReference = FirebaseFirestore.instance.collection(collectionName);
-    var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
-    for (var doc in dataTemp.docs) {
-      lastId = doc["id"];
-      lastId += 1;
-    }
-    return lastId;
+  @override
+  String getCurrentUserId() {
+    return auth.currentUser!.uid;
   }
+
+
 }

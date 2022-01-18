@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:flutter/foundation.dart';
-import 'package:jocs/Theme/custom_theme.dart' as custom_colors;
 
 import 'Controllers/login_controller_windows.dart';
 
+/// A widget that paints the Login Screen
+/// It contains simple form with two input fields
+/// When Login is pressed User is Logged in to Firebase Account (If Account Exists)
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -32,7 +33,6 @@ class _LoginState extends State<Login> {
     }else {
       _loginController = Get.find<LoginController>();
     }
-    _loginController.initializeLogin();
   }
 
   @override
@@ -93,8 +93,6 @@ class _LoginState extends State<Login> {
                           hintText: 'Enter Password'
                         ),
                         validator: (value){
-                          // RegExp regex =
-                          // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
                           if (value!.isEmpty) {
                             return 'Please enter password';
                           } else {
@@ -103,11 +101,6 @@ class _LoginState extends State<Login> {
                             }else {
                               return null;
                             }
-                            // if (!regex.hasMatch(value)) {
-                            //   return 'Enter valid password';
-                            // } else {
-                            //   return null;
-                            // }
                           }
                         },
 

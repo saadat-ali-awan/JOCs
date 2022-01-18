@@ -19,7 +19,6 @@ class ScreensLayout extends StatelessWidget {
             TopMenu(),
             Expanded(
                 child: Container(
-                  padding: const EdgeInsets.all(32),
                   child: MainScreen(),
                 )
             )

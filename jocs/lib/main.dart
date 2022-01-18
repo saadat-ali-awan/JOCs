@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Bindings/dashboard_bindings.dart';
@@ -13,18 +12,16 @@ import 'package:jocs/Registration/register.dart';
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'Theme/custom_theme.dart';
-import 'firebase_options.dart';
 import 'package:flutter/foundation.dart';
 
 Future<void> main() async {
-
-  // First to make sure Flutter is Initialized WidgetsFlutterBinding.ensureInitialized() will be called
-  // It is required for Firebase Initialization
+  /// First to make sure Flutter is Initialized [WidgetsFlutterBinding.ensureInitialized()] will be called
+  /// It is required for Firebase Initialization
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase is initialized using firebase_options.dart
-  // firebase_options.dart is generated automatically by flutterfire configure command
-  // It contains all the details to connect with Firebase
+  /// Firebase is initialized using firebase_options.dart
+  /// firebase_options.dart is generated automatically by flutterfire configure command
+  /// It contains all the details to connect with Firebase
 
   if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
     Get.put(FirebaseController());
@@ -35,26 +32,20 @@ Future<void> main() async {
   }
 
 
-  // Entry Point For App
-  // Firebase will go to Login Page initially
+  /// Entry Point For App
+  /// Firebase will go to Login Page initially
   runApp(
       GetMaterialApp(
-        /**
-         * Using GetX Library for advanced State Management
-         * getPages parameter is used to set all the Routes of the Application
-         *
-        * */
+        /// Using GetX Library for advanced State Management
         scrollBehavior: MyCustomScrollBehavior(),
         theme: CustomTheme.lightTheme,
+        /// [GetMaterialApp.getPages] is used to set all the Routes of the Application
         getPages: [
           GetPage(
 
-            /**
-             * name parameter is the name That will be used to refer the page
-             * page parameter contains reference to the page
-             * binding parameter binds All the Services or Class Instances so
-             * that we can easily recognize the page of a Class Instance
-             * **/
+            /// [GetPage.name] is the name That will be used to refer the page
+            /// [GetPage.page] contains reference to the page
+            /// [GetPage.binding] binds All the Services or Class Instances
             name: '/login',
             page: ()=>const Login(),
             binding: LoginBindings()
@@ -70,7 +61,7 @@ Future<void> main() async {
             binding: DashboardBindings()
           )
         ],
-        initialRoute: '/dashboard',
+        initialRoute: '/login',
         initialBinding: LoginBindings(),
       )
   );
@@ -82,6 +73,5 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
   Set<PointerDeviceKind> get dragDevices => {
     PointerDeviceKind.touch,
     PointerDeviceKind.mouse,
-    // etc.
   };
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-
+/// Theme Colors are colors for the App Theme
+/// In case of multiple themes just add a function that changes colors value
+/// at runtime
 class ThemeColors {
   static Color mainColor = const Color(0xFF00b694);
   static Color hoverColor = const Color(0xff016d70);
@@ -8,6 +10,8 @@ class ThemeColors {
   static Color errorColor = const Color(0xFF84000A);
 }
 
+/// [CustomTheme] defines theme for the Application
+/// For consistency do not change this
 class CustomTheme {
   static ThemeData get lightTheme {
     return ThemeData(
@@ -17,6 +21,7 @@ class CustomTheme {
         backgroundColor: ThemeColors.mainColor,
         foregroundColor: ThemeColors.secondaryColor
       ),
+      //canvasColor: ThemeColors.mainColor,
       buttonTheme: ButtonThemeData(
         buttonColor: ThemeColors.mainColor
       ),

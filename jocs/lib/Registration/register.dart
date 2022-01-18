@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller_windows.dart';
 
+/// A widget that paints the Register Screen
+/// It contains simple form with two input fields
+/// When Login is pressed User is Registered to Firebase
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
 
@@ -13,6 +16,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
@@ -28,7 +32,6 @@ class _RegisterState extends State<Register> {
     }else {
       _registerController = Get.find<RegisterController>();
     }
-    //_registerController.initializeLogin();
   }
 
   @override
@@ -62,6 +65,28 @@ class _RegisterState extends State<Register> {
                     child: SizedBox(
                       width: 350,
                       child: TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: usernameController,
+                        decoration: const InputDecoration(
+                            labelText: 'Username',
+                            hintText: 'Username'
+                        ),
+                        validator: (value){
+                          if (value!.isEmpty) {
+                            return 'Please enter password';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 350,
+                      child: TextFormField(
                         controller: emailController,
                         decoration: const InputDecoration(
                           labelText: 'Email',
@@ -90,8 +115,6 @@ class _RegisterState extends State<Register> {
                             hintText: 'Enter Password'
                         ),
                         validator: (value){
-                          // RegExp regex =
-                          // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
                           if (value!.isEmpty) {
                             return 'Please enter password';
                           } else {
@@ -100,11 +123,6 @@ class _RegisterState extends State<Register> {
                             }else {
                               return null;
                             }
-                            // if (!regex.hasMatch(value)) {
-                            //   return 'Enter valid password';
-                            // } else {
-                            //   return null;
-                            // }
                           }
                         },
                       ),
@@ -138,11 +156,12 @@ class _RegisterState extends State<Register> {
                     child: TextButton(
 
                       onPressed: () {
+                        String username = usernameController.text;
                         String email = emailController.text;
                         String password = passwordController.text;
                         String confirmPassword = confirmPasswordController.text;
                         if (_formKey.currentState!.validate()){
-                          _registerController.register(email, password);
+                          _registerController.register(username, email, password);
                           emailController.clear();
                           passwordController.clear();
                           confirmPasswordController.clear();

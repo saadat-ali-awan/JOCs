@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
+import 'package:jocs/Registration/Interfaces/login_controller_interface.dart';
 
-class LoginController extends GetxController {
+class LoginController extends LoginControllerInterface{
+  /// Firebase Controller get the Instance of [FirebaseController] to use during
+  /// registration process
+  final FirebaseController firebaseController = Get.find<FirebaseController>();
 
-
-  RxString loginErrorMessage = "".obs;
-
-  final FirebaseController _firebaseController = Get.find<FirebaseController>();
-
+  @override
   initializeLogin(){
     FirebaseAuth.instance
         .authStateChanges()
@@ -19,11 +19,12 @@ class LoginController extends GetxController {
         Get.toNamed("/dashboard");
       }
     });
-    _firebaseController.initializeLoginController();
+    firebaseController.initializeLoginController();
   }
 
-
- login(String email, String password){
-   _firebaseController.login(email, password);
+ @override
+  login(String email, String password){
+   firebaseController.login(email, password);
  }
+
 }

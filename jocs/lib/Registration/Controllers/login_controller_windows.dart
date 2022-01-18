@@ -1,18 +1,21 @@
 import 'dart:io';
 
-import 'package:firedart/auth/exceptions.dart';
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
+import 'package:jocs/Registration/Interfaces/login_controller_interface.dart';
 
 import 'hive_store.dart';
 
-class LoginControllerWindows extends GetxController{
+class LoginControllerWindows extends LoginControllerInterface {
 
-  RxString loginErrorMessage = "".obs;
-  final FirebaseControllerWindows _firebaseControllerWindows = Get.find<FirebaseControllerWindows>();
+  /// Firebase Controller get the Instance of [FirebaseController] to use during
+  /// registration process
 
+  final FirebaseControllerWindows firebaseController = Get.find<FirebaseControllerWindows>();
+
+  @override
   initializeLogin() async {
     var path = Directory.current.path;
     Hive
@@ -39,12 +42,13 @@ class LoginControllerWindows extends GetxController{
     }on StateError catch(e){
       print("Listen Stream Created Already");
     }
-    _firebaseControllerWindows.initializeLoginController();
+    firebaseController.initializeLoginController();
 
   }
 
+  @override
   login(String email, String password){
-    _firebaseControllerWindows.login(email, password);
+    firebaseController.login(email, password);
   }
 
 

@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
 import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
 
@@ -20,7 +25,9 @@ class DashboardController extends GetxController {
   RxInt unassignedTickets = 0.obs;
   RxInt ticketsAssignedToMe = 0.obs;
 
-  late var firebaseController;
+  late FirebaseControllerInterface firebaseController;
+
+  Map<String, RxList<MessageModel>> allChats = <String, RxList<MessageModel>>{};
 
   DashboardController() {
     menuList = [
@@ -136,6 +143,7 @@ class DashboardController extends GetxController {
     }
 
     getDashboardData();
+    initializeStream();
 
   }
 
@@ -212,7 +220,82 @@ class DashboardController extends GetxController {
     purchaseAdapter.value.lastId.value = await firebaseController.getLastId("purhase");
   }
   /**
-   * Problems Screen Getx Logic
+   * Purchase Screen Getx Logic
    **/
+
+  /// Chat Screen Logic
+
+  RxList<PersonModel> friendsList = RxList<PersonModel>();
+  RxList<PersonModel> groupList = RxList<PersonModel>();
+
+  PersonModel? openChat;
+
+  Timer? timer;
+
+  void initializeStream(){
+    friendsList.bindStream(firebaseController.friendListStream());
+    groupList.bindStream(firebaseController.groupListStream());
+    //firebaseController.newChatListener();
+  }
+
+  void createNewGroup(Map<String, dynamic> data){
+    firebaseController.createNewGroup(data);
+  }
+
+  Future<List<String>> searchFriend(String friendEmail) async {
+    if (friendEmail == firebaseController.auth.currentUser!.email){
+      return ["", ""];
+    }
+    if (friendsList.contains(friendEmail)){
+      return ["", ""];
+    }
+    return await firebaseController.searchFriend(friendEmail);
+  }
+
+  void addFriend(List friendData){
+    firebaseController.addFriend(friendData);
+  }
+
+  void addFriendToGroup(List friendData, String chatId, String groupName){
+    firebaseController.addFriendToGroup(friendData, chatId, groupName);
+  }
+
+  sendMessage(String chatId, String sender, String message){
+    firebaseController.sendMessage(chatId, message);
+  }
+
+  startChatStream(String chatId) async {
+    if (allChats[chatId] == null || allChats[chatId]!.isEmpty) {
+      allChats[chatId] = RxList<MessageModel>();
+      List<MessageModel> messages= await firebaseController.getChat(chatId);
+      for (MessageModel message in messages){
+        allChats[chatId]!.add(message);
+      }
+
+    }else{
+      List<MessageModel> messages= await firebaseController.getChat(chatId, allChats[chatId]!.last);
+      for (MessageModel message in messages){
+        allChats[chatId]!.add(message);
+      }
+    }
+  }
+
+  startTimer(String chatId){
+    if (timer != null) {
+      timer!.cancel();
+    }
+    timer = Timer.periodic(const Duration(seconds: 2),(Timer t) async {
+      if ( allChats[chatId] == null){
+        return;
+      }
+      if (allChats[chatId]![0].timeStamp.isEmpty){
+        startChatStream(chatId);
+        return;
+      }
+      List<MessageModel> newMessages = await firebaseController.getRecentChat(chatId, allChats[chatId]!.first.timeStamp);
+      allChats[chatId]!.insertAll(0, newMessages.where((ele) => allChats[chatId]!.every((element) => ele.timeStamp != element.timeStamp)));
+    });
+  }
+
 
 }

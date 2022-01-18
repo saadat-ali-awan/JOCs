@@ -24,7 +24,6 @@ class _DashboardMobileState extends State<DashboardMobile> {
           Expanded(
               flex: 10,
               child: Container(
-                  color: Colors.blueAccent,
                   child: ScreensLayout())
           )
         ],

@@ -21,11 +21,10 @@ class ScreenAdapter {
       var data = await firebaseController.getData(
           screenName, currentPage.value, articlesOnOnePage,
           filter: filter);
-      if (data.docs.length == 0) {
+      if (data.length == 0) {
         currentPage -= 1;
       } else {
-        //adapterData.add([]);
-        data.docs.forEach((res) {
+        data.forEach((res) {
           //adapterData[currentPage.value-1].add(res);
           bool valueNotPresent = true;
 
