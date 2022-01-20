@@ -123,6 +123,17 @@ class DashboardController extends GetxController {
           color: iconColor.value,
           size: 32,
         )
+      ],
+      [
+        Text(
+          "Profile",
+          style: menuItemStyle.value,
+        ),
+        Icon(
+          Icons.home,
+          color: iconColor.value,
+          size: 32,
+        )
       ]
     ];
 

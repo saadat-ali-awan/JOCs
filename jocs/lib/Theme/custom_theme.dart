@@ -60,7 +60,7 @@ class CustomTheme {
             backgroundColor: LightThemeColors.mainColor,
             foregroundColor: ThemeColors.secondaryColor
         ),
-        //canvasColor: ThemeColors.mainColor,
+        //canvasColor: LightThemeColors.mainColor,
         buttonTheme: ButtonThemeData(
             buttonColor: LightThemeColors.mainColor
         ),
@@ -155,7 +155,7 @@ class CustomTheme {
             backgroundColor: DarkThemeColors.mainColor,
             foregroundColor: ThemeColors.secondaryColor
         ),
-        //canvasColor: ThemeColors.mainColor,
+        //canvasColor: DarkThemeColors.mainColor,
         buttonTheme: ButtonThemeData(
             buttonColor: DarkThemeColors.mainColor
         ),

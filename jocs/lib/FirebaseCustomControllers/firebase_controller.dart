@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
@@ -17,6 +20,8 @@ class FirebaseController implements FirebaseControllerInterface{
   late LoginController _loginController;
   late RegisterController _registerController;
 
+  @override
+  CurrentUserDetails currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "");
   late var data;
 
   @override
@@ -258,6 +263,7 @@ class FirebaseController implements FirebaseControllerInterface{
     );
     auth = FirebaseAuth.instance;
     collectionReference = FirebaseFirestore.instance.collection('tickets');
+    getCurrentUserData();
   }
 
   @override
@@ -357,5 +363,32 @@ class FirebaseController implements FirebaseControllerInterface{
     return auth.currentUser!.uid;
   }
 
+  @override
+  void getCurrentUserData() {
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference
+        .doc(auth.currentUser!.uid)
+        .snapshots()
+        .map((DocumentSnapshot snapshot) async {
+
+          currentUserDetails = CurrentUserDetails.fromDocumentSnapshot(snapshot);
+          currentUserDetails.downloadUrl.value = await FirebaseStorage.instance
+              .ref('uploads/${currentUserDetails.imageUrl}')
+              .getDownloadURL();
+          print(currentUserDetails.imageUrl);
+          print(currentUserDetails.downloadUrl.value);
+        }).listen((event) {
+
+        });
+  }
+
+  @override
+  void uploadImage(Uint8List fileBytes, String extension) async {
+    Map<String, String> imagePath = <String, String>{};
+    imagePath["imageName"] = '${getCurrentUserId()}.$extension';
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference.doc(getCurrentUserId()).update(imagePath);
+    await FirebaseStorage.instance.ref('uploads/${getCurrentUserId()}.$extension').putData(fileBytes);
+  }
 
 }

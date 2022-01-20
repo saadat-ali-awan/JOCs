@@ -1,10 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
 
 abstract class FirebaseControllerInterface {
   get auth;
 
   get chatScreenMainStreams => null;
+
+  get currentUserDetails;
 
   /// Initialize Firebase App to be used during the entire session
   initializeFirebase();
@@ -34,4 +39,8 @@ abstract class FirebaseControllerInterface {
   Future<List<MessageModel>> getRecentChat(String chatId, String mostRecentMessageTimeStamp);
 
   String getCurrentUserId();
+
+  void uploadImage(Uint8List imageData, String extension);
+
+  void getCurrentUserData();
 }

@@ -92,6 +92,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  ffi:
+    dependency: transitive
+    description:
+      name: ffi
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.2"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.3.2"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -134,6 +148,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.3"
+  firebase_storage:
+    dependency: "direct main"
+    description:
+      name: firebase_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "10.2.5"
+  firebase_storage_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_storage_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.12"
+  firebase_storage_web:
+    dependency: transitive
+    description:
+      name: firebase_storage_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.6"
   firedart:
     dependency: "direct main"
     description:
@@ -160,6 +195,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -338,4 +380,4 @@ packages:
     version: "2.1.0"
 sdks:
   dart: ">=2.15.0-116.0.dev <3.0.0"
-  flutter: ">=1.12.13+hotfix.5"
+  flutter: ">=2.0.0"

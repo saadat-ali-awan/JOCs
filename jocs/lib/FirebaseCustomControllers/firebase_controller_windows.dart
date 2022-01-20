@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firedart/auth/exceptions.dart';
@@ -15,6 +16,8 @@ import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_contro
 import 'package:jocs/Registration/Controllers/hive_store.dart';
 import 'package:jocs/Registration/Controllers/login_controller_windows.dart';
 import 'package:jocs/Registration/Controllers/register_controller_windows.dart';
+
+import 'ChatModels/user_details_model.dart';
 
 class FirebaseControllerWindows implements FirebaseControllerInterface{
 
@@ -356,6 +359,19 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   String getCurrentUserId() {
     return auth.userId;
+  }
+
+  @override
+  void getCurrentUserData() {
+    // TODO: implement getCurrentUserData
+  }
+
+  @override
+  CurrentUserDetails currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "");
+
+  @override
+  void uploadImage(Uint8List fileBytes, String extension) {
+    // TODO: implement uploadImage
   }
 
 }
