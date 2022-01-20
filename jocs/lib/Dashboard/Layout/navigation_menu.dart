@@ -15,7 +15,7 @@ class NavItems extends StatelessWidget {
       _dashboardController.mobileDisplay.value?
       Container(
           height: 50,
-          color: _dashboardController.tileColor,
+          color: _dashboardController.tileColor.value,
         child: Obx(
               () => IconButton(
               onPressed: () {
@@ -34,29 +34,29 @@ class NavItems extends StatelessWidget {
           decoration: BoxDecoration(
               border: Border.symmetric(
                   horizontal:
-                  BorderSide(color: _dashboardController.iconColor!))),
+                  BorderSide(color: _dashboardController.iconColor.value!))),
           child: Obx(
                 () => Material(
               child: _dashboardController.showPanel.value
                   ? Container(
-                  color: _dashboardController.tileColor,
+                  color: _dashboardController.tileColor.value,
                   child: IconButton(
                     icon: const Icon(Icons.arrow_forward_ios_outlined),
-                    color: _dashboardController.iconColor,
+                    color: _dashboardController.iconColor.value!,
                     onPressed: () {
                       _dashboardController.showPanel.value = false;
                     },
                   ))
                   : ListTile(
-                tileColor: _dashboardController.tileColor,
-                hoverColor: ThemeColors.hoverColor,
+                tileColor: _dashboardController.tileColor.value,
+                hoverColor: ThemeColors.getHoverColor(),
                 onTap: () {
                   _dashboardController.showPanel.value = true;
                 },
                 trailing: Icon(Icons.arrow_back_ios_outlined,
-                    color: _dashboardController.iconColor),
+                    color: _dashboardController.iconColor.value),
                 title: Text("HIDE PANEL",
-                    style: _dashboardController.menuItemStyle),
+                    style: _dashboardController.menuItemStyle.value),
               ),
             ),
           )),
@@ -66,25 +66,25 @@ class NavItems extends StatelessWidget {
             decoration: BoxDecoration(
                 border: Border.symmetric(
                     horizontal:
-                    BorderSide(color: _dashboardController.iconColor!))),
+                    BorderSide(color: _dashboardController.iconColor.value!))),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Obx(
                     () => Material(
                     child: _dashboardController.showPanel.value
                         ? Container(
-                        color: _dashboardController.tileColor,
+                        color: _dashboardController.tileColor.value,
                         child: IconButton(
                           icon: _dashboardController.menuList[0][1],
-                          color: _dashboardController.iconColor,
+                          color: _dashboardController.iconColor.value,
                           onPressed: () {
                             _dashboardController.selectedMenuItem.value = 0;
                             _dashboardController.getDashboardData();
                           },
                         ))
                         : ListTile(
-                      tileColor: _dashboardController.tileColor,
-                      hoverColor: ThemeColors.hoverColor,
+                      tileColor: _dashboardController.tileColor.value,
+                      hoverColor: ThemeColors.getHoverColor(),
                       onTap: () { _dashboardController.selectedMenuItem.value = 0;},
                       leading: _dashboardController.menuList[0][1],
                       title: _dashboardController.menuList[0][0],
@@ -97,25 +97,25 @@ class NavItems extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: _dashboardController.iconColor!))),
+                  bottom: BorderSide(color: _dashboardController.iconColor.value!))),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Obx(
                   () => Material(
                   child: _dashboardController.showPanel.value
                       ? Container(
-                      color: _dashboardController.tileColor,
+                      color: _dashboardController.tileColor.value,
                       child: IconButton(
                         icon: _dashboardController.menuList[1][1],
-                        color: _dashboardController.iconColor,
+                        color: _dashboardController.iconColor.value,
                         onPressed: () {
                           _dashboardController.selectedMenuItem.value = 1;
                           _dashboardController.getTicketsData();
                         },
                       ))
                       : ListTile(
-                    tileColor: _dashboardController.tileColor,
-                    hoverColor: ThemeColors.hoverColor,
+                    tileColor: _dashboardController.tileColor.value,
+                    hoverColor: ThemeColors.getHoverColor(),
                     onTap: () {
                       _dashboardController.selectedMenuItem.value = 1;
                       _dashboardController.getTicketsData();
@@ -132,25 +132,25 @@ class NavItems extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: _dashboardController.iconColor!))),
+                  bottom: BorderSide(color: _dashboardController.iconColor.value!))),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Obx(
                   () => Material(
                   child: _dashboardController.showPanel.value
                       ? Container(
-                      color: _dashboardController.tileColor,
+                      color: _dashboardController.tileColor.value,
                       child: IconButton(
                         icon: _dashboardController.menuList[2][1],
-                        color: _dashboardController.iconColor,
+                        color: _dashboardController.iconColor.value,
                         onPressed: () {
                           _dashboardController.selectedMenuItem.value = 2;
                           _dashboardController.getProblemsData();
                         },
                       ))
                       : ListTile(
-                    tileColor: _dashboardController.tileColor,
-                    hoverColor: ThemeColors.hoverColor,
+                    tileColor: _dashboardController.tileColor.value,
+                    hoverColor: ThemeColors.getHoverColor(),
                     onTap: () {
                       _dashboardController.selectedMenuItem.value = 2;
                       _dashboardController.getProblemsData();
@@ -167,19 +167,19 @@ class NavItems extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: _dashboardController.iconColor!))),
+                  bottom: BorderSide(color: _dashboardController.iconColor.value!))),
           child: ExpansionTile(
             tilePadding:
             const EdgeInsets.only(left: 0, right: 8, top: 0, bottom: 0),
-            iconColor: _dashboardController.iconColor,
-            collapsedIconColor: _dashboardController.iconColor,
-            backgroundColor: _dashboardController.tileColor,
+            iconColor: _dashboardController.iconColor.value,
+            collapsedIconColor: _dashboardController.iconColor.value,
+            backgroundColor: _dashboardController.tileColor.value,
             title: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Obx(() => Material(
                   child: _dashboardController.showPanel.value
                       ? Container(
-                      color: _dashboardController.tileColor,
+                      color: _dashboardController.tileColor.value,
                       child: _dashboardController.menuList[3][1],
                     // child: IconButton(
                       //   icon: _dashboardController.menuList[3][1],
@@ -190,8 +190,8 @@ class NavItems extends StatelessWidget {
                       // )
                   )
                       : ListTile(
-                    tileColor: _dashboardController.tileColor,
-                    hoverColor: ThemeColors.hoverColor,
+                    tileColor: _dashboardController.tileColor.value,
+                    hoverColor: ThemeColors.getHoverColor(),
                     leading: _dashboardController.menuList[3][1],
                     title: _dashboardController.menuList[3][0],
                   ))),
@@ -234,25 +234,25 @@ class NavItems extends StatelessWidget {
         child: Container(
             decoration: BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(color: _dashboardController.iconColor!))),
+                    bottom: BorderSide(color: _dashboardController.iconColor.value!))),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Obx(
                     () => Material(
                     child: _dashboardController.showPanel.value
                         ? Container(
-                        color: _dashboardController.tileColor,
+                        color: _dashboardController.tileColor.value,
                         child: IconButton(
                           icon: _dashboardController.menuList[4][1],
-                          color: _dashboardController.iconColor,
+                          color: _dashboardController.iconColor.value,
                           onPressed: () {
                             _dashboardController.initializeStream();
                             _dashboardController.selectedMenuItem.value = 4;
                           },
                         ))
                         : ListTile(
-                      tileColor: _dashboardController.tileColor,
-                      hoverColor: ThemeColors.hoverColor,
+                      tileColor: _dashboardController.tileColor.value,
+                      hoverColor: ThemeColors.getHoverColor(),
                       onTap: () {
                         _dashboardController.selectedMenuItem.value = 4;
                         },
@@ -267,24 +267,24 @@ class NavItems extends StatelessWidget {
         child: Container(
             decoration: BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(color: _dashboardController.iconColor!))),
+                    bottom: BorderSide(color: _dashboardController.iconColor.value!))),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Obx(
                     () => Material(
                     child: _dashboardController.showPanel.value
                         ? Container(
-                        color: _dashboardController.tileColor,
+                        color: _dashboardController.tileColor.value,
                         child: IconButton(
                           icon: _dashboardController.menuList[5][1],
-                          color: _dashboardController.iconColor,
+                          color: _dashboardController.iconColor.value,
                           onPressed: () {
                             _dashboardController.selectedMenuItem.value = 5;
                           },
                         ))
                         : ListTile(
-                      tileColor: _dashboardController.tileColor,
-                      hoverColor: ThemeColors.hoverColor,
+                      tileColor: _dashboardController.tileColor.value,
+                      hoverColor: ThemeColors.getHoverColor(),
                       onTap: () { _dashboardController.selectedMenuItem.value = 5;},
                       leading: _dashboardController.menuList[5][1],
                       title: _dashboardController.menuList[5][0],
@@ -297,24 +297,24 @@ class NavItems extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: _dashboardController.iconColor!))),
+                  bottom: BorderSide(color: _dashboardController.iconColor.value!))),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Obx(
                   () => Material(
                 child: _dashboardController.showPanel.value
                     ? Container(
-                    color: _dashboardController.tileColor,
+                    color: _dashboardController.tileColor.value,
                     child: IconButton(
                       icon: _dashboardController.menuList[6][1],
-                      color: _dashboardController.iconColor,
+                      color: _dashboardController.iconColor.value,
                       onPressed: () {
                         _dashboardController.selectedMenuItem.value = 6;
                       },
                     ))
                     : ListTile(
-                  tileColor: _dashboardController.tileColor,
-                  hoverColor: ThemeColors.hoverColor,
+                  tileColor: _dashboardController.tileColor.value,
+                  hoverColor: ThemeColors.getHoverColor(),
                   onTap: () { _dashboardController.selectedMenuItem.value = 6;},
                   leading: _dashboardController.menuList[6][1],
                   title: _dashboardController.menuList[6][0],
@@ -324,18 +324,26 @@ class NavItems extends StatelessWidget {
           ),
         ),
       ),
-      const Padding(
-        padding: EdgeInsets.only(top: 32.0),
-        child: ListTile(
-          title: Center(
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.white,
-              child: ClipOval(
-                child: Image(
-                  image: AssetImage('images/avatar.png'),
-                  width: 100,
-                  height: 100,
+      Tooltip(
+        message: "Profile",
+        child: Padding(
+          padding: const EdgeInsets.only(top: 32.0),
+          child: ListTile(
+            title: Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: ClipOval(
+                  child: InkWell(
+                    onTap: (){
+                      _dashboardController.selectedMenuItem.value = 7;
+                    },
+                    child: const Image(
+                      image: AssetImage('images/avatar.png'),
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
                 ),
               ),
             ),

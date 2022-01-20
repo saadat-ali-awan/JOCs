@@ -13,7 +13,7 @@ class TopMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 100,
-      color: Get.theme.appBarTheme.backgroundColor,
+      color: context.theme.appBarTheme.backgroundColor,
       child: Row(children: [
         Expanded(
             child: Wrap(
@@ -41,12 +41,12 @@ class TopMenu extends StatelessWidget {
                           titlePadding: const EdgeInsets.all(16.0),
                             title: "Can not add when in Dashboard Tab",
                           middleText: "Switch Tab and come back.",
-                          titleStyle: TextStyle(color: Get.theme.appBarTheme.backgroundColor),
+                          titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
                           onConfirm: (){
                               Get.back();
                           },
-                          confirmTextColor:  Get.theme.iconTheme.color,
-                          buttonColor: Get.theme.appBarTheme.backgroundColor
+                          confirmTextColor:  context.theme.iconTheme.color,
+                          buttonColor: context.theme.appBarTheme.backgroundColor
                         );
                       }
                     },

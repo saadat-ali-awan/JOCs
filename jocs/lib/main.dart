@@ -19,6 +19,8 @@ Future<void> main() async {
   /// It is required for Firebase Initialization
   WidgetsFlutterBinding.ensureInitialized();
 
+  bool isDarkTheme = await ThemeColors.getThemeMode();
+  print("Is Dark? ${isDarkTheme}");
   /// Firebase is initialized using firebase_options.dart
   /// firebase_options.dart is generated automatically by flutterfire configure command
   /// It contains all the details to connect with Firebase
@@ -38,7 +40,7 @@ Future<void> main() async {
       GetMaterialApp(
         /// Using GetX Library for advanced State Management
         scrollBehavior: MyCustomScrollBehavior(),
-        theme: CustomTheme.lightTheme,
+        theme: ThemeColors.darkTheme? CustomTheme.darkTheme : CustomTheme.lightTheme,
         /// [GetMaterialApp.getPages] is used to set all the Routes of the Application
         getPages: [
           GetPage(

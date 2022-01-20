@@ -32,7 +32,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
           ? Row(children: [
         Container(
             width: MediaQuery.of(context).size.width,
-            color: _dashboardController.tileColor,
+            color: _dashboardController.tileColor.value,
             child: NavItems()
         )
       ])

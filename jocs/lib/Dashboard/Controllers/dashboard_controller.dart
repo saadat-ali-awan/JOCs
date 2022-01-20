@@ -11,13 +11,14 @@ import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
+import 'package:jocs/Theme/custom_theme.dart';
 
 class DashboardController extends GetxController {
-  var menuItemStyle = Get.theme.textTheme.headline5;
-  var submenuItemStyle = Get.theme.textTheme.headline6;
-  var submenuItemStyle2 = Get.theme.textTheme.caption;
-  var iconColor = Get.theme.iconTheme.color;
-  var tileColor = Get.theme.appBarTheme.backgroundColor;
+  Rx<TextStyle?> menuItemStyle = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline5.obs:CustomTheme.lightTheme.textTheme.headline5.obs;
+  Rx<TextStyle?> submenuItemStyle = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline6.obs:CustomTheme.lightTheme.textTheme.headline6.obs;
+  Rx<TextStyle?> submenuItemStyle2 = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.caption.obs:CustomTheme.lightTheme.textTheme.caption.obs;
+  Rx<Color?> iconColor = ThemeColors.darkTheme?CustomTheme.darkTheme.iconTheme.color.obs:CustomTheme.lightTheme.iconTheme.color.obs;
+  Rx<Color?> tileColor = ThemeColors.darkTheme?CustomTheme.darkTheme.appBarTheme.backgroundColor.obs:CustomTheme.lightTheme.appBarTheme.backgroundColor.obs;
   late final List<Widget> menuItemWidgets;
   RxBool mobileDisplay = false.obs;
   RxInt openTickets = 0.obs;
@@ -30,61 +31,62 @@ class DashboardController extends GetxController {
   Map<String, RxList<MessageModel>> allChats = <String, RxList<MessageModel>>{};
 
   DashboardController() {
+    changeTheme();
     menuList = [
       [
         Text(
           "DASHBOARD",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.dashboard,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ],
       [
         Text(
           "TICKETS",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.all_inbox_sharp,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ],
       [
         Text(
           "PROBLEMS",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.clear,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ],
       [
         Text(
           "ASSETS",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.featured_play_list,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         ),
         Obx(
           () => Text(
             "INVENTORY",
-            style: showPanel.value ? submenuItemStyle2 : submenuItemStyle,
+            style: showPanel.value ? submenuItemStyle2.value : submenuItemStyle.value,
             textAlign: TextAlign.left,
           ),
         ),
         Obx(
           () => Text(
             "PURCHASE ORDER",
-            style: showPanel.value ? submenuItemStyle2 : submenuItemStyle,
+            style: showPanel.value ? submenuItemStyle2.value : submenuItemStyle.value,
             textAlign: TextAlign.left,
           ),
         )
@@ -92,33 +94,33 @@ class DashboardController extends GetxController {
       [
         Text(
           "CHAT",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.message,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ],
       [
         Text(
           "ETERNAL KBS",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.attach_file,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ],
       [
         Text(
           "SETTINGS",
-          style: menuItemStyle,
+          style: menuItemStyle.value,
         ),
         Icon(
           Icons.settings,
-          color: iconColor,
+          color: iconColor.value,
           size: 32,
         )
       ]
@@ -295,6 +297,14 @@ class DashboardController extends GetxController {
       List<MessageModel> newMessages = await firebaseController.getRecentChat(chatId, allChats[chatId]!.first.timeStamp);
       allChats[chatId]!.insertAll(0, newMessages.where((ele) => allChats[chatId]!.every((element) => ele.timeStamp != element.timeStamp)));
     });
+  }
+
+  void changeTheme(){
+    menuItemStyle.value = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline5:CustomTheme.lightTheme.textTheme.headline5;
+    submenuItemStyle.value = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline6:CustomTheme.lightTheme.textTheme.headline6;
+    submenuItemStyle2.value = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.caption:CustomTheme.lightTheme.textTheme.caption;
+    iconColor.value = ThemeColors.darkTheme?CustomTheme.darkTheme.iconTheme.color:CustomTheme.lightTheme.iconTheme.color;
+    tileColor.value = ThemeColors.darkTheme?CustomTheme.darkTheme.appBarTheme.backgroundColor:CustomTheme.lightTheme.appBarTheme.backgroundColor;
   }
 
 
