@@ -42,6 +42,11 @@ dependencies:
   cloud_firestore: ^3.1.5
   file_picker: ^4.3.2
   firebase_storage: ^10.2.5
+  html_editor_enhanced: ^2.4.0+1
+  pointer_interceptor: ^0.9.0+1
+  flutter_quill: ^3.6.3
+  permission_handler: ^8.3.0
+  dropdown_search: ^2.0.1
 
 dev_dependencies:
   flutter_test:

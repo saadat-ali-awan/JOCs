@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firedart/auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';

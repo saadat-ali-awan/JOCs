@@ -18,9 +18,7 @@ class ScreensLayout extends StatelessWidget {
           children: [
             TopMenu(),
             Expanded(
-                child: Container(
-                  child: MainScreen(),
-                )
+                child: MainScreen()
             )
           ],
         ),

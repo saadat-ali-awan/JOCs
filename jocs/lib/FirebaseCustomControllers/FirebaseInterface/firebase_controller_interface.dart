@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 
 abstract class FirebaseControllerInterface {
   get auth;
@@ -21,7 +22,7 @@ abstract class FirebaseControllerInterface {
   bool checkFirebaseLoggedIn();
   Future<void> addDataToFirebase(data, String collectionName);
   register(String username, String email, String password);
-  getData(String collectionName, int page, int length, {String filter = ""});
+  getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}});
   Future<int> getDashboardData(String documentName, {String filter= ""});
   void newChatListener();
   Stream<List<PersonModel>> friendListStream();
@@ -41,6 +42,13 @@ abstract class FirebaseControllerInterface {
   String getCurrentUserId();
 
   void uploadImage(Uint8List imageData, String extension);
+  void updateUserData(Map<String, dynamic> data);
 
   void getCurrentUserData();
+
+  void addArticleCategory(Map<String, String> data, String collectionName);
+
+  Stream<List<ArticleCategory>> getCategoryData();
+
+  void createNewArticle(Map<String, String> data);
 }

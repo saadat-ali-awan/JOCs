@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LightThemeColors {
   static Color mainColor = const Color(0xFF00b694);
@@ -31,6 +35,21 @@ class ThemeColors {
   }
 
   static Future<bool> getThemeMode() async {
+    if (!kIsWeb){
+      var status = await Permission.storage.status;
+      if (status.isDenied) {
+        if (await Permission.storage.request().isGranted) {
+          // Either the permission was already granted before or the user just granted it.
+          var path = Directory.current.path;
+          Hive.init(path);
+        }
+        return false;
+      }else {
+        var path = Directory.current.path;
+        Hive.init(path);
+      }
+    }
+
     var box = await Hive.openBox("theme");
     if (box.get("mode") != null && box.get("mode")){
       darkTheme = true;
@@ -77,7 +96,7 @@ class CustomTheme {
         textTheme: TextTheme(
           headline1: TextStyle(color: ThemeColors.secondaryColor),
           headline2: TextStyle(color: ThemeColors.secondaryColor),
-          headline3: TextStyle(color: ThemeColors.secondaryColor),
+          headline3: TextStyle(color: LightThemeColors.mainColor),
           headline4: TextStyle(color: ThemeColors.secondaryColor),
           headline5: TextStyle(color: ThemeColors.secondaryColor),
           headline6: TextStyle(color: ThemeColors.secondaryColor),
@@ -172,7 +191,7 @@ class CustomTheme {
         textTheme: TextTheme(
           headline1: TextStyle(color: ThemeColors.secondaryColor),
           headline2: TextStyle(color: ThemeColors.secondaryColor),
-          headline3: TextStyle(color: ThemeColors.secondaryColor),
+          headline3: TextStyle(color: DarkThemeColors.mainColor),
           headline4: TextStyle(color: ThemeColors.secondaryColor),
           headline5: TextStyle(color: ThemeColors.secondaryColor),
           headline6: TextStyle(color: ThemeColors.secondaryColor),

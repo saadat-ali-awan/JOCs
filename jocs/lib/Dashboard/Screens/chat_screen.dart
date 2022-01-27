@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
-import 'package:jocs/Dashboard/Dialog/chat_screen_dialog.dart';
+import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/chat_screen_dialog.dart';
 import 'package:intl/intl.dart';
 
 class ChatScreen extends StatelessWidget {

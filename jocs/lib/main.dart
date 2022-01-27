@@ -6,9 +6,11 @@ import 'package:jocs/Dashboard/Bindings/dashboard_bindings.dart';
 import 'package:jocs/Dashboard/dashboard.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
+import 'package:jocs/HtmlEditorTest/html_editor_test.dart';
 import 'package:jocs/Registration/bindings/register_bindings.dart';
 import 'package:jocs/Registration/register.dart';
 
+import 'Dashboard/Screens/eternal_kbs_screen.dart';
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'Theme/custom_theme.dart';
@@ -19,19 +21,21 @@ Future<void> main() async {
   /// It is required for Firebase Initialization
   WidgetsFlutterBinding.ensureInitialized();
 
-  bool isDarkTheme = await ThemeColors.getThemeMode();
-  print("Is Dark? ${isDarkTheme}");
+
   /// Firebase is initialized using firebase_options.dart
   /// firebase_options.dart is generated automatically by flutterfire configure command
   /// It contains all the details to connect with Firebase
 
-  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
+  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
     Get.put(FirebaseController());
   }else {
     if (defaultTargetPlatform == TargetPlatform.windows){
       Get.put(FirebaseControllerWindows());
     }
   }
+
+  bool isDarkTheme = await ThemeColors.getThemeMode();
+  print("Is Dark? ${isDarkTheme}");
 
 
   /// Entry Point For App
@@ -61,6 +65,10 @@ Future<void> main() async {
             name: '/dashboard',
             page: ()=> const Dashboard(),
             binding: DashboardBindings()
+          ),
+          GetPage(
+            name: "/htmlTest",
+            page: ()=> HtmlEditorTest(),
           )
         ],
         initialRoute: '/login',

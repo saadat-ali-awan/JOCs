@@ -45,7 +45,7 @@ class InventoryScreen extends StatelessWidget {
                               .currentPaginatedPage){
                             _dashboardController.inventoryAdapter.value
                                 .getNextPage(_dashboardController
-                                .firebaseController);
+                                .firebaseController, <String, String>{});
                           }
                           _dashboardController.inventoryAdapter.value
                               .currentPaginatedPage = ((index+1)/10).ceil();

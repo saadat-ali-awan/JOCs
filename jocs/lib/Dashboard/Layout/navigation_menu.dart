@@ -338,10 +338,11 @@ class NavItems extends StatelessWidget {
                     onTap: (){
                       _dashboardController.selectedMenuItem.value = 7;
                     },
-                    child: const Image(
+                    child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl == "" ? Image(
                       image: AssetImage('images/avatar.png'),
                       width: 100,
                       height: 100,
+                    ): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
                     ),
                   ),
                 ),

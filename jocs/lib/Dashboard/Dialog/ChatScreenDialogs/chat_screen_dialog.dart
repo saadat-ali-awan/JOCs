@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jocs/Dashboard/Dialog/search_group_user_dialog.dart';
-import 'package:jocs/Dashboard/Dialog/search_user_dialog.dart';
+import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/search_group_user_dialog.dart';
+import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/search_user_dialog.dart';
 
 import 'create_group_dialog.dart';
 

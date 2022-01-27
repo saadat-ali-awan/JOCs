@@ -8,6 +8,7 @@ import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
 import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
@@ -198,8 +199,8 @@ class DashboardController extends GetxController {
 
   /// Tickets Screen Getx Logic
   late Rx<ScreenAdapter> ticketAdapter;
-  getTicketsData() async {
-    ticketAdapter.value.getScreenData(firebaseController);
+  getTicketsData({Map<String, String> customFilter = const <String, String>{}}) async {
+    ticketAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
     ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
   }
   /**
@@ -208,8 +209,8 @@ class DashboardController extends GetxController {
 
   /// Problems Screen Getx Logic
   late Rx<ScreenAdapter> problemAdapter;
-  getProblemsData() async {
-    problemAdapter.value.getScreenData(firebaseController);
+  getProblemsData({Map<String, String> customFilter = const <String, String>{}}) async {
+    problemAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
     problemAdapter.value.lastId.value = await firebaseController.getLastId("problems");
   }
   /**
@@ -248,6 +249,7 @@ class DashboardController extends GetxController {
   void initializeStream(){
     friendsList.bindStream(firebaseController.friendListStream());
     groupList.bindStream(firebaseController.groupListStream());
+    getCategoryData();
     //firebaseController.newChatListener();
   }
 
@@ -310,6 +312,7 @@ class DashboardController extends GetxController {
     });
   }
 
+  /// Theme
   void changeTheme(){
     menuItemStyle.value = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline5:CustomTheme.lightTheme.textTheme.headline5;
     submenuItemStyle.value = ThemeColors.darkTheme?CustomTheme.darkTheme.textTheme.headline6:CustomTheme.lightTheme.textTheme.headline6;
@@ -318,5 +321,17 @@ class DashboardController extends GetxController {
     tileColor.value = ThemeColors.darkTheme?CustomTheme.darkTheme.appBarTheme.backgroundColor:CustomTheme.lightTheme.appBarTheme.backgroundColor;
   }
 
+  /// Eternal KBS Screen Functions
+  RxList<ArticleCategory> categoryList = RxList<ArticleCategory>();
+  void addArticleCategory(Map<String, String> data){
+    firebaseController.addArticleCategory(data, "category");
+  }
 
+  void createNewArticle(Map<String, String> data){
+    firebaseController.createNewArticle(data);
+  }
+
+  void getCategoryData() async {
+    categoryList.bindStream(firebaseController.getCategoryData());
+  }
 }

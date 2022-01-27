@@ -7,6 +7,7 @@ class ProblemsScreen extends StatelessWidget {
 
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
+  Map<String,  String> customFilter = <String, String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +28,79 @@ class ProblemsScreen extends StatelessWidget {
                                 color: Get.theme.appBarTheme
                                     .backgroundColor))),
                     child: PaginatedDataTable(
-                      columns: const [
-                        DataColumn(label: Text("Issued By")),
-                        DataColumn(label: Text("Topic")),
-                        DataColumn(label: Text("Status")),
-                        DataColumn(label: Text("Priority")),
-                        DataColumn(label: Text("Assigned To")),
-                        DataColumn(label: Text("Department")),
+                      columns: [
+                        const DataColumn(label: Text("Issued By")),
+                        const DataColumn(label: Text("Topic")),
+                        DataColumn(
+                          label: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
+                              borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                              child: Theme(
+                                data: context.theme.copyWith(canvasColor: context.theme.appBarTheme.backgroundColor),
+                                child: DropdownButton(
+                                  iconEnabledColor: context.theme.appBarTheme.foregroundColor,
+                                  style: context.textTheme.bodyText1,
+                                  value: "Status",
+                                  items: <String>["Status", "OPEN", "PENDING", "RESOLVED", "CLOSED"].map((value){
+                                    return DropdownMenuItem(
+                                      child: Text(value, textAlign: TextAlign.right,),
+                                      value: value,
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue){
+                                    if (newValue != null){
+                                      customFilter["status"] = newValue;
+                                      _dashboardController.getProblemsData(customFilter:customFilter);
+                                    }
+                                  },
+                                  isExpanded: false,
+                                  underline: Container(),
+
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
+                              borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                              child: Theme(
+                                data: context.theme.copyWith(canvasColor: context.theme.appBarTheme.backgroundColor),
+                                child: DropdownButton(
+                                  iconEnabledColor: context.theme.appBarTheme.foregroundColor,
+                                  style: context.textTheme.bodyText1,
+                                  value: "Priority",
+                                  items: <String>["Priority", "LOW", "MEDIUM", "HIGH", "URGENT"].map((value){
+                                    return DropdownMenuItem(
+                                      child: Text(value, textAlign: TextAlign.right,),
+                                      value: value,
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue){
+                                    if (newValue != null){
+                                      customFilter["priority"] = newValue;
+                                      _dashboardController.getProblemsData(customFilter:customFilter);
+                                    }
+                                  },
+                                  isExpanded: false,
+                                  underline: Container(),
+
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const DataColumn(label: Text("Assigned To")),
+                        const DataColumn(label: Text("Department")),
                       ],
                       source: _dashboardController
                           .problemAdapter.value.dataTableSource.value,
@@ -45,7 +112,7 @@ class ProblemsScreen extends StatelessWidget {
                               .currentPaginatedPage){
                             _dashboardController.problemAdapter.value
                                 .getNextPage(_dashboardController
-                                .firebaseController);
+                                .firebaseController, customFilter);
                           }
                           _dashboardController.problemAdapter.value
                               .currentPaginatedPage = ((index+1)/10).ceil();

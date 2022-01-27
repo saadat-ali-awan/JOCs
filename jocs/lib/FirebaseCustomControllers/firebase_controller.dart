@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
@@ -21,7 +22,7 @@ class FirebaseController implements FirebaseControllerInterface{
   late RegisterController _registerController;
 
   @override
-  CurrentUserDetails currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "");
+  Rx<CurrentUserDetails> currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "").obs;
   late var data;
 
   @override
@@ -32,6 +33,15 @@ class FirebaseController implements FirebaseControllerInterface{
 
   FirebaseController(){
     initializeFirebase();
+  }
+
+  @override
+  void addArticleCategory(Map<String, String> data, String collectionName) {
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    collectionReference
+        .add(data)
+        .then((value) => print("Ticket Added"))
+        .catchError((error) => print("Failed to add Ticket: $error"));
   }
 
   @override
@@ -115,6 +125,14 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
+  void createNewArticle(Map<String, String> data) {
+    collectionReference = FirebaseFirestore.instance.collection("articles");
+    collectionReference.add(data).then((value) {
+      print("Article Added");
+    });
+  }
+
+  @override
   Future<void> createNewChat(id) async {
     collectionReference = FirebaseFirestore.instance.collection("Chat");
     collectionReference
@@ -159,6 +177,20 @@ class FirebaseController implements FirebaseControllerInterface{
           return retVal;
         });
   }
+  
+  @override
+  Stream<List<ArticleCategory>> getCategoryData() {
+    collectionReference = FirebaseFirestore.instance.collection("category");
+    print("Called on getCategory");
+    return collectionReference.snapshots().map((QuerySnapshot snapshot){
+      List<ArticleCategory> retVal = [];
+      for (var category in snapshot.docs){
+        print(category.id);
+        retVal.add(ArticleCategory.fromDocumentSnapshot(documentSnapshot: category));
+      }
+      return retVal;
+    });
+  }
 
   @override
   Future<List<MessageModel>> getChat(String chatId, [MessageModel? lastMessage]) async {
@@ -189,8 +221,10 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   Future<int> getDashboardData(String documentName, {String filter= ""}) async {
+    getCurrentUserData();
     collectionReference = FirebaseFirestore.instance.collection("tickets");
     QuerySnapshot<Object?> tempData;
+
     if (filter == ""){
       tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
     }else{
@@ -202,16 +236,21 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  getData(String collectionName, int page, int length, {String filter = ""}) async {
-    // login("sa@gmail.com", "12345678");
-    print(collectionName);
+  getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}}) async {
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
+
+    Query ref;
     if (page > 1) {
-      data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
+      ref = collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length);
     } else {
-      data = await collectionReference.orderBy("time", descending: true).limit(length).get();
+      ref = collectionReference.orderBy("time", descending: true).limit(length);
     }
-    print(data.docs.length);
+
+    customFilter.forEach((key, value) {
+      ref = ref.where(key, isEqualTo: value);
+    });
+
+    data = await ref.get();
     return data.docs;
   }
 
@@ -263,7 +302,6 @@ class FirebaseController implements FirebaseControllerInterface{
     );
     auth = FirebaseAuth.instance;
     collectionReference = FirebaseFirestore.instance.collection('tickets');
-    getCurrentUserData();
   }
 
   @override
@@ -357,7 +395,7 @@ class FirebaseController implements FirebaseControllerInterface{
     collectionReference = FirebaseFirestore.instance.collection("Chat");
     collectionReference.doc(chatId).collection("messages").doc(uniqueMessageId).set(message);
   }
-
+  
   @override
   String getCurrentUserId() {
     return auth.currentUser!.uid;
@@ -371,12 +409,10 @@ class FirebaseController implements FirebaseControllerInterface{
         .snapshots()
         .map((DocumentSnapshot snapshot) async {
 
-          currentUserDetails = CurrentUserDetails.fromDocumentSnapshot(snapshot);
-          currentUserDetails.downloadUrl.value = await FirebaseStorage.instance
-              .ref('uploads/${currentUserDetails.imageUrl}')
+          currentUserDetails.value = CurrentUserDetails.fromDocumentSnapshot(snapshot);
+          currentUserDetails.value.downloadUrl.value = await FirebaseStorage.instance
+              .ref('uploads/${currentUserDetails.value.imageUrl}')
               .getDownloadURL();
-          print(currentUserDetails.imageUrl);
-          print(currentUserDetails.downloadUrl.value);
         }).listen((event) {
 
         });
@@ -389,6 +425,15 @@ class FirebaseController implements FirebaseControllerInterface{
     collectionReference = FirebaseFirestore.instance.collection("Users");
     collectionReference.doc(getCurrentUserId()).update(imagePath);
     await FirebaseStorage.instance.ref('uploads/${getCurrentUserId()}.$extension').putData(fileBytes);
+  }
+
+  @override
+  void updateUserData(Map<String, dynamic> data) {
+    if (data["email"] != null && data["email"] != ""){
+      auth.currentUser!.updateEmail(data["email"]);
+    }
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference.doc(getCurrentUserId()).update(data);
   }
 
 }

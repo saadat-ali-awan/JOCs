@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/Dashboard/Dialog/ProfileScreenDialogs/change_user_details_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({Key? key}) : super(key: key);
@@ -35,9 +36,13 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Email: XYZ@Dingdong.com", style: context.theme.textTheme.bodyText2,),
+                  Obx((){
+                    return Text("Email: ${_dashboardController.firebaseController.currentUserDetails.value.email}", style: context.theme.textTheme.bodyText2,);
+                  }),
                   IconButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      Get.dialog(ChangeUserDetailsDialog(selectedDialog: 2));
+                    },
                     icon: Icon(Icons.edit, color: _dashboardController.tileColor.value,),
                   )
                 ],
@@ -48,9 +53,14 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Username: Mr. XYZ", style: context.theme.textTheme.bodyText2,),
+                  Obx((){
+                    return Text("Username: ${_dashboardController.firebaseController.currentUserDetails.value.username}", style: context.theme.textTheme.bodyText2,);
+                  }),
+
                   IconButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      Get.dialog(ChangeUserDetailsDialog(selectedDialog: 1));
+                    },
                     icon: Icon(Icons.edit, color: _dashboardController.tileColor.value,),
                   )
                 ],
@@ -66,11 +76,11 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: ClipOval(
                       child: InkWell(
-                        child: Obx(() => _dashboardController.firebaseController.currentUserDetails.downloadUrl == "" ? Image(
+                        child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value == "" ? Image(
                             image: AssetImage('images/avatar.png'),
                             width: 100,
                             height: 100,
-                          ): Image.network(_dashboardController.firebaseController.currentUserDetails.downloadUrl.value),
+                          ): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
                         ),
                       ),
                     ),

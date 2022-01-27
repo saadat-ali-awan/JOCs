@@ -45,7 +45,7 @@ class PurchaseScreen extends StatelessWidget {
                               .currentPaginatedPage){
                             _dashboardController.purchaseAdapter.value
                                 .getNextPage(_dashboardController
-                                .firebaseController);
+                                .firebaseController, <String, String>{});
                           }
                           _dashboardController.purchaseAdapter.value
                               .currentPaginatedPage = ((index+1)/10).ceil();

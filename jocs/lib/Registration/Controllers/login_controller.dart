@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/Registration/Interfaces/login_controller_interface.dart';
 
@@ -10,6 +13,9 @@ class LoginController extends LoginControllerInterface{
 
   @override
   initializeLogin(){
+    var path = Directory.current.path;
+    Hive
+        .init(path);
     FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) {

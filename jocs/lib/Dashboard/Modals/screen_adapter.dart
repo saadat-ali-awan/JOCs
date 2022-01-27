@@ -16,11 +16,17 @@ class ScreenAdapter {
     dataTableSource = CustomDataTableSource(screenName).obs;
   }
 
-  getScreenData(firebaseController, {String filter = ""}) async {
+  getScreenData(firebaseController, {String filter = "", Map<String, String> customFilter = const <String, String>{}, bool nextPage = false}) async {
+    if (customFilter.isNotEmpty && !nextPage){
+      currentPage.value = 1;
+      currentPaginatedPage = 1;
+      lastId.value = 0;
+      adapterData.clear();
+    }
     if (adapterData.length < (10 * currentPage.value)) {
       var data = await firebaseController.getData(
           screenName, currentPage.value, articlesOnOnePage,
-          filter: filter);
+          filter: filter, customFilter: customFilter);
       if (data.length == 0) {
         currentPage -= 1;
       } else {
@@ -90,10 +96,10 @@ class ScreenAdapter {
     // }
   }
 
-  getNextPage(firebaseController) {
+  getNextPage(firebaseController, Map<String , String> customFilter) {
     currentPage.value += 1;
     getScreenData(firebaseController,
-        filter: adapterData[adapterData.length-1]["time"]);
+        filter: adapterData[adapterData.length-1]["time"], customFilter: customFilter, nextPage: true);
   }
 
   getPreviousPage(firebaseController) {
@@ -110,7 +116,7 @@ class ScreenAdapter {
     getScreenData(firebaseController);
   }
 
-  DataRow createRow(data) {
+  static DataRow createRow(data) {
     return DataRow(cells: [
       DataCell(
         Padding(

@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/hive_store.dart';
 import 'package:jocs/Registration/Controllers/login_controller_windows.dart';
@@ -35,8 +36,15 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  void addArticleCategory(Map<String, String> data, String collectionName) async {
+    var reference = firestore.collection(collectionName);
+    await reference.add(data);
+  }
+
+  @override
   Future<void> addDataToFirebase(data, String collectionName) async {
-    var reference = firestore.collection('tickets');
+    var reference = firestore.collection(collectionName);
+    data["id"] = await getLastId(collectionName);
     var docReference = await reference.add(data);
   }
 
@@ -110,6 +118,11 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  void createNewArticle(Map<String, String> data) {
+    // TODO: implement createNewArticle
+  }
+
+  @override
   Future<void> createNewChat(id) async {
     var reference = firestore.collection('Chat');
     reference
@@ -155,6 +168,17 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
         });
   }
 
+  @override
+  Stream<List<ArticleCategory>> getCategoryData(){
+    var reference = firestore.collection('category');
+    return reference.stream.map((List<Document> documents){
+      List<ArticleCategory> retVal = [];
+      for (Document document in documents){
+        retVal.add(ArticleCategory(document["category-name"], document["description"]));
+      }
+      return retVal;
+    });
+  }
   @override
   Future<List<MessageModel>> getChat(String chatId, [MessageModel? lastMessage]) async {
     List<MessageModel> temp = [];
@@ -203,7 +227,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
-  getData(String collectionName, int page, int length, {String filter = ""}) async {
+  getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}}) async {
     var collectionReference = firestore.collection(collectionName);
     List<Document> data = <Document>[];
     if (page > 1) {
@@ -372,6 +396,11 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   void uploadImage(Uint8List fileBytes, String extension) {
     // TODO: implement uploadImage
+  }
+
+  @override
+  void updateUserData(Map<String, dynamic> data) {
+    // TODO: implement updateUserData
   }
 
 }
