@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jocs/ArticleReader/Bindings/article_reader_binding.dart';
 import 'package:jocs/Dashboard/Bindings/dashboard_bindings.dart';
 import 'package:jocs/Dashboard/dashboard.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
@@ -10,6 +11,7 @@ import 'package:jocs/HtmlEditorTest/html_editor_test.dart';
 import 'package:jocs/Registration/bindings/register_bindings.dart';
 import 'package:jocs/Registration/register.dart';
 
+import 'ArticleReader/article_reader.dart';
 import 'Dashboard/Screens/eternal_kbs_screen.dart';
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
@@ -42,6 +44,7 @@ Future<void> main() async {
   /// Firebase will go to Login Page initially
   runApp(
       GetMaterialApp(
+        debugShowCheckedModeBanner: false,
         /// Using GetX Library for advanced State Management
         scrollBehavior: MyCustomScrollBehavior(),
         theme: ThemeColors.darkTheme? CustomTheme.darkTheme : CustomTheme.lightTheme,
@@ -69,7 +72,12 @@ Future<void> main() async {
           GetPage(
             name: "/htmlTest",
             page: ()=> HtmlEditorTest(),
-          )
+          ),
+          GetPage(
+            name: '/articleReader',
+            page: ()=> ArticleReader(),
+            binding: ArticleReaderBinding(),
+          ),
         ],
         initialRoute: '/login',
         initialBinding: LoginBindings(),

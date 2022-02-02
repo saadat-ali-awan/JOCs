@@ -28,12 +28,13 @@ class InventoryScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: const [
-                        DataColumn(label: Text("Issued By")),
-                        DataColumn(label: Text("Topic")),
-                        DataColumn(label: Text("Status")),
-                        DataColumn(label: Text("Priority")),
-                        DataColumn(label: Text("Assigned To")),
-                        DataColumn(label: Text("Comments")),
+                        DataColumn(label: Expanded(child: Text("Item Name", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("Item Type", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("Location", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("Used By", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("Processed By", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("Comments", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                       ],
                       source: _dashboardController
                           .inventoryAdapter.value.dataTableSource.value,

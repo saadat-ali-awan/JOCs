@@ -27,42 +27,76 @@ class TopMenu extends StatelessWidget {
                     children: getTitle(),
                   )),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      if (_dashboardController.selectedMenuItem>0) {
-                        Get.dialog(
-                          CustomDialog()
-                        );
-                      }else{
-                        Get.defaultDialog(
-                          titlePadding: const EdgeInsets.all(16.0),
-                            title: "Can not add when in Dashboard Tab",
-                          middleText: "Switch Tab and come back.",
-                          titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
-                          onConfirm: (){
-                              Get.back();
-                          },
-                          confirmTextColor:  context.theme.iconTheme.color,
-                          buttonColor: context.theme.appBarTheme.backgroundColor
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.add_box)),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.perm_contact_calendar_rounded)),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.notifications_active))
-              ],
-            )
+            IconButton(
+                onPressed: () {
+                  if (_dashboardController.selectedMenuItem>0) {
+                    Get.dialog(
+                        CustomDialog()
+                    );
+                  }else{
+                    Get.defaultDialog(
+                        titlePadding: const EdgeInsets.all(16.0),
+                        title: "Can not add when in Dashboard Tab",
+                        middleText: "Switch Tab and come back.",
+                        titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+                        onConfirm: (){
+                          Get.back();
+                        },
+                        confirmTextColor:  context.theme.iconTheme.color,
+                        buttonColor: context.theme.appBarTheme.backgroundColor
+                    );
+                  }
+                },
+                icon: const Icon(Icons.add_box)),
+            // _dashboardController.mobileDisplay.value ? PopupMenuButton(
+            //     color: context.theme.appBarTheme.backgroundColor,
+            //     itemBuilder: (context) {
+            //       List<Widget> list = getMenuItems(context);
+            //       return [
+            //         PopupMenuItem(child: list[0]),
+            //         PopupMenuItem(child: list[1]),
+            //         PopupMenuItem(child: list[2]),
+            //       ];
+            //     }) : Row(
+            //         mainAxisSize: MainAxisSize.min,
+            //         children: getMenuItems(context)
+            //     ),
           ],
         )),
       ]),
     );
+  }
+
+  List<Widget> getMenuItems(context) {
+    return [
+      IconButton(
+          onPressed: () {
+            if (_dashboardController.selectedMenuItem>0) {
+              Get.dialog(
+                  CustomDialog()
+              );
+            }else{
+              Get.defaultDialog(
+                  titlePadding: const EdgeInsets.all(16.0),
+                  title: "Can not add when in Dashboard Tab",
+                  middleText: "Switch Tab and come back.",
+                  titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+                  onConfirm: (){
+                    Get.back();
+                  },
+                  confirmTextColor:  context.theme.iconTheme.color,
+                  buttonColor: context.theme.appBarTheme.backgroundColor
+              );
+            }
+          },
+          icon: const Icon(Icons.add_box)),
+      IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.perm_contact_calendar_rounded)),
+      IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications_active))
+    ];
   }
 
   List<Widget> getTitle() {

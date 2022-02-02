@@ -3,13 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ArticleCategory {
   String name = "";
   String description = "";
-  List<String> articles = [];
+  List<dynamic> articles = [];
   ArticleCategory(this.name, [this.description = "", this.articles = const []]);
 
   ArticleCategory.fromDocumentSnapshot({required DocumentSnapshot documentSnapshot}) {
     name = documentSnapshot["category-name"];
     description = documentSnapshot["description"];
-    articles = [];
+    articles = List.from(documentSnapshot["articles"]);
+    print(articles);
   }
 
   factory ArticleCategory.fromJson(Map<String, dynamic> json){

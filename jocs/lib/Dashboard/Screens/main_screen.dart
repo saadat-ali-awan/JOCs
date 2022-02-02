@@ -23,7 +23,7 @@ class MainScreen extends StatelessWidget {
     return Obx((){
       switch (_dashboardController.selectedMenuItem.value){
         case 0:
-          return EternalKbsScreen();
+          return DashboardScreen();
         case 1:
           return TicketsScreen();
         case 2:

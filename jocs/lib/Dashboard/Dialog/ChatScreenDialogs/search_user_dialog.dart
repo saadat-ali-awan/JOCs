@@ -64,7 +64,7 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
 
                   },
                   child: Text(
-                    "Add Item",
+                    "Search User",
                     style: Get.textTheme.bodyText1,
                   ),
                 ),

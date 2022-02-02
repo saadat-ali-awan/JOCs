@@ -28,12 +28,13 @@ class PurchaseScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: const [
-                        DataColumn(label: Text("ORDER NO.")),
-                        DataColumn(label: Text("ORDER NAME")),
-                        DataColumn(label: Text("DESCRIPTION")),
-                        DataColumn(label: Text("EXPECTED DELIVERY")),
-                        DataColumn(label: Text("STATUS")),
-                        DataColumn(label: Text("COMMENTS")),
+                        DataColumn(label: Expanded(child: Text("ORDER NO.", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("ORDER NAME", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("DESCRIPTION", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("EXPECTED DELIVERY", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("STATUS", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("COMMENTS", textAlign: TextAlign.center,))),
+                        DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                       ],
                       source: _dashboardController
                           .purchaseAdapter.value.dataTableSource.value,

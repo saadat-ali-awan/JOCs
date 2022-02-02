@@ -58,6 +58,7 @@ class _ChangeUserEmailDialogState extends State<ChangeUserEmailDialog> {
                   setState(() {
                     emailController.clear();
                   });
+                  Get.back();
                 }
 
               },

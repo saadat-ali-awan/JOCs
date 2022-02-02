@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 
 abstract class FirebaseControllerInterface {
   get auth;
@@ -20,7 +22,7 @@ abstract class FirebaseControllerInterface {
   initializeRegisterController();
   login(String email, String password);
   bool checkFirebaseLoggedIn();
-  Future<void> addDataToFirebase(data, String collectionName);
+  Future<void> addDataToFirebase(data, String collectionName, String metadataKey, int lastId);
   register(String username, String email, String password);
   getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}});
   Future<int> getDashboardData(String documentName, {String filter= ""});
@@ -32,7 +34,7 @@ abstract class FirebaseControllerInterface {
   Future<List<String>> searchFriend(String email);
   Future<void> addFriend(List friendData);
   Future<void> addFriendToGroup(List friendData, String chatId, String groupName);
-  Future<int> getLastId(String collectionName);
+  //Future<int> getLastId(String collectionName);
 
   void sendMessage(String chatId, String message);
 
@@ -46,9 +48,19 @@ abstract class FirebaseControllerInterface {
 
   void getCurrentUserData();
 
-  void addArticleCategory(Map<String, String> data, String collectionName);
+  void addArticleCategory(Map<String, dynamic> data, String collectionName);
 
   Stream<List<ArticleCategory>> getCategoryData();
 
-  void createNewArticle(Map<String, String> data);
+  void createNewArticle(Map<String, dynamic> data, int lastId);
+
+  Future<dynamic> getArticle(String documentId);
+
+  Stream<DetailedMetadata> getMetaDataFromDatabase();
+
+  void setMetadataInDatabase(Map<String, int> metaDataMap);
+
+  void removeDataFromTable(String screenName, String time, Map<String, int> map);
+
+  void removeArticleFromCategory(String categoryName, reference);
 }

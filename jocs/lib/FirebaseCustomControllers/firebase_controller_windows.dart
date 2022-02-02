@@ -13,6 +13,7 @@ import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/hive_store.dart';
 import 'package:jocs/Registration/Controllers/login_controller_windows.dart';
@@ -36,15 +37,15 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
-  void addArticleCategory(Map<String, String> data, String collectionName) async {
+  void addArticleCategory(Map<String, dynamic> data, String collectionName) async {
     var reference = firestore.collection(collectionName);
     await reference.add(data);
   }
 
   @override
-  Future<void> addDataToFirebase(data, String collectionName) async {
+  Future<void> addDataToFirebase(data, String collectionName, String metadataKey, int lastId) async {
     var reference = firestore.collection(collectionName);
-    data["id"] = await getLastId(collectionName);
+    data["id"] = lastId;
     var docReference = await reference.add(data);
   }
 
@@ -118,8 +119,25 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
-  void createNewArticle(Map<String, String> data) {
-    // TODO: implement createNewArticle
+  void createNewArticle(Map<String, dynamic> data, int lastId) async {
+    data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
+    data["id"] = lastId;
+    var reference = firestore.collection('articles');
+    reference.add(data).then((value) {
+        reference = firestore.collection('category');
+        reference.where("category-name", isEqualTo: data['category-name']).get().then((List<Document> docs){
+          docs.forEach((element) {
+            List articles = element["articles"];
+            Map<String, String> tempArticle = {
+              'topic': data['topic']!,
+              'id': value.id
+            };
+            articles.add(tempArticle);
+            reference.document(element.id).update({"articles": articles});
+          });
+        });
+    });
+
   }
 
   @override
@@ -169,6 +187,13 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  Future<Document> getArticle(String documentId) {
+    var reference = firestore.collection('articles');
+    var snapshot = reference.document(documentId).get();
+    return snapshot;
+  }
+
+  @override
   Stream<List<ArticleCategory>> getCategoryData(){
     var reference = firestore.collection('category');
     return reference.stream.map((List<Document> documents){
@@ -215,6 +240,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   Future<int> getDashboardData(String documentName, {String filter = ""}) async {
+    getCurrentUserData();
     var collectionReference = firestore.collection("tickets");
     List<Document> tempData;
     if (filter == ""){
@@ -243,17 +269,17 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     return returnData;
   }
 
-  @override
-  Future<int> getLastId(String collectionName) async {
-    int lastId = 1;
-    var collectionReference = firestore.collection(collectionName);
-    var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
-    for (var doc in dataTemp) {
-      lastId = doc.map["id"];
-      lastId += 1;
-    }
-    return lastId;
-  }
+  // @override
+  // Future<int> getLastId(String collectionName) async {
+  //   int lastId = 1;
+  //   var collectionReference = firestore.collection(collectionName);
+  //   var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
+  //   for (var doc in dataTemp) {
+  //     lastId = doc.map["id"];
+  //     lastId += 1;
+  //   }
+  //   return lastId;
+  // }
 
   @override
   Future<List<MessageModel>> getRecentChat(String chatId, String mostRecentMessageTimeStamp) async {
@@ -353,7 +379,15 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     }on AuthException catch(e){
       _registerControllerWindows.registerErrorMessage.value = e.message;
     }
+  }
 
+  @override
+  void removeDataFromTable(String screenName, String time, Map<String, int> map) {
+    // TODO: implement removeDataFromTable
+  }
+
+  void removeArticleFromCategory(String categoryName, reference) {
+    // TODO: implement removeArticleFromCategory
   }
 
   @override
@@ -387,20 +421,50 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   void getCurrentUserData() {
-    // TODO: implement getCurrentUserData
+    var ref = firestore.collection("Users");
+    ref.document(auth.userId).stream.map((Document? document) {
+      if (document != null) {
+        currentUserDetails.value = CurrentUserDetails.fromDocumentSnapshotWindows(document);
+        // TODO
+      }
+    }).listen((event) { });
   }
 
   @override
-  CurrentUserDetails currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "");
+  Rx<CurrentUserDetails> currentUserDetails = CurrentUserDetails(userId: "", email: "", username: "").obs;
 
   @override
   void uploadImage(Uint8List fileBytes, String extension) {
-    // TODO: implement uploadImage
+    Get.defaultDialog(title: "Sorry", textCustom: "Cannot Access Firebase Storage from Windows");
   }
 
   @override
   void updateUserData(Map<String, dynamic> data) {
-    // TODO: implement updateUserData
+    if (data["email"] != null && data["email"] != ""){
+      // TODO: Change Email Using Firedart
+      Get.defaultDialog(title:  "Cannot Change Email From Windows");
+      //auth.updateProfile(email: data["email"]);
+    }
+    // var ref = firestore.collection("Users");
+    // ref.document(getCurrentUserId()).update(data);
+  }
+
+  @override
+  Stream<DetailedMetadata> getMetaDataFromDatabase() {
+    var ref = firestore.collection("metadata");
+    return ref.document("data").stream.map((Document? document) {
+      if (document != null){
+        return DetailedMetadata.fromDataSnapshotWindows(document);
+      }else {
+        return DetailedMetadata();
+      }
+    });
+  }
+
+  @override
+  void setMetadataInDatabase(Map<String, int> metaDataMap) {
+    var ref = firestore.collection("metadata");
+    ref.document("data").update(metaDataMap);
   }
 
 }

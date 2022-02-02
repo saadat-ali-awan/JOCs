@@ -158,7 +158,7 @@ class _PurchaseItemState extends State<PurchaseItem> {
                     'status': statusController.text,
                     'comments': commentsController.text,
                     'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                  }, "purchase");
+                  }, "purchase", "purchaseCount", _dashboardController.metadata.value.purchaseCount);
                   setState(() {
                     orderNoController.clear();
                     orderNameController.clear();
@@ -168,11 +168,12 @@ class _PurchaseItemState extends State<PurchaseItem> {
                     commentsController.clear();
                     commentsController.clear();
                   });
+                  Get.back();
                 }
 
               },
               child: Text(
-                "Add Item",
+                "Add Purchase Item",
                 style: Get.textTheme.bodyText1,
               ),
             ),

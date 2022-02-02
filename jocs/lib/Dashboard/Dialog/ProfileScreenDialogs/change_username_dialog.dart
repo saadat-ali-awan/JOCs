@@ -58,6 +58,7 @@ class _ChangeUsernameDialogState extends State<ChangeUsernameDialog> {
                   setState(() {
                     usernameController.clear();
                   });
+                  Get.back();
                 }
 
               },

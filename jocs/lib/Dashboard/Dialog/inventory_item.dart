@@ -158,7 +158,7 @@ class _InventoryItemState extends State<InventoryItem> {
                     'processed_by': processedByController.text,
                     'comments': commentsController.text,
                     'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                  }, "inventory");
+                  }, "inventory", "inventoryCount", _dashboardController.metadata.value.inventoryCount);
                   setState(() {
                     itemNameController.clear();
                     itemTypeController.clear();
@@ -168,11 +168,12 @@ class _InventoryItemState extends State<InventoryItem> {
                     commentsController.clear();
                     commentsController.clear();
                   });
+                  Get.back();
                 }
 
               },
               child: Text(
-                "Add Item",
+                "Add Inventory Item",
                 style: Get.textTheme.bodyText1,
               ),
             ),

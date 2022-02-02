@@ -1,10 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class LightThemeColors {
   static Color mainColor = const Color(0xFF00b694);
@@ -35,20 +31,7 @@ class ThemeColors {
   }
 
   static Future<bool> getThemeMode() async {
-    if (!kIsWeb){
-      var status = await Permission.storage.status;
-      if (status.isDenied) {
-        if (await Permission.storage.request().isGranted) {
-          // Either the permission was already granted before or the user just granted it.
-          var path = Directory.current.path;
-          Hive.init(path);
-        }
-        return false;
-      }else {
-        var path = Directory.current.path;
-        Hive.init(path);
-      }
-    }
+    await Hive.initFlutter();
 
     var box = await Hive.openBox("theme");
     if (box.get("mode") != null && box.get("mode")){
@@ -162,7 +145,8 @@ class CustomTheme {
                 )
             )
         ),
-        dividerColor: Colors.black
+        dividerColor: Colors.black,
+      errorColor: ThemeColors.errorColor,
     );
   }
 
@@ -257,7 +241,8 @@ class CustomTheme {
                 )
             )
         ),
-        dividerColor: Colors.black
+        dividerColor: Colors.black,
+      errorColor: ThemeColors.errorColor,
     );
   }
 }

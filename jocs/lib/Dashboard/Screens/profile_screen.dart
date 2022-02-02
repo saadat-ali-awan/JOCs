@@ -76,11 +76,16 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: ClipOval(
                       child: InkWell(
-                        child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value == "" ? Image(
-                            image: AssetImage('images/avatar.png'),
-                            width: 100,
-                            height: 100,
-                          ): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
+                        child: Obx(() =>
+                        _dashboardController.firebaseController
+                            .currentUserDetails.value.downloadUrl.value == ""
+                            ? Text(_dashboardController.firebaseController
+                            .currentUserDetails.value.email.isEmpty? "J"
+                            : _dashboardController.firebaseController
+                            .currentUserDetails.value.email[0], style: context.textTheme.headline3,)
+                            : Image.network(_dashboardController
+                            .firebaseController.currentUserDetails.value
+                            .downloadUrl.value),
                         ),
                       ),
                     ),

@@ -4,9 +4,14 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 
-class AddArticleDialog extends StatelessWidget {
+class AddArticleDialog extends StatefulWidget {
   AddArticleDialog({Key? key}) : super(key: key);
 
+  @override
+  State<AddArticleDialog> createState() => _AddArticleDialogState();
+}
+
+class _AddArticleDialogState extends State<AddArticleDialog> {
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
 
@@ -150,10 +155,16 @@ class AddArticleDialog extends StatelessWidget {
                   _dashboardController.createNewArticle({
                     'topic': articleTopicController.text,
                     'author': articleAuthorController.text,
-                    'category': categorySelected.name,
+                    'category-name': categorySelected.name,
                     'comment': articleCommentsController.text,
                     'article': Get.arguments['article'],
                   });
+                  setState(() {
+                    articleTopicController.clear();
+                    articleAuthorController.clear();
+                    articleCommentsController.clear();
+                  });
+                  Get.back();
                 }
 
               },

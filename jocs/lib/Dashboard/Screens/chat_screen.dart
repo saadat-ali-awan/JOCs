@@ -98,8 +98,32 @@ class MobileChatScreen extends StatelessWidget {
                             child: Center(
                                 child: InkWell(
                               onTap: () {
-                                selectedChat.value = _dashboardController
-                                    .groupList.value[index].modelName;
+                                if ((_dashboardController.openChat != null &&
+                                    _dashboardController.openChat!.chatId == _dashboardController.friendsList[index].chatId)) {
+                                  return;
+                                }
+                                _dashboardController.startTimer(_dashboardController.friendsList[index].chatId);
+                                if (_dashboardController.allChats[_dashboardController.friendsList[index].chatId] != null){
+                                  selectedChat.value =
+                                      _dashboardController
+                                          .friendsList[index]
+                                          .modelName;
+                                  _dashboardController.openChat =
+                                  _dashboardController
+                                      .friendsList[index];
+                                  return;
+                                }
+                                _dashboardController.openChat =
+                                _dashboardController
+                                    .friendsList[index];
+                                _dashboardController
+                                    .startChatStream(
+                                    _dashboardController
+                                        .openChat!.chatId);
+                                selectedChat.value =
+                                    _dashboardController
+                                        .friendsList[index]
+                                        .chatId;
                               },
                               child: Container(
                                 padding: EdgeInsets.all(4.0),
@@ -138,9 +162,7 @@ class MobileChatScreen extends StatelessWidget {
   }
 
   Widget buildChat() {
-    return Container(
-      color: Colors.lime,
-    );
+    return ChatBox();
   }
 }
 

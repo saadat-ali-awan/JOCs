@@ -9,6 +9,7 @@ import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
@@ -30,6 +31,8 @@ class DashboardController extends GetxController {
   late FirebaseControllerInterface firebaseController;
 
   Map<String, RxList<MessageModel>> allChats = <String, RxList<MessageModel>>{};
+
+  Rx<DetailedMetadata> metadata = DetailedMetadata().obs;
 
   DashboardController() {
     changeTheme();
@@ -142,6 +145,7 @@ class DashboardController extends GetxController {
     problemAdapter = ScreenAdapter("problems").obs;
     inventoryAdapter = ScreenAdapter("inventory").obs;
     purchaseAdapter = ScreenAdapter("purchase").obs;
+    kbsAdapter = ScreenAdapter("articles").obs;
 
 
 
@@ -155,6 +159,8 @@ class DashboardController extends GetxController {
         firebaseController = Get.find<FirebaseControllerWindows>();
       }
     }
+
+    metadata.bindStream(firebaseController.getMetaDataFromDatabase());
 
     getDashboardData();
     initializeStream();
@@ -182,26 +188,23 @@ class DashboardController extends GetxController {
     }
   }
 
-  void addDataToFirebase(Map<String, dynamic> data, String collectionName) {
-    firebaseController.addDataToFirebase(data, collectionName);
+  void addDataToFirebase(Map<String, dynamic> data, String collectionName, String metadataKey, int lastId) {
+    firebaseController.addDataToFirebase(data, collectionName, metadataKey, lastId);
   }
 
   /// Dashboard Screen Getx Logic
   getDashboardData() async{
-    ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
     openTickets.value = await firebaseController.getDashboardData("status", filter:"OPEN");
     unresolvedTickets.value = await firebaseController.getDashboardData("status", filter: "RESOLVED");
-    print("${unresolvedTickets.value} - ${ticketAdapter.value.lastId.value}");
-    unresolvedTickets.value = ticketAdapter.value.lastId.value - unresolvedTickets.value - 1;
+    unresolvedTickets.value = metadata.value.ticketsCount - unresolvedTickets.value;
     unassignedTickets.value = await firebaseController.getDashboardData("assigned_to");
-    unassignedTickets.value = ticketAdapter.value.lastId.value - unassignedTickets.value - 1;
+    unassignedTickets.value = metadata.value.ticketsCount - unassignedTickets.value;
   }
 
   /// Tickets Screen Getx Logic
   late Rx<ScreenAdapter> ticketAdapter;
   getTicketsData({Map<String, String> customFilter = const <String, String>{}}) async {
     ticketAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
-    ticketAdapter.value.lastId.value = await firebaseController.getLastId("tickets");
   }
   /**
   * Tickets Screen Getx Logic
@@ -211,7 +214,6 @@ class DashboardController extends GetxController {
   late Rx<ScreenAdapter> problemAdapter;
   getProblemsData({Map<String, String> customFilter = const <String, String>{}}) async {
     problemAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
-    problemAdapter.value.lastId.value = await firebaseController.getLastId("problems");
   }
   /**
    * Problems Screen Getx Logic
@@ -221,7 +223,6 @@ class DashboardController extends GetxController {
   late Rx<ScreenAdapter> inventoryAdapter;
   getInventoryData() async {
     inventoryAdapter.value.getScreenData(firebaseController);
-    inventoryAdapter.value.lastId.value = await firebaseController.getLastId("inventory");
   }
   /**
    * Inventory Screen Getx Logic
@@ -231,7 +232,6 @@ class DashboardController extends GetxController {
   late Rx<ScreenAdapter> purchaseAdapter;
   getPurchaseData() async {
     purchaseAdapter.value.getScreenData(firebaseController);
-    purchaseAdapter.value.lastId.value = await firebaseController.getLastId("purhase");
   }
   /**
    * Purchase Screen Getx Logic
@@ -323,15 +323,21 @@ class DashboardController extends GetxController {
 
   /// Eternal KBS Screen Functions
   RxList<ArticleCategory> categoryList = RxList<ArticleCategory>();
-  void addArticleCategory(Map<String, String> data){
+  void addArticleCategory(Map<String, dynamic> data){
     firebaseController.addArticleCategory(data, "category");
   }
 
-  void createNewArticle(Map<String, String> data){
-    firebaseController.createNewArticle(data);
+  void createNewArticle(Map<String, dynamic> data){
+    firebaseController.createNewArticle(data, metadata.value.articlesCount);
   }
 
   void getCategoryData() async {
     categoryList.bindStream(firebaseController.getCategoryData());
   }
+
+  late Rx<ScreenAdapter> kbsAdapter;
+  getKBSData({Map<String, String> customFilter = const <String, String>{}}) async {
+    kbsAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
+  }
+
 }

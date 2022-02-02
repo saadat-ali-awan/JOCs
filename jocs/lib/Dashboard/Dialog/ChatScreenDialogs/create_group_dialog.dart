@@ -60,11 +60,12 @@ class _CreateGroupDialogState extends State<CreateGroupDialog> {
                   setState(() {
                     groupNameController.clear();
                   });
+                  Get.back();
                 }
 
               },
               child: Text(
-                "Add Item",
+                "Create Group",
                 style: Get.textTheme.bodyText1,
               ),
             ),

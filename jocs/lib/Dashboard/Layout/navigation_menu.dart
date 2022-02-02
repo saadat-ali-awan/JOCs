@@ -78,6 +78,9 @@ class NavItems extends StatelessWidget {
                           icon: _dashboardController.menuList[0][1],
                           color: _dashboardController.iconColor.value,
                           onPressed: () {
+                            if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                            _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                             _dashboardController.selectedMenuItem.value = 0;
                             _dashboardController.getDashboardData();
                           },
@@ -85,7 +88,10 @@ class NavItems extends StatelessWidget {
                         : ListTile(
                       tileColor: _dashboardController.tileColor.value,
                       hoverColor: ThemeColors.getHoverColor(),
-                      onTap: () { _dashboardController.selectedMenuItem.value = 0;},
+                      onTap: () {
+                        if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                        _dashboardController.menuIcon.value = const Icon(Icons.menu);
+                        _dashboardController.selectedMenuItem.value = 0;},
                       leading: _dashboardController.menuList[0][1],
                       title: _dashboardController.menuList[0][0],
                     )),
@@ -109,6 +115,9 @@ class NavItems extends StatelessWidget {
                         icon: _dashboardController.menuList[1][1],
                         color: _dashboardController.iconColor.value,
                         onPressed: () {
+                          if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                          _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                           _dashboardController.selectedMenuItem.value = 1;
                           _dashboardController.getTicketsData();
                         },
@@ -117,6 +126,9 @@ class NavItems extends StatelessWidget {
                     tileColor: _dashboardController.tileColor.value,
                     hoverColor: ThemeColors.getHoverColor(),
                     onTap: () {
+                      if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                      _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                       _dashboardController.selectedMenuItem.value = 1;
                       _dashboardController.getTicketsData();
                       },
@@ -144,6 +156,9 @@ class NavItems extends StatelessWidget {
                         icon: _dashboardController.menuList[2][1],
                         color: _dashboardController.iconColor.value,
                         onPressed: () {
+                          if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                          _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                           _dashboardController.selectedMenuItem.value = 2;
                           _dashboardController.getProblemsData();
                         },
@@ -152,6 +167,9 @@ class NavItems extends StatelessWidget {
                     tileColor: _dashboardController.tileColor.value,
                     hoverColor: ThemeColors.getHoverColor(),
                     onTap: () {
+                      if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                      _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                       _dashboardController.selectedMenuItem.value = 2;
                       _dashboardController.getProblemsData();
                       },
@@ -202,6 +220,9 @@ class NavItems extends StatelessWidget {
                 children: [
                   TextButton(
                       onPressed: () {
+                        if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                        _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                         _dashboardController.selectedMenuItem.value = 32;
                         _dashboardController.getInventoryData();
                       },
@@ -216,6 +237,9 @@ class NavItems extends StatelessWidget {
                 children: [
                   TextButton(
                       onPressed: () {
+                        if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                        _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                         _dashboardController.selectedMenuItem.value = 33;
                         _dashboardController.getPurchaseData();
                       },
@@ -246,6 +270,9 @@ class NavItems extends StatelessWidget {
                           icon: _dashboardController.menuList[4][1],
                           color: _dashboardController.iconColor.value,
                           onPressed: () {
+                            if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                            _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                             _dashboardController.initializeStream();
                             _dashboardController.selectedMenuItem.value = 4;
                           },
@@ -254,6 +281,9 @@ class NavItems extends StatelessWidget {
                       tileColor: _dashboardController.tileColor.value,
                       hoverColor: ThemeColors.getHoverColor(),
                       onTap: () {
+                        if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                        _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                         _dashboardController.selectedMenuItem.value = 4;
                         },
                       leading: _dashboardController.menuList[4][1],
@@ -279,13 +309,23 @@ class NavItems extends StatelessWidget {
                           icon: _dashboardController.menuList[5][1],
                           color: _dashboardController.iconColor.value,
                           onPressed: () {
+                            if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                            _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                             _dashboardController.selectedMenuItem.value = 5;
+                            _dashboardController.getKBSData();
                           },
                         ))
                         : ListTile(
                       tileColor: _dashboardController.tileColor.value,
                       hoverColor: ThemeColors.getHoverColor(),
-                      onTap: () { _dashboardController.selectedMenuItem.value = 5;},
+                      onTap: () {
+                        if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                        _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
+                        _dashboardController.selectedMenuItem.value = 5;
+                        _dashboardController.getKBSData();
+                      },
                       leading: _dashboardController.menuList[5][1],
                       title: _dashboardController.menuList[5][0],
                     )),
@@ -315,7 +355,10 @@ class NavItems extends StatelessWidget {
                     : ListTile(
                   tileColor: _dashboardController.tileColor.value,
                   hoverColor: ThemeColors.getHoverColor(),
-                  onTap: () { _dashboardController.selectedMenuItem.value = 6;},
+                  onTap: () {
+                    if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                    _dashboardController.menuIcon.value = const Icon(Icons.menu);
+                    _dashboardController.selectedMenuItem.value = 6;},
                   leading: _dashboardController.menuList[6][1],
                   title: _dashboardController.menuList[6][0],
                 ),
@@ -336,13 +379,13 @@ class NavItems extends StatelessWidget {
                 child: ClipOval(
                   child: InkWell(
                     onTap: (){
+                      if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                      _dashboardController.menuIcon.value = const Icon(Icons.menu);
+
                       _dashboardController.selectedMenuItem.value = 7;
                     },
-                    child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl == "" ? Image(
-                      image: AssetImage('images/avatar.png'),
-                      width: 100,
-                      height: 100,
-                    ): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
+                    child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl == "" ?
+                    Text(_dashboardController.firebaseController.currentUserDetails.value.email.isEmpty? "J": _dashboardController.firebaseController.currentUserDetails.value.email[0], style: context.textTheme.headline3,): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
                     ),
                   ),
                 ),

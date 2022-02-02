@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/src/list_extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,6 +11,7 @@ import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
+import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
@@ -36,21 +38,26 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  void addArticleCategory(Map<String, String> data, String collectionName) {
+  void addArticleCategory(Map<String, dynamic> data, String collectionName) {
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
     collectionReference
         .add(data)
-        .then((value) => print("Ticket Added"))
-        .catchError((error) => print("Failed to add Ticket: $error"));
+        .then((value) {
+          print("${collectionName} Added");
+        })
+        .catchError((error) => print("Failed to add ${collectionName}: $error"));
   }
 
   @override
-  Future<void> addDataToFirebase(data, String collectionName) async {
-    data["id"] = await getLastId(collectionName);
+  Future<void> addDataToFirebase(data, String collectionName, String metadataKey, int lastId) async {
+    // data["id"] = lastId;
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
     collectionReference
         .add(data)
-        .then((value) => print("Ticket Added"))
+        .then((value) {
+          print("${collectionName} Added");
+          setMetadataInDatabase({metadataKey: lastId + 1});
+        })
         .catchError((error) => print("Failed to add Ticket: $error"));
   }
 
@@ -125,10 +132,28 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  void createNewArticle(Map<String, String> data) {
+  void createNewArticle(Map<String, dynamic> data, int lastId) async {
+    data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
+    //data["id"] = lastId;
     collectionReference = FirebaseFirestore.instance.collection("articles");
     collectionReference.add(data).then((value) {
       print("Article Added");
+
+      setMetadataInDatabase({'articlesCount': lastId + 1});
+
+      collectionReference = FirebaseFirestore.instance.collection("category");
+      collectionReference.where("category-name", isEqualTo: data['category-name']).get().then((QuerySnapshot snapshot){
+        for (var element in snapshot.docs) {
+          print(element["articles"]);
+          List articles = element["articles"];
+          Map<String, String> tempArticle = {
+            'topic': data['topic']!,
+            'id': value.id
+          };
+          articles.add(tempArticle);
+          collectionReference.doc(element.id).update({"articles": articles});
+        }
+      });
     });
   }
 
@@ -177,7 +202,14 @@ class FirebaseController implements FirebaseControllerInterface{
           return retVal;
         });
   }
-  
+
+  @override
+  Future<DocumentSnapshot> getArticle(String documentId) async {
+    collectionReference = FirebaseFirestore.instance.collection("articles");
+    DocumentSnapshot snapshot = await collectionReference.doc(documentId).get();
+    return snapshot;
+  }
+
   @override
   Stream<List<ArticleCategory>> getCategoryData() {
     collectionReference = FirebaseFirestore.instance.collection("category");
@@ -225,12 +257,12 @@ class FirebaseController implements FirebaseControllerInterface{
     collectionReference = FirebaseFirestore.instance.collection("tickets");
     QuerySnapshot<Object?> tempData;
 
-    if (filter == ""){
+    if (filter != ""){
       tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
     }else{
       tempData = await collectionReference.orderBy(documentName, descending: true).get();
     }
-    print(documentName+ "${tempData.docs.length}");
+    print("getDashboardData() ${documentName} ${filter} => ${tempData.docs.length}");
     return tempData.docs.length;
 
   }
@@ -241,30 +273,41 @@ class FirebaseController implements FirebaseControllerInterface{
 
     Query ref;
     if (page > 1) {
-      ref = collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length);
+      ref = collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length+10);
     } else {
-      ref = collectionReference.orderBy("time", descending: true).limit(length);
+      ref = collectionReference.orderBy("time", descending: true).limit(length+10);
     }
 
     customFilter.forEach((key, value) {
       ref = ref.where(key, isEqualTo: value);
     });
 
-    data = await ref.get();
-    return data.docs;
+    QuerySnapshot tempData = await ref.get();
+
+    return tempData.docs;
   }
 
+  /// MetaData For Document Queries
   @override
-  Future<int> getLastId(String collectionName) async {
-    int lastId = 1;
-    collectionReference = FirebaseFirestore.instance.collection(collectionName);
-    var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
-    for (var doc in dataTemp.docs) {
-      lastId = doc["id"];
-      lastId += 1;
-    }
-    return lastId;
+  Stream<DetailedMetadata> getMetaDataFromDatabase(){
+    collectionReference = FirebaseFirestore.instance.collection("metadata");
+    return collectionReference.doc("data").snapshots().map((DocumentSnapshot snapshot) {
+      print(snapshot);
+      return DetailedMetadata.fromDataSnapshot(snapshot);
+    });
   }
+
+  // @override
+  // Future<int> getLastId(String collectionName) async {
+  //   int lastId = 1;
+  //   collectionReference = FirebaseFirestore.instance.collection(collectionName);
+  //   var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
+  //   for (var doc in dataTemp.docs) {
+  //     lastId = doc["id"];
+  //     lastId += 1;
+  //   }
+  //   return lastId;
+  // }
 
   @override
   Future<List<MessageModel>> getRecentChat(String chatId, String mostRecentMessageTimeStamp) async {
@@ -356,7 +399,7 @@ class FirebaseController implements FirebaseControllerInterface{
         password: password,
       ).then((value) {
         collectionReference = FirebaseFirestore.instance.collection("Users");
-        collectionReference.doc(value.user!.uid).set({"email": value.user!.email});
+        collectionReference.doc(value.user!.uid).set({"email": value.user!.email, "username": username, "imageName": ""});
         return value;
       });
     } on FirebaseAuthException catch (e) {
@@ -371,6 +414,45 @@ class FirebaseController implements FirebaseControllerInterface{
     } catch (e) {
       print(e);
     }
+  }
+
+  @override
+  void removeDataFromTable(String screenName, String time, Map<String, int> map) async {
+    collectionReference = FirebaseFirestore.instance.collection(screenName);
+    await collectionReference.where("time", isEqualTo: time).get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((element) async {
+        print("Element Reference ${element.reference}");
+        await element.reference.delete();
+      });
+      setMetadataInDatabase(map);
+    });
+
+    // TODO: Remove article from category
+  }
+
+  @override
+  void removeArticleFromCategory(String categoryName, reference) async {
+    DocumentReference ref = reference as DocumentReference;
+    collectionReference = FirebaseFirestore.instance.collection('category');
+    await collectionReference.where('category-name', isEqualTo: categoryName).get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((QueryDocumentSnapshot categoryData) {
+        List<dynamic> articleList = categoryData['articles'];
+        // articleList.where((Map<String, String> article) {
+        //   if (article["id"] == reference.toString()) {
+        //     print("ID: ${article["id"]} ${reference.toString()}");
+        //   }
+        //   return false;
+        // });
+        articleList.forEachIndexed((int index, element) {
+          if (element["id"] == ref.id){
+            categoryData.reference.update({
+              'articles': FieldValue.arrayRemove([element])
+            });
+          }
+        });
+      });
+    });
+
   }
 
   @override
@@ -394,6 +476,13 @@ class FirebaseController implements FirebaseControllerInterface{
     };
     collectionReference = FirebaseFirestore.instance.collection("Chat");
     collectionReference.doc(chatId).collection("messages").doc(uniqueMessageId).set(message);
+  }
+
+  /// Update Metadata
+  @override
+  void setMetadataInDatabase(Map<String, int> metaDataMap) {
+    collectionReference = FirebaseFirestore.instance.collection("metadata");
+    collectionReference.doc("data").update(metaDataMap);
   }
   
   @override

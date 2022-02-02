@@ -29,8 +29,8 @@ class ProblemsScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: [
-                        const DataColumn(label: Text("Issued By")),
-                        const DataColumn(label: Text("Topic")),
+                        const DataColumn(label: Expanded(child: Text("Issued By", textAlign: TextAlign.center,))),
+                        const DataColumn(label: Expanded(child: Text("Topic", textAlign: TextAlign.center,))),
                         DataColumn(
                           label: DecoratedBox(
                             decoration: BoxDecoration(
@@ -99,8 +99,9 @@ class ProblemsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const DataColumn(label: Text("Assigned To")),
-                        const DataColumn(label: Text("Department")),
+                        const DataColumn(label: Expanded(child: Text("Assigned To", textAlign: TextAlign.center,))),
+                        const DataColumn(label: Expanded(child: Text("Department", textAlign: TextAlign.center,))),
+                        const DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                       ],
                       source: _dashboardController
                           .problemAdapter.value.dataTableSource.value,
