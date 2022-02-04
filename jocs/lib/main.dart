@@ -67,7 +67,7 @@ Future<void> main() async {
           GetPage(
             name: '/dashboard',
             page: ()=> const Dashboard(),
-            binding: DashboardBindings()
+            bindings: [DashboardBindings(), ArticleReaderBinding()]
           ),
           GetPage(
             name: "/htmlTest",

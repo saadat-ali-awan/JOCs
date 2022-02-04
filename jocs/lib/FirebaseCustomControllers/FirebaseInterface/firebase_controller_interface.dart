@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
@@ -63,4 +64,6 @@ abstract class FirebaseControllerInterface {
   void removeDataFromTable(String screenName, String time, Map<String, int> map);
 
   void removeArticleFromCategory(String categoryName, reference);
+
+  getNewData(ScreenAdapter adapter);
 }

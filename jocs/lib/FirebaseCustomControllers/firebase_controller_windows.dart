@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/src/iterable_extensions.dart';
 import 'package:firedart/auth/exceptions.dart';
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:firedart/auth/user_gateway.dart';
@@ -10,6 +10,7 @@ import 'package:firedart/firestore/firestore.dart';
 import 'package:firedart/firestore/models.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
@@ -121,7 +122,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   void createNewArticle(Map<String, dynamic> data, int lastId) async {
     data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
-    data["id"] = lastId;
+    //data["id"] = lastId;
     var reference = firestore.collection('articles');
     reference.add(data).then((value) {
         reference = firestore.collection('category');
@@ -255,13 +256,22 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}}) async {
     var collectionReference = firestore.collection(collectionName);
-    List<Document> data = <Document>[];
+    QueryReference ref;
     if (page > 1) {
-      data = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length).get();
+      ref = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length+10);
     } else {
-      data = await collectionReference.orderBy("time", descending: true).limit(length).get();
+      ref = await collectionReference.orderBy("time", descending: true).limit(length+10);
     }
-    print(data.first.map);
+
+    customFilter.forEach((key, value) {
+      print("Custom Filter: ${key}, ${value}");
+      if (key != "S" && key != "P"){
+        ref = ref.where(key, isEqualTo: value);
+      }
+    });
+
+    List<Document> data = await ref.get();
+
     var returnData = [];
     for (var element in data) {
       returnData.add(element.map);
@@ -269,17 +279,24 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     return returnData;
   }
 
-  // @override
-  // Future<int> getLastId(String collectionName) async {
-  //   int lastId = 1;
-  //   var collectionReference = firestore.collection(collectionName);
-  //   var dataTemp = await collectionReference.orderBy("time", descending: true).limit(1).get();
-  //   for (var doc in dataTemp) {
-  //     lastId = doc.map["id"];
-  //     lastId += 1;
-  //   }
-  //   return lastId;
-  // }
+  @override
+  Future<List<Document>> getNewData(ScreenAdapter adapter) async {
+    var ref = firestore.collection(adapter.screenName);
+    List<Document> snapshot = await ref.where("time", isEqualTo: adapter.adapterData.first["time"]).get();
+    return snapshot;
+  }
+
+  @override
+  Stream<DetailedMetadata> getMetaDataFromDatabase() {
+    var ref = firestore.collection("metadata");
+    return ref.document("data").stream.map((Document? document) {
+      if (document != null){
+        return DetailedMetadata.fromDataSnapshotWindows(document);
+      }else {
+        return DetailedMetadata();
+      }
+    });
+  }
 
   @override
   Future<List<MessageModel>> getRecentChat(String chatId, String mostRecentMessageTimeStamp) async {
@@ -382,12 +399,35 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
-  void removeDataFromTable(String screenName, String time, Map<String, int> map) {
-    // TODO: implement removeDataFromTable
+  void removeDataFromTable(String screenName, String time, Map<String, int> map) async {
+    var collectionReference = firestore.collection(screenName);
+    await collectionReference.where("time", isEqualTo: time).get().then((List<Document> snapshot) {
+      snapshot.forEach((element) async {
+        print("Element Reference ${element.reference}");
+        await element.reference.delete();
+      });
+      setMetadataInDatabase(map);
+    });
   }
 
-  void removeArticleFromCategory(String categoryName, reference) {
-    // TODO: implement removeArticleFromCategory
+  void removeArticleFromCategory(String categoryName, reference) async {
+    DocumentReference ref = reference as DocumentReference;
+    var collectionReference = firestore.collection('category');
+    await collectionReference.where('category-name', isEqualTo: categoryName).get().then((List<Document> snapshot) {
+      snapshot.forEach((Document categoryData) {
+        List<dynamic> articleList = categoryData['articles'];
+        List<dynamic> allArticles = [];
+        articleList.forEachIndexed((int index, element) {
+          if (element["id"] != ref.id){
+            allArticles.add(element);
+          }
+        });
+
+        categoryData.reference.update({
+          'articles': allArticles
+        });
+      });
+    });
   }
 
   @override
@@ -449,17 +489,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     // ref.document(getCurrentUserId()).update(data);
   }
 
-  @override
-  Stream<DetailedMetadata> getMetaDataFromDatabase() {
-    var ref = firestore.collection("metadata");
-    return ref.document("data").stream.map((Document? document) {
-      if (document != null){
-        return DetailedMetadata.fromDataSnapshotWindows(document);
-      }else {
-        return DetailedMetadata();
-      }
-    });
-  }
+
 
   @override
   void setMetadataInDatabase(Map<String, int> metaDataMap) {

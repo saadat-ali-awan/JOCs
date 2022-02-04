@@ -9,6 +9,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:get/get.dart';
+import 'package:jocs/ArticleReader/Controllers/article_reader_controller.dart';
+import 'package:jocs/ArticleReader/article_reader.dart';
+import 'package:jocs/ArticleReader/article_reader.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/CategoryScreenDialogs/add_article_dialog.dart';
 import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
@@ -51,44 +54,70 @@ class EternalKbsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
-                borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                child: Theme(
-                  data: context.theme.copyWith(canvasColor: context.theme.appBarTheme.backgroundColor),
-                  child: DropdownButton(
-                    iconEnabledColor: context.theme.appBarTheme.foregroundColor,
-                    style: context.textTheme.bodyText1,
-                    value: "Create New",
-                    items: <String>["Create New", "Article", "Category"].map((value){
-                      return DropdownMenuItem(
-                        child: Text(value),
-                        value: value,
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue){
-                      if (newValue == "Article"){
-                        sub_category.value = 2;
-                      }else {
-                        if (newValue == "Category"){
-                          sub_category.value = 3;
-                        }else {
-                          _dashboardController.getKBSData();
-                          sub_category.value = 1;
-                        }
-                      }
-                    },
-                    isExpanded: false,
-                    underline: Container(),
-
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              controller: ScrollController(),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: (){sub_category.value = 1;}, child: Text("Articles", style: context.textTheme.bodyText1,),),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: (){sub_category.value = 2;}, child: Text("Create Article", style: context.textTheme.bodyText1,),),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(onPressed: (){sub_category.value = 3;}, child: Text("Categories", style: context.textTheme.bodyText1,),),
+                  )
+                ],
               ),
             ),
+            // child: DecoratedBox(
+            //   decoration: BoxDecoration(
+            //     color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
+            //     borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
+            //   ),
+            //   child: Row(
+            //     children: [
+            //       TextButton(onPressed: (){sub_category.value = 2;}, child: const Text("Create Article"),),
+            //       TextButton(onPressed: (){sub_category.value = 3;}, child: const Text("Categories"),)
+            //     ],
+            //   ),
+              // child: Padding(
+              //   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              //   child: Theme(
+              //     data: context.theme.copyWith(canvasColor: context.theme.appBarTheme.backgroundColor),
+              //     child: DropdownButton(
+              //       iconEnabledColor: context.theme.appBarTheme.foregroundColor,
+              //       style: context.textTheme.bodyText1,
+              //       value: "Create New",
+              //       items: <String>["Create New", "Article", "Category"].map((value){
+              //         return DropdownMenuItem(
+              //           child: Text(value),
+              //           value: value,
+              //         );
+              //       }).toList(),
+              //       onChanged: (String? newValue){
+              //         if (newValue == "Article"){
+              //           sub_category.value = 2;
+              //         }else {
+              //           if (newValue == "Category"){
+              //             sub_category.value = 3;
+              //           }else {
+              //             _dashboardController.getKBSData();
+              //             sub_category.value = 1;
+              //           }
+              //         }
+              //       },
+              //       isExpanded: false,
+              //       underline: Container(),
+              //
+              //     ),
+              //   ),
+              // ),
+            // ),
           ),
         ),
       ],
@@ -373,7 +402,7 @@ class CategoryCreationWidget extends StatelessWidget {
                 ),
                 Flexible(
                   flex: 7,
-                  child: CategoryFormWidget(),
+                  child: ArticleReader(),
                 )
               ],
             ),
@@ -392,7 +421,7 @@ class CategoryCreationWidget extends StatelessWidget {
                     controller: ScrollController(),
                     child: Column(
                       children: [
-                        Expanded(child: CategoryFormWidget())
+                        Expanded(child: ArticleReader())
                       ],
                     ),
                   ),
@@ -531,6 +560,9 @@ class CategorySideWidget extends StatelessWidget {
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
 
+  final ArticleReaderController  _readerController =
+  Get.find<ArticleReaderController>();
+
   ArticleCategory categorySelected = ArticleCategory("");
 
   @override
@@ -569,7 +601,8 @@ class CategorySideWidget extends StatelessWidget {
                 ),
                 onChanged: (dynamic data) {
                   print(data["topic"]);
-                  Get.toNamed('/articleReader', arguments: {'id': data["id"]});
+                  //Get.toNamed('/articleReader', arguments: {'id': data["id"]});
+                  _readerController.getArticles(data["id"]);
                 },
                 showSearchBox: true,
                 itemAsString: (dynamic data) => data["topic"],

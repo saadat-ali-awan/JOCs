@@ -12,7 +12,6 @@ class ArticleReader extends StatelessWidget {
   final FocusNode _focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
-    _readerController.getArticles(Get.arguments["id"]);
     var quillEditor = Obx( ()=> QuillEditor(
       controller: _readerController.controller.value,
       scrollController: ScrollController(),
@@ -35,21 +34,15 @@ class ArticleReader extends StatelessWidget {
           padding: EdgeInsets.zero,
           embedBuilder: defaultEmbedBuilderWeb));
     }
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("JOC Articles"),
-          leading: InkWell(
-            child: Icon(Icons.arrow_back_ios_rounded),
-            onTap: () {
-              Get.back();
-            },
+    return  Column(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: quillEditor,
           ),
         ),
-        body: Container(
-          child: quillEditor,
-        ),
-      ),
+      ],
     );
   }
 }

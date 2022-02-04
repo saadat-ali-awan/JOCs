@@ -65,8 +65,9 @@ class _TicketsScreenState extends State<TicketsScreen> {
                                                 setState(() {
                                                   customFilter.remove("status");
                                                 });
-                                                print(customFilter);
-                                                _dashboardController.getTicketsData();
+                                                customFilter["P"] = "R";
+                                                _dashboardController.getTicketsData(customFilter: customFilter);
+                                                customFilter.remove("P");
                                               },
                                             ) else Container(),
                                             Text(value, textAlign: TextAlign.right,),
@@ -76,6 +77,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                                       );
                                     }).toList(),
                                     onChanged: (String? newValue){
+                                      print("CHANGED ${newValue}");
                                       if (newValue != null){
                                         if (newValue == "Status"){
                                           return;
@@ -98,7 +100,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                             label: DecoratedBox(
                               decoration: BoxDecoration(
                                 color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
-                                borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
+                                borderRadius: const BorderRadius.all(Radius.circular(12)), //border radius of dropdown button
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -107,16 +109,38 @@ class _TicketsScreenState extends State<TicketsScreen> {
                                   child: DropdownButton(
                                     iconEnabledColor: context.theme.appBarTheme.foregroundColor,
                                     style: context.textTheme.bodyText1,
-                                    value: "Priority",
+                                    value: customFilter["priority"] == null || customFilter["priority"] == "" ? "Priority" : customFilter["priority"],
                                     items: <String>["Priority", "LOW", "MEDIUM", "HIGH", "URGENT"].map((value){
                                       return DropdownMenuItem(
-                                        child: Text(value, textAlign: TextAlign.right,),
+                                        child: Row(
+                                          children: [
+                                            if (customFilter["priority"] != null && customFilter["priority"] == value) InkWell(
+                                              child: const Icon(
+                                                  Icons.remove_circle
+                                              ),
+                                              onTap: (){
+                                                setState(() {
+                                                  customFilter.remove("priority");
+                                                });
+                                                customFilter["P"] = "R";
+                                                _dashboardController.getTicketsData(customFilter: customFilter);
+                                                customFilter.remove("P");
+                                              },
+                                            ) else Container(),
+                                            Text(value, textAlign: TextAlign.right,),
+                                          ],
+                                        ),
                                         value: value,
                                       );
                                     }).toList(),
                                     onChanged: (String? newValue){
                                       if (newValue != null){
-                                        customFilter["priority"] = newValue;
+                                        if (newValue == "Priority"){
+                                          return;
+                                        }
+                                        setState(() {
+                                          customFilter["priority"] = newValue;
+                                        });
                                         _dashboardController.getTicketsData(customFilter:customFilter);
                                       }
                                     },
@@ -168,10 +192,6 @@ class CustomDataTableSource extends DataTableSource {
   String screenName = "";
 
   CustomDataTableSource(this.screenName, List<DataRow> list){
-    if (screenName == 'articles' && list.isNotEmpty){
-      print("CustomDataTableSource() => ${this.screenName}, ${list.first.cells.length}");
-
-    }
     data.value = list;
   }
 

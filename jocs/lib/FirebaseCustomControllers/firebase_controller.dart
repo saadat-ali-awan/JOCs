@@ -6,7 +6,11 @@ import 'package:collection/src/list_extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
+import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_details_model.dart';
@@ -279,7 +283,10 @@ class FirebaseController implements FirebaseControllerInterface{
     }
 
     customFilter.forEach((key, value) {
-      ref = ref.where(key, isEqualTo: value);
+      print("Custom Filter: ${key}, ${value}");
+      if (key != "S" && key != "P"){
+        ref = ref.where(key, isEqualTo: value);
+      }
     });
 
     QuerySnapshot tempData = await ref.get();
@@ -287,12 +294,20 @@ class FirebaseController implements FirebaseControllerInterface{
     return tempData.docs;
   }
 
+  @override
+  Future<List<QueryDocumentSnapshot<Object?>>> getNewData(ScreenAdapter adapter) async {
+    collectionReference = FirebaseFirestore.instance.collection(adapter.screenName);
+    QuerySnapshot snapshot = await collectionReference.where("time", isGreaterThan: adapter.adapterData.first["time"]).get();
+    return snapshot.docs;
+  }
+
   /// MetaData For Document Queries
   @override
   Stream<DetailedMetadata> getMetaDataFromDatabase(){
+    DashboardController _dashboardController = Get.find<DashboardController>();
     collectionReference = FirebaseFirestore.instance.collection("metadata");
     return collectionReference.doc("data").snapshots().map((DocumentSnapshot snapshot) {
-      print(snapshot);
+      _dashboardController.getUpdatedTableData();
       return DetailedMetadata.fromDataSnapshot(snapshot);
     });
   }
@@ -426,8 +441,6 @@ class FirebaseController implements FirebaseControllerInterface{
       });
       setMetadataInDatabase(map);
     });
-
-    // TODO: Remove article from category
   }
 
   @override
@@ -437,12 +450,6 @@ class FirebaseController implements FirebaseControllerInterface{
     await collectionReference.where('category-name', isEqualTo: categoryName).get().then((QuerySnapshot snapshot) {
       snapshot.docs.forEach((QueryDocumentSnapshot categoryData) {
         List<dynamic> articleList = categoryData['articles'];
-        // articleList.where((Map<String, String> article) {
-        //   if (article["id"] == reference.toString()) {
-        //     print("ID: ${article["id"]} ${reference.toString()}");
-        //   }
-        //   return false;
-        // });
         articleList.forEachIndexed((int index, element) {
           if (element["id"] == ref.id){
             categoryData.reference.update({

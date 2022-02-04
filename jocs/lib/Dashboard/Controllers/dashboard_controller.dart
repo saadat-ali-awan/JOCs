@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_general.dart';
 import 'package:jocs/Dashboard/Layout/dashboard_mobile.dart';
 import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
+import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
@@ -160,7 +161,7 @@ class DashboardController extends GetxController {
       }
     }
 
-    metadata.bindStream(firebaseController.getMetaDataFromDatabase());
+
 
     getDashboardData();
     initializeStream();
@@ -199,6 +200,7 @@ class DashboardController extends GetxController {
     unresolvedTickets.value = metadata.value.ticketsCount - unresolvedTickets.value;
     unassignedTickets.value = await firebaseController.getDashboardData("assigned_to");
     unassignedTickets.value = metadata.value.ticketsCount - unassignedTickets.value;
+    metadata.bindStream(firebaseController.getMetaDataFromDatabase());
   }
 
   /// Tickets Screen Getx Logic
@@ -338,6 +340,118 @@ class DashboardController extends GetxController {
   late Rx<ScreenAdapter> kbsAdapter;
   getKBSData({Map<String, String> customFilter = const <String, String>{}}) async {
     kbsAdapter.value.getScreenData(firebaseController, customFilter: customFilter);
+  }
+
+  void getUpdatedTableData() async {
+    var snapshot;
+    ScreenAdapter adapter;
+    switch (selectedMenuItem.value){
+      case 1:
+        snapshot = await firebaseController.getNewData(ticketAdapter.value);
+        adapter = ticketAdapter.value;
+        break;
+      case 2:
+        snapshot = await firebaseController.getNewData(problemAdapter.value);
+        adapter = problemAdapter.value;
+        break;
+      case 32:
+        snapshot = await firebaseController.getNewData(inventoryAdapter.value);
+        adapter = inventoryAdapter.value;
+        break;
+      case 33:
+        snapshot = await firebaseController.getNewData(purchaseAdapter.value);
+        adapter = purchaseAdapter.value;
+        break;
+      case 5:
+        snapshot = await firebaseController.getNewData(kbsAdapter.value);
+        adapter = kbsAdapter.value;
+        break;
+      default:
+        return;
+    }
+
+    for (var element in snapshot.docs) {
+      adapter.adapterData.insert(0, element);
+    }
+
+    RxList<DataRow> tempRows = <DataRow>[].obs;
+
+    String metadataKey = "";
+    int metadataValue = 0;
+
+    for (var d in adapter.adapterData) {
+      var tempData;
+      if (adapter.screenName == "inventory"){
+        tempData = [
+          d["item_name"],
+          d["item_type"],
+          d["location"],
+          d["used_by"],
+          d["processed_by"],
+          d["comments"]
+        ];
+        metadataKey = "inventoryCount";
+        metadataValue = metadata.value.inventoryCount;
+      }else {
+        if (adapter.screenName == "purchase"){
+          tempData = [
+            d["order_no"],
+            d["order_name"],
+            d["description"],
+            d["expected_delivery"],
+            d["status"],
+            d["comments"]
+          ];
+          metadataKey = "purchaseCount";
+          metadataValue = metadata.value.purchaseCount;
+        }else {
+          if (adapter.screenName == "articles") {
+            tempData = [
+              d['author'],
+              d['category-name'],
+              d['comment'],
+              d['topic']
+            ];
+            metadataKey = "articlesCount";
+            metadataValue = metadata.value.articlesCount;
+          }else {
+            tempData = [
+              d["issued_by"],
+              d["topic"],
+              d["status"],
+              d["priority"],
+              d["assigned_to"],
+            ];
+            if (adapter.screenName == "tickets") {
+              tempData.add(d["comments"]);
+              metadataKey = "ticketsCount";
+              metadataValue = metadata.value.ticketsCount;
+            } else {
+              if (adapter.screenName == "problems") {
+                tempData.add(d["department"]);
+                metadataKey = "problemsCount";
+                metadataValue = metadata.value.problemsCount;
+              }
+            }
+          }
+
+        }
+      }
+      int index = tempRows.length;
+      tempRows.add(ScreenAdapter.createRow(tempData, (){
+        adapter.adapterData.removeAt(index);
+        adapter.dataTableSource.value.data.removeAt(index);
+        adapter.dataTableSource.value.data.refresh();
+        adapter.dataTableSource.value.notifyListeners();
+        firebaseController.removeDataFromTable(adapter.screenName, d["time"], {metadataKey: metadataValue - 1});
+        if (adapter.screenName == "articles") {
+          firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
+        }
+      }, false
+      )
+      );
+    }
+    adapter.dataTableSource.value = CustomDataTableSource(adapter.screenName, tempRows);
   }
 
 }

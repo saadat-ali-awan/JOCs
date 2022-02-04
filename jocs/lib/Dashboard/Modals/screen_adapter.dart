@@ -29,6 +29,7 @@ class ScreenAdapter {
       //lastId.value = 0;
       adapterData.clear();
     }
+    print("Check Codition ${adapterData.length < (10 * currentPage.value)}");
     if (adapterData.length < (10 * currentPage.value)) {
       var data = await firebaseController.getData(
           screenName, currentPage.value, articlesOnOnePage,
