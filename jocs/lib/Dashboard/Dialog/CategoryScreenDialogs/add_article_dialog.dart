@@ -5,8 +5,10 @@ import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 
 class AddArticleDialog extends StatefulWidget {
-  AddArticleDialog({Key? key}) : super(key: key);
+  const AddArticleDialog({Key? key, required this.previousData, required this.time}) : super(key: key);
 
+  final List<String> previousData;
+  final String time;
   @override
   State<AddArticleDialog> createState() => _AddArticleDialogState();
 }
@@ -16,6 +18,25 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
   Get.find<DashboardController>();
 
   ArticleCategory categorySelected = ArticleCategory("");
+
+  var _formKey = GlobalKey<FormState>();
+  TextEditingController articleTopicController = TextEditingController();
+  TextEditingController articleAuthorController = TextEditingController();
+  TextEditingController articleCommentsController = TextEditingController();
+
+  bool updateData = false;
+
+  @override
+  void initState() {
+    if (widget.previousData.isNotEmpty){
+      articleTopicController.text = widget.previousData[0];
+      articleAuthorController.text = widget.previousData[1];
+      articleCommentsController.text = widget.previousData[2];
+      categorySelected.name = widget.previousData[3];
+      updateData = true;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +81,6 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
   }
 
   Widget getArticleForm() {
-    var _formKey = GlobalKey<FormState>();
-    TextEditingController articleTopicController = TextEditingController();
-    TextEditingController articleAuthorController = TextEditingController();
-    TextEditingController articleCommentsController = TextEditingController();
     return Form(
       key: _formKey,
       child: Column(
@@ -142,6 +159,7 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
                   filterFn: (category, filter) => category!.userFilterByName(filter!),
                   itemAsString: (ArticleCategory? category) => category!.categoryAsString(),
                   onChanged: (ArticleCategory? data) => categorySelected = data!,
+                  selectedItem: categorySelected,
                 ),
               ),
             ),
@@ -152,13 +170,27 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  _dashboardController.createNewArticle({
-                    'topic': articleTopicController.text,
-                    'author': articleAuthorController.text,
-                    'category-name': categorySelected.name,
-                    'comment': articleCommentsController.text,
-                    'article': Get.arguments['article'],
-                  });
+                  if (updateData) {
+                    _dashboardController.updateTableData(
+                      "articles",
+                      widget.time,
+                      {
+                        'topic': articleTopicController.text,
+                        'author': articleAuthorController.text,
+                        'category-name': categorySelected.name,
+                        'comment': articleCommentsController.text,
+                      },
+                    );
+                  } else {
+                    _dashboardController.createNewArticle({
+                      'topic': articleTopicController.text,
+                      'author': articleAuthorController.text,
+                      'category-name': categorySelected.name,
+                      'comment': articleCommentsController.text,
+                      'article': Get.arguments['article'],
+                      'fileName': Get.arguments['fileName'],
+                    });
+                  }
                   setState(() {
                     articleTopicController.clear();
                     articleAuthorController.clear();
@@ -168,8 +200,11 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
                 }
 
               },
-              child: Text(
+              child: widget.time.isEmpty ? Text(
                 "Add Article",
+                style: Get.textTheme.bodyText1,
+              ) : Text(
+                "Update Article Data",
                 style: Get.textTheme.bodyText1,
               ),
             ),

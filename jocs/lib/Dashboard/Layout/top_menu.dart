@@ -27,27 +27,7 @@ class TopMenu extends StatelessWidget {
                     children: getTitle(),
                   )),
             ),
-            IconButton(
-                onPressed: () {
-                  if (_dashboardController.selectedMenuItem>0) {
-                    Get.dialog(
-                        CustomDialog()
-                    );
-                  }else{
-                    Get.defaultDialog(
-                        titlePadding: const EdgeInsets.all(16.0),
-                        title: "Can not add when in Dashboard Tab",
-                        middleText: "Switch Tab and come back.",
-                        titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
-                        onConfirm: (){
-                          Get.back();
-                        },
-                        confirmTextColor:  context.theme.iconTheme.color,
-                        buttonColor: context.theme.appBarTheme.backgroundColor
-                    );
-                  }
-                },
-                icon: const Icon(Icons.add_box)),
+            getAddButton(context),
             // _dashboardController.mobileDisplay.value ? PopupMenuButton(
             //     color: context.theme.appBarTheme.backgroundColor,
             //     itemBuilder: (context) {
@@ -67,13 +47,47 @@ class TopMenu extends StatelessWidget {
     );
   }
 
+  Widget getAddButton(context) {
+    return Obx((){
+      switch (_dashboardController.selectedMenuItem.value) {
+        case 0:
+        case 4:
+        case 6:
+        case 7:
+          return Container();
+        default:
+          return IconButton(
+              onPressed: () {
+                if (_dashboardController.selectedMenuItem>0) {
+                  Get.dialog(
+                      CustomDialog(previousData: const [], time: "")
+                  );
+                }else{
+                  Get.defaultDialog(
+                      titlePadding: const EdgeInsets.all(16.0),
+                      title: "Can not add when in Dashboard Tab",
+                      middleText: "Switch Tab and come back.",
+                      titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+                      onConfirm: (){
+                        Get.back();
+                      },
+                      confirmTextColor:  context.theme.iconTheme.color,
+                      buttonColor: context.theme.appBarTheme.backgroundColor
+                  );
+                }
+              },
+              icon: const Icon(Icons.add_box));
+      }
+    });
+  }
+
   List<Widget> getMenuItems(context) {
     return [
       IconButton(
           onPressed: () {
             if (_dashboardController.selectedMenuItem>0) {
               Get.dialog(
-                  CustomDialog()
+                  CustomDialog(previousData: const [], time: "")
               );
             }else{
               Get.defaultDialog(

@@ -195,6 +195,12 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  Future getArticleByTime(time) {
+    // TODO: implement getArticleByTime
+    throw UnimplementedError();
+  }
+
+  @override
   Stream<List<ArticleCategory>> getCategoryData(){
     var reference = firestore.collection('category');
     return reference.stream.map((List<Document> documents){
@@ -455,6 +461,12 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  void setMetadataInDatabase(Map<String, int> metaDataMap) {
+    var ref = firestore.collection("metadata");
+    ref.document("data").update(metaDataMap);
+  }
+
+  @override
   String getCurrentUserId() {
     return auth.userId;
   }
@@ -489,12 +501,56 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     // ref.document(getCurrentUserId()).update(data);
   }
 
-
+  @override
+  void updateTableData(String collectionName, String time, Map<String, String> newData) {
+    var ref = firestore.collection(collectionName);
+    ref.where("time", isEqualTo: time).get().then((List<Document> snapshot) {
+      for (var element in snapshot) {
+        element.reference.update(newData);
+      }
+    });
+  }
 
   @override
-  void setMetadataInDatabase(Map<String, int> metaDataMap) {
-    var ref = firestore.collection("metadata");
-    ref.document("data").update(metaDataMap);
+  Future<Stream<List<String>>> getReviews(String time, String collectionName) {
+    var ref = firestore.collection(collectionName);
+    ref.where('time', isEqualTo: time).get().then((List<Document> snapshot) {
+      for (var doc in snapshot) {
+        return doc.reference.collection('reviews').stream.map((List<Document> snapshot) {
+          List<String> reviewsList = <String>[];
+          for (var doc in snapshot) {
+            reviewsList.add(doc['review']);
+          }
+          return reviewsList;
+        });
+      }
+    });
+    throw "Reviews Not Found";
+  }
+
+  @override
+  void sendReview(String review, String time, String collectionName) {
+    var ref = firestore.collection(collectionName);
+    ref.where('time', isEqualTo: time).get().then((List<Document> snapshot) async {
+      User user = await auth.getUser();
+      for (var doc in snapshot) {
+        doc.reference.collection('reviews').add({
+          'review': review,
+          'sender': user.email,
+          'time': DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+        });
+      }
+    });
+  }
+
+  @override
+  uploadFile(Uint8List fileData, String fileName) async {
+    throw 'Unimplemented Error';
+  }
+
+  @override
+  void downloadFile(String fileName) {
+    // TODO: implement downloadFile
   }
 
 }

@@ -37,6 +37,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                     child: Obx(() {
                       return PaginatedDataTable(
                         columns: [
+                          //const DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                           const DataColumn(label: Expanded(child: Text("Issued By", textAlign: TextAlign.center,))),
                           const DataColumn(label: Expanded(child: Text("Topic", textAlign: TextAlign.center,))),
                           DataColumn(
@@ -203,9 +204,9 @@ class CustomDataTableSource extends DataTableSource {
       return data[index];
     } on RangeError catch (e) {
       if (screenName == "articles") {
-        return ScreenAdapter.createRow(["","","",""], (){},  true);
+        return ScreenAdapter.createRow(["","","",""], (){},  true, screenName, "");
       }
-      return ScreenAdapter.createRow(["","","","","",""], (){}, true);
+      return ScreenAdapter.createRow(["","","","","",""], (){}, true, screenName, "");
     }
   }
 

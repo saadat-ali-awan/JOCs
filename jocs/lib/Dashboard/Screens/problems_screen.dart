@@ -35,6 +35,7 @@ class _ProblemsScreenState extends State<ProblemsScreen> {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: [
+                        //const DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                         const DataColumn(label: Expanded(child: Text("Issued By", textAlign: TextAlign.center,))),
                         const DataColumn(label: Expanded(child: Text("Topic", textAlign: TextAlign.center,))),
                         DataColumn(

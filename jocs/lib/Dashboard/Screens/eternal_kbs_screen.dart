@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:file_picker/file_picker.dart';
@@ -74,50 +75,6 @@ class EternalKbsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // child: DecoratedBox(
-            //   decoration: BoxDecoration(
-            //     color: context.theme.appBarTheme.backgroundColor, //background color of  //border of dropdown button
-            //     borderRadius: const BorderRadius.all(Radius.circular(12)), //border raiuds of dropdown button
-            //   ),
-            //   child: Row(
-            //     children: [
-            //       TextButton(onPressed: (){sub_category.value = 2;}, child: const Text("Create Article"),),
-            //       TextButton(onPressed: (){sub_category.value = 3;}, child: const Text("Categories"),)
-            //     ],
-            //   ),
-              // child: Padding(
-              //   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-              //   child: Theme(
-              //     data: context.theme.copyWith(canvasColor: context.theme.appBarTheme.backgroundColor),
-              //     child: DropdownButton(
-              //       iconEnabledColor: context.theme.appBarTheme.foregroundColor,
-              //       style: context.textTheme.bodyText1,
-              //       value: "Create New",
-              //       items: <String>["Create New", "Article", "Category"].map((value){
-              //         return DropdownMenuItem(
-              //           child: Text(value),
-              //           value: value,
-              //         );
-              //       }).toList(),
-              //       onChanged: (String? newValue){
-              //         if (newValue == "Article"){
-              //           sub_category.value = 2;
-              //         }else {
-              //           if (newValue == "Category"){
-              //             sub_category.value = 3;
-              //           }else {
-              //             _dashboardController.getKBSData();
-              //             sub_category.value = 1;
-              //           }
-              //         }
-              //       },
-              //       isExpanded: false,
-              //       underline: Container(),
-              //
-              //     ),
-              //   ),
-              // ),
-            // ),
           ),
         ),
       ],
@@ -136,6 +93,15 @@ class _ArticleWriterState extends State<ArticleWriter> {
   final QuillController _controller = QuillController.basic();
 
   final FocusNode _focusNode = FocusNode();
+
+  RxString fileName = "".obs;
+
+  RxBool fileCanUpload = false.obs;
+
+  Uint8List? fileBytes;
+
+  final DashboardController _dashboardController =
+  Get.find<DashboardController>();
 
   @override
   Widget build(BuildContext context) {
@@ -220,11 +186,77 @@ class _ArticleWriterState extends State<ArticleWriter> {
         Container(
           padding: const EdgeInsets.all(8.0),
           alignment: Alignment.centerRight,
-          child: TextButton(
-            child: Text("NEXT", style: context.textTheme.bodyText1),
-            onPressed: () {
-              Get.dialog(AddArticleDialog(), arguments: {'article': jsonEncode(_controller.document.toDelta().toJson())});
-            },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _isDesktop() ? Container() : TextButton(
+                child: Text("Upload File", style: context.textTheme.bodyText1),
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                    type: FileType.any,
+                  );
+
+                  if (result != null) {
+                    PlatformFile file = result.files.first;
+
+                    fileBytes = result.files.first.bytes!;
+                    String fileName = result.files.first.name;
+                    this.fileName.value = fileName;
+                    fileCanUpload.value = true;
+
+                    // Upload file
+                    //_dashboardController.firebaseController.uploadImage(fileBytes, file.extension!);
+                  } else {
+                    // User canceled the picker
+                  }
+                },
+              ),
+              Obx(()=> Text(fileName.value)),
+              Obx(()=> fileCanUpload.value ? Row(
+                children: [
+                  Tooltip(
+                    message: 'Upload Now',
+                    child: InkWell(
+                        child: Icon(Icons.check, color: context.theme.appBarTheme.backgroundColor,),
+                        onTap: () {
+                          if (fileBytes != null && fileCanUpload.value) {
+                            _dashboardController.uploadFile(fileBytes!, fileName.value);
+                          }
+                        }
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Remove',
+                    child: InkWell(
+                        child: Icon(Icons.close, color: context.theme.appBarTheme.backgroundColor,),
+                        onTap: () {
+                          fileName.value = "";
+                          fileCanUpload.value = false;
+                          fileBytes = Uint8List.fromList([]);
+                        }
+                    ),
+                  ),
+
+                  Tooltip(
+                    message: 'Bytes Transferred',
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(_dashboardController.bytesTransfered.value),
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Total Bytes',
+                    child: Text(_dashboardController.totalBytes.value),
+                  ),
+                ],
+              ): Container()),
+              TextButton(
+                child: Text("NEXT", style: context.textTheme.bodyText1),
+                onPressed: () {
+                  Get.dialog(const AddArticleDialog(time: '', previousData: [],), arguments: {'article': jsonEncode(_controller.document.toDelta().toJson()), 'fileName': fileName.value});
+                },
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -345,6 +377,7 @@ class ArticlesTable extends StatelessWidget {
                         print("DATA TABLE SOURCE: ${_dashboardController.kbsAdapter.value.dataTableSource.value}");
                         return PaginatedDataTable(
                           columns: const [
+                            //DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                             DataColumn(label: Expanded(child: Text("ARTICLE TOPIC", textAlign: TextAlign.center))),
                             DataColumn(label: Expanded(child: Text("AUTHOR", textAlign: TextAlign.center))),
                             DataColumn(label: Expanded(child: Text("CATEGORY", textAlign: TextAlign.center))),
@@ -410,26 +443,16 @@ class CategoryCreationWidget extends StatelessWidget {
         ],
       );
     }else {
-      return Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    controller: ScrollController(),
-                    child: Column(
-                      children: [
-                        Expanded(child: ArticleReader())
-                      ],
-                    ),
-                  ),
-                )
-              ],
+      return Container(
+        child: Column(
+          children: [
+            Container(
+              color: context.theme.appBarTheme.backgroundColor,
+              child: CategorySideWidget(),
             ),
-          )
-        ],
+            Expanded(child: ArticleReader()),
+          ],
+        ),
       );
     }
   }
@@ -519,7 +542,9 @@ class CategoryFormWidget extends StatelessWidget {
                             padding: const EdgeInsets.all(8.0),
                             child: TextButton(
                               child: Text("Cancel", style: context.textTheme.bodyText2,),
-                              onPressed: (){},
+                              onPressed: (){
+                                Get.back();
+                              },
                               style: context.theme.textButtonTheme.style!.copyWith(backgroundColor: MaterialStateColor.resolveWith((states) => context.theme.appBarTheme.foregroundColor!)),
                             ),
                           ),
@@ -572,6 +597,18 @@ class CategorySideWidget extends StatelessWidget {
         children: getChildrenList(context.textTheme.bodyText1, context.width),
       );
     }
+    // return SizedBox(
+    //   width: context.width,
+    //   height: 24,
+    //   child: ListView.builder(
+    //     itemBuilder: (BuildContext context, int index) {
+    //       return Text('Abc De');
+    //     },
+    //     controller: ScrollController(),
+    //     scrollDirection: Axis.horizontal,
+    //     itemCount: 50,
+    //   ),
+    // );
     return Row(
       children: getChildrenList(context.textTheme.bodyText1, context.width),
     );
@@ -580,36 +617,67 @@ class CategorySideWidget extends StatelessWidget {
 
   List<Widget> getChildrenList(style, width){
     return [
-      Text("CATEGORIES", style: style,),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text("CATEGORIES", style: style,),
+      ),
       Expanded(
-        child: Obx( ()=> ListView.builder(
-          controller: ScrollController(),
-          scrollDirection: width > 600 ? Axis.vertical : Axis.horizontal,
-          itemCount: _dashboardController.categoryList.length,
-          itemBuilder: (context, index){
-            return ListTile(
-              title: DropdownSearch<dynamic>(
-                items: _dashboardController.categoryList[index].articles,
-                dropdownSearchDecoration: InputDecoration(
-                    labelText: _dashboardController.categoryList[index].name,
-                    labelStyle: context.textTheme.bodyText2,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)
+        child: Obx( ()=> Container(
+          height: 48,
+          child: ListView.builder(
+            controller: ScrollController(),
+            scrollDirection: width > 600 ? Axis.vertical : Axis.horizontal,
+            itemCount: _dashboardController.categoryList.length,
+            itemBuilder: (context, index){
+              if (width<600) {
+                return Container(
+                  width: context.width * 0.5,
+                  padding: EdgeInsets.all(8.0),
+                  child: DropdownSearch<dynamic>(
+                    items: _dashboardController.categoryList[index].articles,
+                    dropdownSearchDecoration: InputDecoration(
+                        labelText: _dashboardController.categoryList[index].name,
+                        labelStyle: context.textTheme.bodyText2,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)
+                        ),
+                        fillColor: Colors.white,
+                        filled: true
                     ),
-                    fillColor: Colors.white,
-                    filled: true
+                    onChanged: (dynamic data) {
+                      print("Get Article ${data["topic"]}");
+                      //Get.toNamed('/articleReader', arguments: {'id': data["id"]});
+                      _readerController.getArticles(data["id"]);
+                    },
+                    showSearchBox: true,
+                    itemAsString: (dynamic data) => data["topic"],
+                  ),
+                );
+              }
+              return ListTile(
+                title: DropdownSearch<dynamic>(
+                  items: _dashboardController.categoryList[index].articles,
+                  dropdownSearchDecoration: InputDecoration(
+                      labelText: _dashboardController.categoryList[index].name,
+                      labelStyle: context.textTheme.bodyText2,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)
+                      ),
+                      fillColor: Colors.white,
+                      filled: true
+                  ),
+                  onChanged: (dynamic data) {
+                    print("Get Article ${data["topic"]}");
+                    //Get.toNamed('/articleReader', arguments: {'id': data["id"]});
+                    _readerController.getArticles(data["id"]);
+                  },
+                  showSearchBox: true,
+                  itemAsString: (dynamic data) => data["topic"],
                 ),
-                onChanged: (dynamic data) {
-                  print(data["topic"]);
-                  //Get.toNamed('/articleReader', arguments: {'id': data["id"]});
-                  _readerController.getArticles(data["id"]);
-                },
-                showSearchBox: true,
-                itemAsString: (dynamic data) => data["topic"],
-              ),
-              tileColor: Colors.red,
-            );
-          },
+                tileColor: Colors.red,
+              );
+            },
+          ),
         ),
         ),
       ),

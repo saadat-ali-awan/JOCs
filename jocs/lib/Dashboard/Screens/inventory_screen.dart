@@ -28,6 +28,7 @@ class InventoryScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: const [
+                        //DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("Item Name", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("Item Type", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("Location", textAlign: TextAlign.center,))),

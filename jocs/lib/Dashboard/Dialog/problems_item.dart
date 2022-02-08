@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
 class ProblemsItem extends StatefulWidget {
-  const ProblemsItem({Key? key}) : super(key: key);
+  const ProblemsItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
+  final List<String> previousData;
+  final String time;
   @override
   State<ProblemsItem> createState() => _ProblemsItemState();
 }
@@ -29,6 +31,20 @@ class _ProblemsItemState extends State<ProblemsItem> {
   bool assigned = false;
 
   @override
+  void initState() {
+    if (widget.previousData.isNotEmpty){
+      topicController.text = widget.previousData[1];
+      statusValue = widget.previousData[2];
+      priorityValue = widget.previousData[3];
+      assignedToController.text = widget.previousData[4];
+      foundFriend[0] = widget.previousData[4];
+      assigned = true;
+      departmentController.text = widget.previousData[5];
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
@@ -43,7 +59,11 @@ class _ProblemsItemState extends State<ProblemsItem> {
               child: Material(
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Text('Issued By: ${_dashboardController.firebaseController.currentUserDetails.value.email}'),
+                  child:widget.time.isEmpty ? Text(
+                    'Issued By: ${_dashboardController.firebaseController.currentUserDetails.value.email}',
+                  ): Text(
+                    'Issued By: ${widget.previousData[0]}',
+                  ),
                 ),
               ),
             ),
@@ -194,15 +214,31 @@ class _ProblemsItemState extends State<ProblemsItem> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()){
-                  _dashboardController.addDataToFirebase({
-                    'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
-                    'topic': topicController.text, // Stokes and Sons
-                    'status': statusValue, // 42
-                    'priority': priorityValue,
-                    'assigned_to': assignedToController.text,
-                    'department': departmentController.text,
-                    'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                  }, "problems", "problemsCount", _dashboardController.metadata.value.problemsCount);
+                  if (widget.time.isEmpty) {
+                    _dashboardController.addDataToFirebase({
+                      'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
+                      'topic': topicController.text, // Stokes and Sons
+                      'status': statusValue, // 42
+                      'priority': priorityValue,
+                      'assigned_to': assignedToController.text,
+                      'department': departmentController.text,
+                      'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                    }, "problems", "problemsCount", _dashboardController.metadata.value.problemsCount);
+                  } else {
+                    print(widget.time);
+                    _dashboardController.updateTableData(
+                      "problems",
+                      widget.time,
+                      {
+                        'issued_by': widget.previousData[0], // John Doe
+                        'topic': topicController.text, // Stokes and Sons
+                        'status': statusValue, // 42
+                        'priority': priorityValue,
+                        'assigned_to': assignedToController.text,
+                        'department': departmentController.text,
+                      },
+                    );
+                  }
                   setState(() {
                     topicController.clear();
                     assignedToController.clear();
@@ -212,8 +248,11 @@ class _ProblemsItemState extends State<ProblemsItem> {
                 }
 
               },
-              child: Text(
+              child: widget.time.isEmpty ? Text(
                 "Add Problem Data",
+                style: Get.textTheme.bodyText1,
+              ) : Text(
+                "Update Problem Data",
                 style: Get.textTheme.bodyText1,
               ),
             ),

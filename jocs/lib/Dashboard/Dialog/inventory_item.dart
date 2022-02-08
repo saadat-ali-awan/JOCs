@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
 class InventoryItem extends StatefulWidget {
-  const InventoryItem({Key? key}) : super(key: key);
+  const InventoryItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
+  final List<String> previousData;
+  final String time;
   @override
   _InventoryItemState createState() => _InventoryItemState();
 }
@@ -26,6 +28,23 @@ class _InventoryItemState extends State<InventoryItem> {
   final TextEditingController processedByController = TextEditingController();
 
   final TextEditingController commentsController = TextEditingController();
+
+  bool updateData = false;
+
+  @override
+  void initState() {
+    print(widget.previousData);
+    if (widget.previousData.isNotEmpty){
+      itemNameController.text = widget.previousData[0];
+      itemTypeController.text = widget.previousData[1];
+      locationController.text = widget.previousData[2];
+      usedByController.text = widget.previousData[3];
+      processedByController.text = widget.previousData[4];
+      commentsController.text = widget.previousData[5];
+      updateData = true;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,15 +169,31 @@ class _InventoryItemState extends State<InventoryItem> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()){
-                  _dashboardController.addDataToFirebase({
-                    'item_name': itemNameController.text, // John Doe
-                    'item_type': itemTypeController.text, // Stokes and Sons
-                    'location': locationController.text, // 42
-                    'used_by': usedByController.text,
-                    'processed_by': processedByController.text,
-                    'comments': commentsController.text,
-                    'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                  }, "inventory", "inventoryCount", _dashboardController.metadata.value.inventoryCount);
+                  if (updateData) {
+                    print ("Update Data");
+                    _dashboardController.updateTableData(
+                      "inventory",
+                      widget.time,
+                      {
+                        'item_name': itemNameController.text, // John Doe
+                        'item_type': itemTypeController.text, // Stokes and Sons
+                        'location': locationController.text, // 42
+                        'used_by': usedByController.text,
+                        'processed_by': processedByController.text,
+                        'comments': commentsController.text,
+                      },);
+                  } else {
+                    _dashboardController.addDataToFirebase({
+                      'item_name': itemNameController.text, // John Doe
+                      'item_type': itemTypeController.text, // Stokes and Sons
+                      'location': locationController.text, // 42
+                      'used_by': usedByController.text,
+                      'processed_by': processedByController.text,
+                      'comments': commentsController.text,
+                      'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                    }, "inventory", "inventoryCount", _dashboardController.metadata.value.inventoryCount);
+                  }
+
                   setState(() {
                     itemNameController.clear();
                     itemTypeController.clear();
@@ -172,8 +207,11 @@ class _InventoryItemState extends State<InventoryItem> {
                 }
 
               },
-              child: Text(
+              child: widget.time.isEmpty ? Text(
                 "Add Inventory Item",
+                style: Get.textTheme.bodyText1,
+              ) : Text(
+                "Update Inventory Data",
                 style: Get.textTheme.bodyText1,
               ),
             ),

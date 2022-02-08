@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
+import 'package:jocs/Dashboard/Dialog/CategoryScreenDialogs/add_article_dialog.dart';
+import 'package:jocs/Dashboard/Dialog/custom_dialog.dart';
 import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
@@ -39,7 +41,7 @@ class ScreenAdapter {
       } else {
         data.forEach((res) {
           //adapterData[currentPage.value-1].add(res);
-          print(res.data());
+          //print(res.data());
           bool valueNotPresent = true;
 
           for (var d in adapterData){
@@ -120,15 +122,38 @@ class ScreenAdapter {
       }
       int index = tempRows.length;
       tempRows.add(createRow(tempData, (){
-        adapterData.removeAt(index);
-        dataTableSource.value.data.removeAt(index);
-        dataTableSource.value.data.refresh();
-        dataTableSource.value.notifyListeners();
-        firebaseController.removeDataFromTable(screenName, d["time"], {metadataKey: metadataValue - 1});
-        if (screenName == "articles") {
-          firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
-        }
-      }, false
+        Get.defaultDialog(
+          title: "Caution",
+          titleStyle: TextStyle(color: Get.theme.errorColor),
+          middleText: "Want to delete the row from Database?",
+          confirm: TextButton(
+            onPressed: () {
+              adapterData.removeAt(index);
+              dataTableSource.value.data.removeAt(index);
+              dataTableSource.value.data.refresh();
+              dataTableSource.value.notifyListeners();
+              firebaseController.removeDataFromTable(screenName, d["time"], {metadataKey: metadataValue - 1});
+              if (screenName == "articles") {
+                firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
+              }
+              Get.back();
+              },
+            child: Text("DELETE", style: Get.textTheme.bodyText1,),
+            style: Get.theme.textButtonTheme.style!.copyWith(backgroundColor: MaterialStateProperty.all(Get.theme.errorColor)),
+          ),
+
+          cancel: TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Cancel", style: Get.textTheme.bodyText1,),
+          ),
+
+          onCancel: () {
+            Get.back();
+          }
+        );
+      }, false, screenName, d["time"]
       )
       );
     }
@@ -163,7 +188,7 @@ class ScreenAdapter {
     getScreenData(firebaseController);
   }
 
-  static DataRow createRow(data, Function() remove, bool empty) {
+  static DataRow createRow(data, Function() remove, bool empty, String screenName, String time) {
     List<DataCell> cellList = <DataCell>[];
     for (var i=0; i<data.length; i++){
       cellList.add(
@@ -174,6 +199,11 @@ class ScreenAdapter {
               child: Text(data[i], style: Get.textTheme.bodyText2,),
             ),
           ),
+          onTap: () {
+            if (screenName == 'articles') {
+              Get.toNamed('/articleReader', arguments: {'time': time});
+            }
+          }
         ),
       );
     }
@@ -181,19 +211,56 @@ class ScreenAdapter {
       DataCell(
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: InkWell(
-              child: empty ? Container() : Icon(
-                Icons.clear,
-                color: Get.theme.errorColor,
+          child: Row(
+            children: [
+              InkWell(
+                child: Tooltip(
+                  message: "Add Review",
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.rate_review, color: Get.theme.appBarTheme.backgroundColor,),
+                  ),
+                ),
+                onTap: () {
+                  Get.toNamed('/review', arguments: {'data': data, 'time': time, 'screenName': screenName});
+                },
               ),
-              onTap: remove,
-            ),
+              InkWell(
+                child: Tooltip(
+                  message: "Edit",
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.edit, color: Get.theme.appBarTheme.backgroundColor,),
+                  ),
+                ),
+                onTap: () {
+                  Get.dialog(
+                    updateDataDialog(data, screenName, time),
+                  );
+                },
+              ),
+              Center(
+                child: InkWell(
+                  child: empty ? Container() : Icon(
+                    Icons.clear,
+                    color: Get.theme.errorColor,
+                  ),
+                  onTap: remove,
+                ),
+              ),
+            ],
           ),
         )
       )
     );
     return DataRow(cells: cellList);
+  }
+
+  static Widget updateDataDialog(data,String screenName, String time) {
+    if (screenName == 'articles') {
+      return AddArticleDialog(previousData: data.cast<String>(), time: time);
+    }
+    return CustomDialog(previousData: data.cast<String>(), time: time);
   }
 
 

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:jocs/Dashboard/Modals/screen_adapter.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/person_model.dart';
 import 'package:jocs/FirebaseCustomControllers/ChatModels/user_chat_model.dart';
@@ -56,6 +57,7 @@ abstract class FirebaseControllerInterface {
   void createNewArticle(Map<String, dynamic> data, int lastId);
 
   Future<dynamic> getArticle(String documentId);
+  Future<dynamic> getArticleByTime(time);
 
   Stream<DetailedMetadata> getMetaDataFromDatabase();
 
@@ -66,4 +68,14 @@ abstract class FirebaseControllerInterface {
   void removeArticleFromCategory(String categoryName, reference);
 
   getNewData(ScreenAdapter adapter);
+
+  void updateTableData(String collectionName, String time, Map<String, String> newData);
+
+  void sendReview(String review, String time, String collectionName);
+
+  Future<Stream<List<String>>> getReviews(String time, String collectionName);
+
+  UploadTask uploadFile(Uint8List fileData, String fileName);
+
+  void downloadFile(String fileName);
 }

@@ -10,9 +10,9 @@ import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart'
 import 'package:jocs/HtmlEditorTest/html_editor_test.dart';
 import 'package:jocs/Registration/bindings/register_bindings.dart';
 import 'package:jocs/Registration/register.dart';
-
-import 'ArticleReader/article_reader.dart';
-import 'Dashboard/Screens/eternal_kbs_screen.dart';
+import 'package:jocs/ReviewScreen/Bindings/review_screen_binding.dart';
+import 'package:jocs/ReviewScreen/review_screen.dart';
+import 'ArticleReader/article_reader_page.dart';
 import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'Theme/custom_theme.dart';
@@ -75,8 +75,13 @@ Future<void> main() async {
           ),
           GetPage(
             name: '/articleReader',
-            page: ()=> ArticleReader(),
+            page: ()=> ArticleReaderPage(),
             binding: ArticleReaderBinding(),
+          ),
+          GetPage(
+            name: '/review',
+            page: ()=> ReviewScreen(),
+            binding: ReviewScreenBinding(),
           ),
         ],
         initialRoute: '/login',

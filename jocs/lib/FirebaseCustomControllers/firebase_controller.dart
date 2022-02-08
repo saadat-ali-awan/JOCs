@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,7 @@ import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../firebase_options.dart';
 
@@ -137,6 +139,7 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void createNewArticle(Map<String, dynamic> data, int lastId) async {
+    print("NEW ARTICLE DATA: ${data}");
     data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
     //data["id"] = lastId;
     collectionReference = FirebaseFirestore.instance.collection("articles");
@@ -148,14 +151,15 @@ class FirebaseController implements FirebaseControllerInterface{
       collectionReference = FirebaseFirestore.instance.collection("category");
       collectionReference.where("category-name", isEqualTo: data['category-name']).get().then((QuerySnapshot snapshot){
         for (var element in snapshot.docs) {
-          print(element["articles"]);
           List articles = element["articles"];
           Map<String, String> tempArticle = {
-            'topic': data['topic']!,
+            'topic': data['topic'],
             'id': value.id
           };
           articles.add(tempArticle);
-          collectionReference.doc(element.id).update({"articles": articles});
+          print(element.id);
+          collectionReference = FirebaseFirestore.instance.collection("category");
+          element.reference.update({"articles": articles});
         }
       });
     });
@@ -215,6 +219,13 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
+  Future getArticleByTime(time) async {
+    collectionReference = FirebaseFirestore.instance.collection("articles");
+    QuerySnapshot snapshot = await collectionReference.where('time', isEqualTo: time).get();
+    return snapshot.docs.first;
+  }
+
+  @override
   Stream<List<ArticleCategory>> getCategoryData() {
     collectionReference = FirebaseFirestore.instance.collection("category");
     print("Called on getCategory");
@@ -266,7 +277,6 @@ class FirebaseController implements FirebaseControllerInterface{
     }else{
       tempData = await collectionReference.orderBy(documentName, descending: true).get();
     }
-    print("getDashboardData() ${documentName} ${filter} => ${tempData.docs.length}");
     return tempData.docs.length;
 
   }
@@ -295,10 +305,10 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  Future<List<QueryDocumentSnapshot<Object?>>> getNewData(ScreenAdapter adapter) async {
+  Future<QuerySnapshot<Object?>> getNewData(ScreenAdapter adapter) async {
     collectionReference = FirebaseFirestore.instance.collection(adapter.screenName);
     QuerySnapshot snapshot = await collectionReference.where("time", isGreaterThan: adapter.adapterData.first["time"]).get();
-    return snapshot.docs;
+    return snapshot;
   }
 
   /// MetaData For Document Queries
@@ -485,6 +495,34 @@ class FirebaseController implements FirebaseControllerInterface{
     collectionReference.doc(chatId).collection("messages").doc(uniqueMessageId).set(message);
   }
 
+  @override
+  void sendReview(String review, String time, String collectionName) {
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    collectionReference.where('time', isEqualTo: time).get().then((QuerySnapshot snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.collection('reviews').add({
+          'review': review,
+          'sender': auth.currentUser!.email,
+          'time': DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+        });
+      }
+    });
+  }
+
+  @override
+  Future<Stream<List<String>>> getReviews(String time, String collectionName) async {
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
+    return await collectionReference.where('time', isEqualTo: time).get().then((QuerySnapshot snapshot) async {
+      return snapshot.docs.first.reference.collection('reviews').snapshots().map((QuerySnapshot snapshot) {
+        List<String> reviewsList = <String>[];
+        for (var doc in snapshot.docs) {
+          reviewsList.add(doc['review']);
+        }
+        return reviewsList;
+      });
+    });
+  }
+
   /// Update Metadata
   @override
   void setMetadataInDatabase(Map<String, int> metaDataMap) {
@@ -530,6 +568,35 @@ class FirebaseController implements FirebaseControllerInterface{
     }
     collectionReference = FirebaseFirestore.instance.collection("Users");
     collectionReference.doc(getCurrentUserId()).update(data);
+  }
+
+  @override
+  void updateTableData(String collectionName, String time, Map<String, String> newData) {
+    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference.where("time", isEqualTo: time).get().then((QuerySnapshot snapshot) {
+      for (var element in snapshot.docs) {
+        element.reference.update(newData);
+      }
+    });
+  }
+
+  @override
+  UploadTask uploadFile(Uint8List fileData, String fileName) {
+    return  FirebaseStorage.instance.ref('uploads/articles/${fileName}').putData(fileData);
+  }
+
+  @override
+  void downloadFile(String fileName)  async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File downloadToFile = File('${appDocDir.path}/$fileName');
+
+    try {
+      await FirebaseStorage.instance
+          .ref('uploads/articles/$fileName')
+          .writeToFile(downloadToFile);
+    } on FirebaseException catch (e) {
+      // e.g, e.code == 'canceled'
+    }
   }
 
 }

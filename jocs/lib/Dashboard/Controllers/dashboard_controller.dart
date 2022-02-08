@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -196,11 +198,11 @@ class DashboardController extends GetxController {
   /// Dashboard Screen Getx Logic
   getDashboardData() async{
     openTickets.value = await firebaseController.getDashboardData("status", filter:"OPEN");
+    metadata.bindStream(firebaseController.getMetaDataFromDatabase());
     unresolvedTickets.value = await firebaseController.getDashboardData("status", filter: "RESOLVED");
     unresolvedTickets.value = metadata.value.ticketsCount - unresolvedTickets.value;
     unassignedTickets.value = await firebaseController.getDashboardData("assigned_to");
     unassignedTickets.value = metadata.value.ticketsCount - unassignedTickets.value;
-    metadata.bindStream(firebaseController.getMetaDataFromDatabase());
   }
 
   /// Tickets Screen Getx Logic
@@ -439,19 +441,58 @@ class DashboardController extends GetxController {
       }
       int index = tempRows.length;
       tempRows.add(ScreenAdapter.createRow(tempData, (){
-        adapter.adapterData.removeAt(index);
-        adapter.dataTableSource.value.data.removeAt(index);
-        adapter.dataTableSource.value.data.refresh();
-        adapter.dataTableSource.value.notifyListeners();
-        firebaseController.removeDataFromTable(adapter.screenName, d["time"], {metadataKey: metadataValue - 1});
-        if (adapter.screenName == "articles") {
-          firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
-        }
-      }, false
+        Get.defaultDialog(
+            title: "Caution",
+            titleStyle: TextStyle(color: Get.theme.errorColor),
+            middleText: "Want to delete the row from Database?",
+            confirm: TextButton(
+              onPressed: () {
+                adapter.adapterData.removeAt(index);
+                adapter.dataTableSource.value.data.removeAt(index);
+                adapter.dataTableSource.value.data.refresh();
+                adapter.dataTableSource.value.notifyListeners();
+                firebaseController.removeDataFromTable(adapter.screenName, d["time"], {metadataKey: metadataValue - 1});
+                if (adapter.screenName == "articles") {
+                  firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
+                }
+                Get.back();
+              },
+              child: Text("DELETE", style: Get.textTheme.bodyText1,),
+              style: Get.theme.textButtonTheme.style!.copyWith(backgroundColor: MaterialStateProperty.all(Get.theme.errorColor)),
+            ),
+
+            cancel: TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text("Cancel", style: Get.textTheme.bodyText1,),
+            ),
+
+            onCancel: () {
+              Get.back();
+            }
+        );
+      }, false, adapter.screenName, d["time"]
       )
       );
     }
     adapter.dataTableSource.value = CustomDataTableSource(adapter.screenName, tempRows);
+  }
+
+  /// Update Pages Data
+  void updateTableData(String collectionName, String time, Map<String, String> newData) {
+    firebaseController.updateTableData(collectionName, time, newData);
+  }
+
+  UploadTask? task;
+  RxString bytesTransfered = "".obs;
+  RxString totalBytes = "".obs;
+  void uploadFile(Uint8List fileData, String fileName) {
+    task = firebaseController.uploadFile(fileData, fileName);
+    task!.snapshotEvents.listen((TaskSnapshot snapshot) {
+      bytesTransfered.value = snapshot.bytesTransferred.toString();
+      totalBytes.value = '/'+snapshot.totalBytes.toString();
+    });
   }
 
 }

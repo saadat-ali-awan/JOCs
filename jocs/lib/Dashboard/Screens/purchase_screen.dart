@@ -28,6 +28,7 @@ class PurchaseScreen extends StatelessWidget {
                                     .backgroundColor))),
                     child: PaginatedDataTable(
                       columns: const [
+                        //DataColumn(label: Expanded(child: Text("", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("ORDER NO.", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("ORDER NAME", textAlign: TextAlign.center,))),
                         DataColumn(label: Expanded(child: Text("DESCRIPTION", textAlign: TextAlign.center,))),

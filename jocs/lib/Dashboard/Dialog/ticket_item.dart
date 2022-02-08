@@ -1,12 +1,15 @@
 
+import 'package:collection/src/iterable_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/search_user_dialog.dart';
 
 class TicketItem extends StatefulWidget {
-  TicketItem({Key? key}) : super(key: key);
+  const TicketItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
+  final List<String> previousData;
+  final String time;
   @override
   State<TicketItem> createState() => _TicketItemState();
 }
@@ -31,6 +34,20 @@ class _TicketItemState extends State<TicketItem> {
   bool assigned = false;
 
   @override
+  void initState() {
+    if (widget.previousData.isNotEmpty){
+      topicController.text = widget.previousData[1];
+      statusValue = widget.previousData[2];
+      priorityValue = widget.previousData[3];
+      assignedToController.text = widget.previousData[4];
+      commentsController.text = widget.previousData[5];
+      foundFriend[0] = widget.previousData[4];
+      assigned = true;
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
@@ -38,28 +55,6 @@ class _TicketItemState extends State<TicketItem> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: SizedBox(
-          //     width: 350,
-          //     child: Material(
-          //       child: TextFormField(
-          //         controller: issuedByController,
-          //         decoration: const InputDecoration(
-          //           labelText: 'Issued By',
-          //           hintText: 'Mr. Abc',
-          //         ),
-          //         validator: (value) {
-          //           print(value);
-          //           if (value == null || value.isEmpty) {
-          //             return 'Issued By?';
-          //           }
-          //           return null;
-          //         },
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
@@ -67,7 +62,11 @@ class _TicketItemState extends State<TicketItem> {
               child: Material(
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: Text('Issued By: ${_dashboardController.firebaseController.currentUserDetails.value.email}'),
+                  child: widget.time.isEmpty ? Text(
+                    'Issued By: ${_dashboardController.firebaseController.currentUserDetails.value.email}',
+                  ): Text(
+                    'Issued By: ${widget.previousData[0]}',
+                  ),
                 ),
               ),
             ),
@@ -140,18 +139,6 @@ class _TicketItemState extends State<TicketItem> {
                   ),
                 )),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: SizedBox(
-          //       width: 350,
-          //       child: Material(
-          //         child: TextFormField(
-          //           controller: assignedToController,
-          //           decoration: const InputDecoration(
-          //               labelText: 'Assigned to', hintText: 'Mr. XYZ'),
-          //         ),
-          //       )),
-          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
@@ -224,15 +211,42 @@ class _TicketItemState extends State<TicketItem> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()){
-                  _dashboardController.addDataToFirebase({
-                    'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
-                    'topic': topicController.text, // Stokes and Sons
-                    'status': statusValue, // 42
-                    'priority': priorityValue,
-                    'assigned_to': assignedToController.text,
-                    'comments': commentsController.text,
-                    'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                  }, "tickets", "ticketsCount", _dashboardController.metadata.value.ticketsCount);
+                  if (widget.time.isEmpty) {
+                    _dashboardController.addDataToFirebase({
+                      'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
+                      'topic': topicController.text, // Stokes and Sons
+                      'status': statusValue, // 42
+                      'priority': priorityValue,
+                      'assigned_to': assignedToController.text,
+                      'comments': commentsController.text,
+                      'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                    }, "tickets", "ticketsCount", _dashboardController.metadata.value.ticketsCount);
+                  } else {
+                    _dashboardController.updateTableData(
+                      "tickets",
+                      widget.time,
+                      {
+                        'issued_by': widget.previousData[0], // John Doe
+                        'topic': topicController.text, // Stokes and Sons
+                        'status': statusValue, // 42
+                        'priority': priorityValue,
+                        'assigned_to': assignedToController.text,
+                        'comments': commentsController.text,
+                      },
+                    );
+
+                    _dashboardController.ticketAdapter.value.adapterData.forEachIndexed((index, ticket) {
+                      if (ticket['time'] == widget.time) {
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['issued_by'] = widget.previousData[0];
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['topic'] = topicController.text;
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['status'] = statusValue;
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['priority'] = priorityValue;
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['assigned_to'] = assignedToController.text;
+                        // _dashboardController.ticketAdapter.value.adapterData[index]['comments'] = commentsController.text;
+                      }
+                    });
+                  }
+
                   setState(() {
                     topicController.clear();
                     assignedToController.clear();
@@ -242,8 +256,11 @@ class _TicketItemState extends State<TicketItem> {
                 }
 
               },
-              child: Text(
+              child: widget.time.isEmpty ? Text(
                 "Add Ticket",
+                style: Get.textTheme.bodyText1,
+              ) : Text(
+                "Update Ticket",
                 style: Get.textTheme.bodyText1,
               ),
             ),

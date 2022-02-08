@@ -5,13 +5,16 @@ import 'package:get/get.dart';
 import 'package:jocs/ArticleReader/Controllers/article_reader_controller.dart';
 import 'package:jocs/universal_ui/universal_ui.dart';
 
-class ArticleReader extends StatelessWidget {
-  ArticleReader({Key? key}) : super(key: key);
+class ArticleReaderPage extends StatelessWidget {
+  ArticleReaderPage({Key? key}) : super(key: key);
 
   ArticleReaderController _readerController = Get.find<ArticleReaderController>();
   final FocusNode _focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
+    if (Get.arguments['time'] != null && Get.arguments['time'] != "") {
+      _readerController.getArticleByTime(Get.arguments['time']);
+    }
     var quillEditor = Obx( ()=> QuillEditor(
       controller: _readerController.controller.value,
       scrollController: ScrollController(),
@@ -35,6 +38,28 @@ class ArticleReader extends StatelessWidget {
           embedBuilder: defaultEmbedBuilderWeb));
     }
 
+    if (Get.arguments['time'] != null && Get.arguments['time'] != "") {
+      return Scaffold(
+        appBar: AppBar(
+          leading: InkWell(
+            child: Icon(Icons.arrow_back_ios_rounded, color: context.theme.appBarTheme.foregroundColor,),
+            onTap: () {
+              Get.back();
+            },
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: quillEditor,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return  Column(
       children: [
         Tooltip(
