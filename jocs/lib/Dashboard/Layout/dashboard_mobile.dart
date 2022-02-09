@@ -24,7 +24,6 @@ class _DashboardMobileState extends State<DashboardMobile> {
           Expanded(
               flex: 10,
               child: Container(
-                  color: Colors.blueAccent,
                   child: ScreensLayout())
           )
         ],
@@ -33,7 +32,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
           ? Row(children: [
         Container(
             width: MediaQuery.of(context).size.width,
-            color: _dashboardController.tileColor,
+            color: _dashboardController.tileColor.value,
             child: NavItems()
         )
       ])

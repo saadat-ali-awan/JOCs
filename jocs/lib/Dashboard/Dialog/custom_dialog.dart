@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/problems_item.dart';
+import 'package:jocs/Dashboard/Dialog/purchase_item.dart';
 import 'package:jocs/Dashboard/Dialog/ticket_item.dart';
+import 'package:jocs/Dashboard/Screens/eternal_kbs_screen.dart';
+
+import 'inventory_item.dart';
 
 class CustomDialog extends StatelessWidget {
-  CustomDialog({Key? key}) : super(key: key);
+  CustomDialog({Key? key, required this.previousData, required this.time}) : super(key: key);
 
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
+
+  final List<String> previousData;
+  final String time;
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -54,9 +61,15 @@ class CustomDialog extends StatelessWidget {
   Widget getDialogOptions(){
     switch (_dashboardController.selectedMenuItem.value){
       case 1:
-        return TicketItem();
+        return TicketItem(previousData: previousData, time: time);
       case 2:
-        return ProblemsItem();
+        return ProblemsItem(previousData: previousData, time: time);
+      case 32:
+        return InventoryItem(previousData: previousData, time: time);
+      case 33:
+        return PurchaseItem(previousData: previousData, time: time);
+      case 5:
+        return CategoryFormWidget();
     }
     return Column();
   }

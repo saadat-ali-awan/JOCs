@@ -13,7 +13,7 @@ class TopMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 100,
-      color: Get.theme.appBarTheme.backgroundColor,
+      color: context.theme.appBarTheme.backgroundColor,
       child: Row(children: [
         Expanded(
             child: Wrap(
@@ -27,42 +27,133 @@ class TopMenu extends StatelessWidget {
                     children: getTitle(),
                   )),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      if (_dashboardController.selectedMenuItem>0) {
-                        Get.dialog(
-                          CustomDialog()
-                        );
-                      }else{
-                        Get.defaultDialog(
-                          titlePadding: const EdgeInsets.all(16.0),
-                            title: "Can not add when in Dashboard Tab",
-                          middleText: "Switch Tab and come back.",
-                          titleStyle: TextStyle(color: Get.theme.appBarTheme.backgroundColor),
-                          onConfirm: (){
-                              Get.back();
-                          },
-                          confirmTextColor:  Get.theme.iconTheme.color,
-                          buttonColor: Get.theme.appBarTheme.backgroundColor
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.add_box)),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.perm_contact_calendar_rounded)),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.notifications_active))
-              ],
-            )
+            _dashboardController.mobileDisplay.value ? PopupMenuButton(
+                color: context.theme.appBarTheme.backgroundColor,
+                itemBuilder: (context) {
+                  List<Widget> list = getMenuItems(context);
+                  return getPopUpAddButtons();
+                },
+              onSelected: (value) {
+                  if (value == 1) {
+                    addButtonListener(context);
+                  }
+                  if (value == 2) {
+                    logoutButtonListener();
+                  }
+              },
+            ) : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        child: getAddButton(context),
+                        onTap: () {
+                          addButtonListener(context);
+                        },
+                      ),
+                      InkWell(
+                        child: const Icon(Icons.logout),
+                        onTap: logoutButtonListener,
+                      ),
+                    ]
+                ),
           ],
         )),
       ]),
     );
+  }
+
+  List<PopupMenuEntry<dynamic>> getPopUpAddButtons() {
+    List<PopupMenuEntry<dynamic>> menuItems = <PopupMenuEntry<dynamic>>[];
+    switch (_dashboardController.selectedMenuItem.value) {
+      case 0:
+      case 4:
+      case 6:
+      case 7:
+        break;
+      default:
+        menuItems.add(
+          const PopupMenuItem(
+            child: const Icon(Icons.add_box),
+            value: 1,
+          ),
+        );
+    }
+    menuItems.add(const PopupMenuItem(
+      child: Icon(Icons.logout),
+      value: 2,
+    ));
+    return menuItems;
+  }
+
+  Widget getAddButton(context) {
+    return Obx((){
+      switch (_dashboardController.selectedMenuItem.value) {
+        case 0:
+        case 4:
+        case 6:
+        case 7:
+          return Container();
+        default:
+          return const Icon(Icons.add_box);
+      }
+    });
+  }
+
+  void addButtonListener(context) {
+      if (_dashboardController.selectedMenuItem>0) {
+        Get.dialog(
+            CustomDialog(previousData: const [], time: "")
+        );
+      }else{
+        Get.defaultDialog(
+            titlePadding: const EdgeInsets.all(16.0),
+            title: "Can not add when in Dashboard Tab",
+            middleText: "Switch Tab and come back.",
+            titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+            onConfirm: (){
+              Get.back();
+            },
+            confirmTextColor:  context.theme.iconTheme.color,
+            buttonColor: context.theme.appBarTheme.backgroundColor
+        );
+      }
+  }
+  // <base href="/JOCs/">
+
+  void logoutButtonListener() {
+    _dashboardController.logOut();
+  }
+
+  List<Widget> getMenuItems(context) {
+    return [
+      IconButton(
+          onPressed: () {
+            if (_dashboardController.selectedMenuItem>0) {
+              Get.dialog(
+                  CustomDialog(previousData: const [], time: "")
+              );
+            }else{
+              Get.defaultDialog(
+                  titlePadding: const EdgeInsets.all(16.0),
+                  title: "Can not add when in Dashboard Tab",
+                  middleText: "Switch Tab and come back.",
+                  titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+                  onConfirm: (){
+                    Get.back();
+                  },
+                  confirmTextColor:  context.theme.iconTheme.color,
+                  buttonColor: context.theme.appBarTheme.backgroundColor
+              );
+            }
+          },
+          icon: const Icon(Icons.add_box)),
+      IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.perm_contact_calendar_rounded)),
+      IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications_active))
+    ];
   }
 
   List<Widget> getTitle() {

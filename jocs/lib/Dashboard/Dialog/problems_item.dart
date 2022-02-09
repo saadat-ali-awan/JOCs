@@ -2,18 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
-class ProblemsItem extends StatelessWidget {
-  ProblemsItem({Key? key}) : super(key: key);
+class ProblemsItem extends StatefulWidget {
+  const ProblemsItem({Key? key, required this.previousData, required this.time}) : super(key: key);
+
+  final List<String> previousData;
+  final String time;
+  @override
+  State<ProblemsItem> createState() => _ProblemsItemState();
+}
+
+class _ProblemsItemState extends State<ProblemsItem> {
   final _formKey = GlobalKey<FormState>();
 
   final DashboardController _dashboardController =
   Get.find<DashboardController>();
-  final TextEditingController issuedByController = TextEditingController();
+
   final TextEditingController topicController = TextEditingController();
-  final TextEditingController statusController = TextEditingController();
-  final TextEditingController priorityController = TextEditingController();
+
+  String statusValue = "OPEN";
+
+  String priorityValue = "LOW";
+
   final TextEditingController assignedToController = TextEditingController();
+
   final TextEditingController departmentController = TextEditingController();
+
+  RxList foundFriend = ["", ""].obs;
+  bool assigned = false;
+
+  @override
+  void initState() {
+    if (widget.previousData.isNotEmpty){
+      topicController.text = widget.previousData[1];
+      statusValue = widget.previousData[2];
+      priorityValue = widget.previousData[3];
+      assignedToController.text = widget.previousData[4];
+      foundFriend[0] = widget.previousData[4];
+      assigned = true;
+      departmentController.text = widget.previousData[5];
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,31 +53,23 @@ class ProblemsItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               width: 350,
               child: Material(
-                child: TextFormField(
-                  controller: issuedByController,
-                  decoration: const InputDecoration(
-                    labelText: 'Issued By',
-                    hintText: 'Mr. Abc',
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child:widget.time.isEmpty ? Text(
+                    'Issued By: ${_dashboardController.firebaseController.currentUserDetails.value.email}',
+                  ): Text(
+                    'Issued By: ${widget.previousData[0]}',
                   ),
-                  validator: (value) {
-                    if (GetUtils.isEmail(
-                        value!)) {
-                      return null;
-                    }
-                    return 'Enter a valid email address';
-                  },
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               width: 350,
               child: Material(
@@ -59,181 +80,180 @@ class ProblemsItem extends StatelessWidget {
                     hintText: 'XYZ Problem',
                   ),
                   validator: (value) {
-                    if (GetUtils.isEmail(
-                        value!)) {
-                      return null;
+                    if (value == null || value.isEmpty) {
+                      return 'Topic?';
                     }
-                    return 'Enter a valid email address';
+                    return null;
                   },
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
                 width: 350,
                 child: Material(
-                  child: TextFormField(
-                    controller: statusController,
-                    decoration: const InputDecoration(
-                        labelText: 'Status',
-                        hintText: 'Resolved'),
-                    validator: (value) {
-                      // RegExp regex =
-                      // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-                      if (value!.isEmpty) {
-                        return 'Please enter password';
-                      } else {
-                        if (value.length <
-                            8) {
-                          return 'Password must contain at least 8 characters';
-                        } else {
-                          return null;
-                        }
-                        // if (!regex.hasMatch(value)) {
-                        //   return 'Enter valid password';
-                        // } else {
-                        //   return null;
-                        // }
-                      }
+                  child: DropdownButton(
+                    value: statusValue,
+                    items: <String>["OPEN", "PENDING", "RESOLVED", "CLOSED"].map((value){
+                      return DropdownMenuItem(
+                        child: Text(value),
+                        value: value,
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue){
+                      setState(() {
+                        statusValue = newValue!;
+                      });
                     },
-                  ),
-                )),
-          ),
+                    isExpanded: true,
 
+                  ),
+
+                )),
+          ),
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
                 width: 350,
                 child: Material(
-                  child: TextFormField(
-                    controller: priorityController,
-                    decoration: const InputDecoration(
-                        labelText: 'Priority',
-                        hintText: 'High'),
-                    validator: (value) {
-                      // RegExp regex =
-                      // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-                      if (value!.isEmpty) {
-                        return 'Please enter password';
-                      } else {
-                        if (value.length <
-                            8) {
-                          return 'Password must contain at least 8 characters';
-                        } else {
-                          return null;
-                        }
-                        // if (!regex.hasMatch(value)) {
-                        //   return 'Enter valid password';
-                        // } else {
-                        //   return null;
-                        // }
-                      }
+                  child: DropdownButton(
+                    value: priorityValue,
+                    items: <String>["LOW", "MEDIUM", "HIGH", "URGENT"].map((value){
+                      return DropdownMenuItem(
+                        child: Text(value),
+                        value: value,
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue){
+                      setState(() {
+                        priorityValue = newValue!;
+                      });
                     },
+                    isExpanded: true,
+
                   ),
                 )),
           ),
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
                 width: 350,
                 child: Material(
                   child: TextFormField(
                     controller: assignedToController,
-                    decoration: const InputDecoration(
-                        labelText: 'Assigned to',
-                        hintText: 'Mr. XYZ'),
-                    validator: (value) {
-                      // RegExp regex =
-                      // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-                      if (value!.isEmpty) {
-                        return 'Please enter password';
-                      } else {
-                        if (value.length <
-                            8) {
-                          return 'Password must contain at least 8 characters';
-                        } else {
-                          return null;
-                        }
-                        // if (!regex.hasMatch(value)) {
-                        //   return 'Enter valid password';
-                        // } else {
-                        //   return null;
-                        // }
+                    decoration: InputDecoration(
+                      labelText: 'Assigned To', hintText: 'Enter Email',
+                      suffixIcon: assigned ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            assigned = false;
+                            foundFriend.value = <String>["", ""];
+                            assignedToController.clear();
+                          });
+                        },
+                      ) : IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () async {
+                          if (assignedToController.text == "") {
+                            return;
+                          }
+                          foundFriend.value = await _dashboardController.searchFriend(assignedToController.text);
+                          setState(() {
+                            assignedToController.clear();
+                          });
+                        },
+                      ),
+                    ),
+                    validator: (String? value) {
+                      if (assigned) {
+                        return null;
                       }
+                      return 'Assign The Ticket First.';
                     },
                   ),
                 )),
           ),
-
+          Material(
+            child: InkWell(
+                onTap: (){
+                  setState(() {
+                    assignedToController.text = foundFriend.value[0];
+                    assigned = true;
+                  });
+                },
+                child: Text(
+                  foundFriend.value[0],
+                  style: Get.textTheme.bodyText2,
+                )
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.all(
-                8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
                 width: 350,
                 child: Material(
                   child: TextFormField(
                     controller: departmentController,
                     decoration: const InputDecoration(
-                        labelText: 'Department',
-                        hintText: 'Add Department for Problem'),
-                    validator: (value) {
-                      // RegExp regex =
-                      // RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-                      if (value!.isEmpty) {
-                        return 'Please enter password';
-                      } else {
-                        if (value.length <
-                            8) {
-                          return 'Password must contain at least 8 characters';
-                        } else {
-                          return null;
-                        }
-                        // if (!regex.hasMatch(value)) {
-                        //   return 'Enter valid password';
-                        // } else {
-                        //   return null;
-                        // }
+                        labelText: 'Department', hintText: 'Department'),
+                    validator: (value){
+                      if (value == null || value.isEmpty) {
+                        return 'Department?';
                       }
+                      return null;
                     },
                   ),
                 )),
           ),
-
           Container(
-            margin: const EdgeInsets.only(
-                top: 32.0),
+            margin: const EdgeInsets.only(top: 32.0),
             child: TextButton(
-              // onPressed: () {
-              //   if (_formKey.currentState!.validate()){
-              //     String email = emailController.text;
-              //     String password = passwordController.text;
-              //     _loginController.login(email, password);
-              //     emailController.clear();
-              //     passwordController.clear();
-              //   }
-              //
-              // },
+
               onPressed: () {
-                _dashboardController.addDataToFirebase({
-                  'issued_by': issuedByController.text, // John Doe
-                  'topic': topicController.text, // Stokes and Sons
-                  'status': statusController.text, // 42
-                  'priority': priorityController.text,
-                  'assigned_to': assignedToController.text,
-                  'department': departmentController.text,
-                  'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
-                }, "problems");
+                if (_formKey.currentState!.validate()){
+                  if (widget.time.isEmpty) {
+                    _dashboardController.addDataToFirebase({
+                      'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
+                      'topic': topicController.text, // Stokes and Sons
+                      'status': statusValue, // 42
+                      'priority': priorityValue,
+                      'assigned_to': assignedToController.text,
+                      'department': departmentController.text,
+                      'time' : DateTime.now().toUtc().millisecondsSinceEpoch.toString()
+                    }, "problems", "problemsCount", _dashboardController.metadata.value.problemsCount);
+                  } else {
+                    print(widget.time);
+                    _dashboardController.updateTableData(
+                      "problems",
+                      widget.time,
+                      {
+                        'issued_by': widget.previousData[0], // John Doe
+                        'topic': topicController.text, // Stokes and Sons
+                        'status': statusValue, // 42
+                        'priority': priorityValue,
+                        'assigned_to': assignedToController.text,
+                        'department': departmentController.text,
+                      },
+                    );
+                  }
+                  setState(() {
+                    topicController.clear();
+                    assignedToController.clear();
+                    departmentController.clear();
+                  });
+                  Get.back();
+                }
+
               },
-              child: Text(
-                "Add Item",
-                style: Get
-                    .textTheme
-                    .bodyText1,
+              child: widget.time.isEmpty ? Text(
+                "Add Problem Data",
+                style: Get.textTheme.bodyText1,
+              ) : Text(
+                "Update Problem Data",
+                style: Get.textTheme.bodyText1,
               ),
             ),
           ),

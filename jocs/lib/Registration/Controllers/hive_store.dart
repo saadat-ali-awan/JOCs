@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 
 /// Stores tokens using a Hive store.
 /// Depends on the Hive plugin: https://pub.dev/packages/hive
+/// Used to store Firebase Login Information
 class HiveStore extends TokenStore {
   static const keyToken = "auth_token";
 

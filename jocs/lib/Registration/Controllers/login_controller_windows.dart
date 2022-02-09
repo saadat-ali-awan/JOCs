@@ -1,19 +1,26 @@
 import 'dart:io';
 
-import 'package:firedart/auth/exceptions.dart';
 import 'package:firedart/auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller_windows.dart';
+import 'package:jocs/Registration/Interfaces/login_controller_interface.dart';
 
 import 'hive_store.dart';
 
-class LoginControllerWindows extends GetxController{
+class LoginControllerWindows extends LoginControllerInterface {
 
-  RxString loginErrorMessage = "".obs;
-  final FirebaseControllerWindows _firebaseControllerWindows = Get.find<FirebaseControllerWindows>();
+  /// Firebase Controller get the Instance of [FirebaseController] to use during
+  /// registration process
 
+  final FirebaseControllerWindows firebaseController = Get.find<FirebaseControllerWindows>();
+
+  LoginControllerWindows();
+
+  @override
   initializeLogin() async {
+    await firebaseController.initializeFirebase();
     var path = Directory.current.path;
     Hive
         .init(path);
@@ -39,12 +46,17 @@ class LoginControllerWindows extends GetxController{
     }on StateError catch(e){
       print("Listen Stream Created Already");
     }
-    _firebaseControllerWindows.initializeLoginController();
+    firebaseController.initializeLoginController();
+
+    if (firebaseController.checkFirebaseLoggedIn()) {
+      Get.toNamed('/dashboard');
+    }
 
   }
 
+  @override
   login(String email, String password){
-    _firebaseControllerWindows.login(email, password);
+    firebaseController.login(email, password);
   }
 
 

@@ -24,17 +24,23 @@ class _DashboardGeneralState extends State<DashboardGeneral> {
           Obx(
                 () => Container(
                 width: _dashboardController.showPanel.value ? 100 : 300,
-                color: _dashboardController.tileColor,
+                color: _dashboardController.tileColor.value,
                 child: NavItems()),
           ),
           //Obx(() =>
-          Expanded(
-              child: Container(
-                  color: _dashboardController.iconColor,
-                  child: ScreensLayout()),
+          Obx( () => Expanded(
+                child: Container(
+                    color: _dashboardController.iconColor.value,
+                    child: ScreensLayout()),
+            ),
           )
         ],
       )
     ]);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
