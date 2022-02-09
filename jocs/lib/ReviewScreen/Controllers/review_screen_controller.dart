@@ -23,7 +23,7 @@ class ReviewScreenController extends GetxController {
     }
 
 
-    if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb) {
+    if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
       firebaseController = Get.find<FirebaseController>();
       // firebaseController.getData("Tickets", 1);
     }else {
@@ -96,5 +96,11 @@ class ReviewScreenController extends GetxController {
 
   sendReview(String review) {
     firebaseController.sendReview(review, time, screenName);
+  }
+
+  @override
+  void onClose() {
+    reviews.close();
+    super.onClose();
   }
 }

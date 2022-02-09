@@ -41,38 +41,71 @@ class MobileChatScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Obx(() {
-                  return SizedBox(
-                    height: 56,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount:
-                            _dashboardController.friendsList.value.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(
-                                child: InkWell(
-                              onTap: () {
-                                selectedChat.value = _dashboardController
-                                    .friendsList.value[index].modelName;
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(4.0),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Get.theme.appBarTheme
-                                            .backgroundColor!),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8.0))),
-                                child: Text(_dashboardController
-                                    .friendsList[index].modelName),
-                              ),
-                            )),
-                          );
-                        }),
-                  );
-                }),
+                child: SizedBox(
+                  height: 56,
+                  child: GetX<DashboardController>(
+                    builder: (DashboardController dashboardController) {
+                      if (_dashboardController != null &&
+                          _dashboardController.friendsList != null) {
+                        return ListView.builder(
+                            controller: ScrollController(),
+                            scrollDirection: Axis.horizontal,
+                            itemCount:
+                            _dashboardController.friendsList.length,
+                            itemBuilder:
+                                (BuildContext context, int index) {
+                              return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if ((_dashboardController.openChat != null &&
+                                            _dashboardController.openChat!.chatId == _dashboardController.friendsList[index].chatId)) {
+                                          return;
+                                        }
+                                        _dashboardController.startTimer(_dashboardController.friendsList[index].chatId);
+                                        if (_dashboardController.allChats[_dashboardController.friendsList[index].chatId] != null){
+                                          selectedChat.value =
+                                              _dashboardController
+                                                  .friendsList[index]
+                                                  .modelName;
+                                          _dashboardController.openChat =
+                                          _dashboardController
+                                              .friendsList[index];
+                                          return;
+                                        }
+                                        _dashboardController.openChat =
+                                        _dashboardController
+                                            .friendsList[index];
+                                        _dashboardController
+                                            .startChatStream(
+                                            _dashboardController
+                                                .openChat!.chatId);
+                                        selectedChat.value =
+                                            _dashboardController
+                                                .friendsList[index]
+                                                .chatId;
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(4.0),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Get.theme.appBarTheme
+                                                    .backgroundColor!),
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(8.0))),
+                                        child: Text(_dashboardController
+                                            .friendsList[index].modelName),
+                                      ),
+                                    ),
+                                  ));
+                            });
+                      } else {
+                        return Text("Loading");
+                      }
+                    },
+                  ),
+                ),
               ),
             ],
           ),
@@ -86,61 +119,71 @@ class MobileChatScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Obx(() {
-                  return SizedBox(
-                    height: 56,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _dashboardController.groupList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(
-                                child: InkWell(
-                              onTap: () {
-                                if ((_dashboardController.openChat != null &&
-                                    _dashboardController.openChat!.chatId == _dashboardController.friendsList[index].chatId)) {
-                                  return;
-                                }
-                                _dashboardController.startTimer(_dashboardController.friendsList[index].chatId);
-                                if (_dashboardController.allChats[_dashboardController.friendsList[index].chatId] != null){
-                                  selectedChat.value =
-                                      _dashboardController
-                                          .friendsList[index]
-                                          .modelName;
-                                  _dashboardController.openChat =
-                                  _dashboardController
-                                      .friendsList[index];
-                                  return;
-                                }
-                                _dashboardController.openChat =
-                                _dashboardController
-                                    .friendsList[index];
-                                _dashboardController
-                                    .startChatStream(
-                                    _dashboardController
-                                        .openChat!.chatId);
-                                selectedChat.value =
-                                    _dashboardController
-                                        .friendsList[index]
-                                        .chatId;
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(4.0),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Get.theme.appBarTheme
-                                            .backgroundColor!),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8.0))),
-                                child: Text(_dashboardController
-                                    .groupList.value[index].modelName),
-                              ),
-                            )),
-                          );
-                        }),
-                  );
-                }),
+                child: SizedBox(
+                  height: 56,
+                  child: GetX<DashboardController>(
+                    builder: (DashboardController dashboardController) {
+                      if (_dashboardController != null &&
+                          _dashboardController.groupList != null) {
+                        return ListView.builder(
+                            controller: ScrollController(),
+                            scrollDirection: Axis.horizontal,
+                            itemCount:
+                            _dashboardController.groupList.length,
+                            itemBuilder:
+                                (BuildContext context, int index) {
+                              return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if ((_dashboardController.openChat != null &&
+                                            _dashboardController.openChat!.chatId == _dashboardController.groupList[index].chatId)) {
+                                          return;
+                                        }
+                                        _dashboardController.startTimer(_dashboardController.groupList[index].chatId);
+                                        if (_dashboardController.allChats[_dashboardController.groupList[index].chatId] != null){
+                                          selectedChat.value =
+                                              _dashboardController
+                                                  .groupList[index]
+                                                  .modelName;
+                                          _dashboardController.openChat =
+                                          _dashboardController
+                                              .groupList[index];
+                                          return;
+                                        }
+                                        selectedChat.value =
+                                            _dashboardController
+                                                .groupList[index]
+                                                .modelName;
+                                        _dashboardController.openChat =
+                                        _dashboardController
+                                            .groupList[index];
+                                        _dashboardController
+                                            .startChatStream(
+                                            _dashboardController
+                                                .openChat!.chatId);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(4.0),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Get.theme.appBarTheme
+                                                    .backgroundColor!),
+                                            borderRadius: const BorderRadius.all(
+                                                Radius.circular(8.0))),
+                                        child: Text(_dashboardController
+                                            .groupList.value[index].modelName),
+                                      ),
+                                    ),
+                                  ));
+                            });
+                      } else {
+                        return Text("Loading");
+                      }
+                    },
+                  ),
+                ),
               ),
             ],
           ),
@@ -472,7 +515,7 @@ class _ChatBoxState extends State<ChatBox> {
               child: Container(
                   color: Get.theme.appBarTheme.backgroundColor,
                   padding: EdgeInsets.all(8.0),
-                  child: Text(_dashboardController.openChat!.modelName,
+                  child: Text(_dashboardController.openChat == null ? "" : _dashboardController.openChat!.modelName,
                       style: Get.textTheme.headline4)),
             )
           ],
@@ -504,10 +547,13 @@ class _ChatBoxState extends State<ChatBox> {
                             if (message.text.isEmpty) {
                               return;
                             }
-                            _dashboardController.sendMessage(
-                                _dashboardController.openChat!.chatId,
-                                _dashboardController.openChat!.modelId,
-                                message.text);
+                            if (_dashboardController.openChat != null) {
+                              _dashboardController.sendMessage(
+                                  _dashboardController.openChat!.chatId,
+                                  _dashboardController.openChat!.modelId,
+                                  message.text);
+                            }
+
                             message.clear();
                             myFocusNode.requestFocus();
                           },

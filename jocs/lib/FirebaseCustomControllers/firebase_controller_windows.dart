@@ -392,7 +392,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   void logOut() {
-    Get.toNamed("/login");
+    Get.back();
     auth.signOut();
   }
 
@@ -482,9 +482,11 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
+  StreamSubscription? currentUserStream;
+  @override
   void getCurrentUserData() {
     var ref = firestore.collection("Users");
-    ref.document(auth.userId).stream.map((Document? document) {
+    currentUserStream = ref.document(auth.userId).stream.map((Document? document) {
       if (document != null) {
         currentUserDetails.value = CurrentUserDetails.fromDocumentSnapshotWindows(document);
         // TODO

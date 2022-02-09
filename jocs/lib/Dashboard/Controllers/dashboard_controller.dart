@@ -306,8 +306,10 @@ class DashboardController extends GetxController {
 
   startTimer(String chatId){
     if (timer != null) {
+      print('Timer REMOVED');
       timer!.cancel();
     }
+    print('Timer STARTED');
     timer = Timer.periodic(const Duration(seconds: 2),(Timer t) async {
       if ( allChats[chatId] == null){
         return;
@@ -502,6 +504,26 @@ class DashboardController extends GetxController {
 
   void logOut() {
     firebaseController.logOut();
+  }
+
+  @override
+  void onClose() {
+    if (timer != null) {
+      timer!.cancel();
+    }
+    for (var element in firebaseController.chatScreenMainStreams) {
+      element.cancel();
+    }
+
+    friendsList.close();
+    metadata.close();
+    groupList.close();
+    categoryList.close();
+    if (firebaseController.currentUserStream != null) {
+      firebaseController.currentUserStream!.cancel();
+    }
+
+    super.onClose();
   }
 
 }

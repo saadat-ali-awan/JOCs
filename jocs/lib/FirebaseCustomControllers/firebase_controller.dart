@@ -407,7 +407,8 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void logOut() {
-    Get.toNamed('/login');
+    Get.offAllNamed('/login');
+    // Signing Out
     auth.signOut();
   }
 
@@ -514,14 +515,13 @@ class FirebaseController implements FirebaseControllerInterface{
   @override
   Future<Stream<List<String>>> getReviews(String time, String collectionName) async {
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
-    return await collectionReference.where('time', isEqualTo: time).get().then((QuerySnapshot snapshot) async {
-      return snapshot.docs.first.reference.collection('reviews').snapshots().map((QuerySnapshot snapshot) {
-        List<String> reviewsList = <String>[];
-        for (var doc in snapshot.docs) {
-          reviewsList.add(doc['review']);
-        }
-        return reviewsList;
-      });
+    QuerySnapshot ref = await collectionReference.where('time', isEqualTo: time).get();
+    return ref.docs.first.reference.collection('reviews').snapshots().map((QuerySnapshot snapshot) {
+      List<String> reviewsList = <String>[];
+      for (var doc in snapshot.docs) {
+        reviewsList.add(doc['review']);
+      }
+      return reviewsList;
     });
   }
 
@@ -538,9 +538,11 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
+  StreamSubscription? currentUserStream;
+  @override
   void getCurrentUserData() {
     collectionReference = FirebaseFirestore.instance.collection("Users");
-    collectionReference
+    currentUserStream = collectionReference
         .doc(auth.currentUser!.uid)
         .snapshots()
         .map((DocumentSnapshot snapshot) async {

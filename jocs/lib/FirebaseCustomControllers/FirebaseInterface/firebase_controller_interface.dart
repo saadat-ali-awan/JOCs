@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,6 +17,7 @@ abstract class FirebaseControllerInterface {
   get chatScreenMainStreams => null;
 
   Rx<CurrentUserDetails> get currentUserDetails;
+  StreamSubscription? get currentUserStream;
 
   /// Initialize Firebase App to be used during the entire session
   initializeFirebase();

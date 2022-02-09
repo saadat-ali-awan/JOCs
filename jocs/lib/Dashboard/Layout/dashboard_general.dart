@@ -41,10 +41,6 @@ class _DashboardGeneralState extends State<DashboardGeneral> {
 
   @override
   void dispose() {
-    for (var element in _dashboardController.firebaseController.chatScreenMainStreams) {
-      element.cancel();
-    }
-    _dashboardController.timer!.cancel();
     super.dispose();
   }
 }

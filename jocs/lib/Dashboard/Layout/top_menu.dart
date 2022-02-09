@@ -27,30 +27,62 @@ class TopMenu extends StatelessWidget {
                     children: getTitle(),
                   )),
             ),
-            getAddButton(context),
-            InkWell(
-              child: const Icon(Icons.logout),
-              onTap: () {
-                _dashboardController.logOut();
+            _dashboardController.mobileDisplay.value ? PopupMenuButton(
+                color: context.theme.appBarTheme.backgroundColor,
+                itemBuilder: (context) {
+                  List<Widget> list = getMenuItems(context);
+                  return getPopUpAddButtons();
+                },
+              onSelected: (value) {
+                  if (value == 1) {
+                    addButtonListener(context);
+                  }
+                  if (value == 2) {
+                    logoutButtonListener();
+                  }
               },
-            ),
-            // _dashboardController.mobileDisplay.value ? PopupMenuButton(
-            //     color: context.theme.appBarTheme.backgroundColor,
-            //     itemBuilder: (context) {
-            //       List<Widget> list = getMenuItems(context);
-            //       return [
-            //         PopupMenuItem(child: list[0]),
-            //         PopupMenuItem(child: list[1]),
-            //         PopupMenuItem(child: list[2]),
-            //       ];
-            //     }) : Row(
-            //         mainAxisSize: MainAxisSize.min,
-            //         children: getMenuItems(context)
-            //     ),
+            ) : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        child: getAddButton(context),
+                        onTap: () {
+                          addButtonListener(context);
+                        },
+                      ),
+                      InkWell(
+                        child: const Icon(Icons.logout),
+                        onTap: logoutButtonListener,
+                      ),
+                    ]
+                ),
           ],
         )),
       ]),
     );
+  }
+
+  List<PopupMenuEntry<dynamic>> getPopUpAddButtons() {
+    List<PopupMenuEntry<dynamic>> menuItems = <PopupMenuEntry<dynamic>>[];
+    switch (_dashboardController.selectedMenuItem.value) {
+      case 0:
+      case 4:
+      case 6:
+      case 7:
+        break;
+      default:
+        menuItems.add(
+          const PopupMenuItem(
+            child: const Icon(Icons.add_box),
+            value: 1,
+          ),
+        );
+    }
+    menuItems.add(const PopupMenuItem(
+      child: Icon(Icons.logout),
+      value: 2,
+    ));
+    return menuItems;
   }
 
   Widget getAddButton(context) {
@@ -62,29 +94,34 @@ class TopMenu extends StatelessWidget {
         case 7:
           return Container();
         default:
-          return IconButton(
-              onPressed: () {
-                if (_dashboardController.selectedMenuItem>0) {
-                  Get.dialog(
-                      CustomDialog(previousData: const [], time: "")
-                  );
-                }else{
-                  Get.defaultDialog(
-                      titlePadding: const EdgeInsets.all(16.0),
-                      title: "Can not add when in Dashboard Tab",
-                      middleText: "Switch Tab and come back.",
-                      titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
-                      onConfirm: (){
-                        Get.back();
-                      },
-                      confirmTextColor:  context.theme.iconTheme.color,
-                      buttonColor: context.theme.appBarTheme.backgroundColor
-                  );
-                }
-              },
-              icon: const Icon(Icons.add_box));
+          return const Icon(Icons.add_box);
       }
     });
+  }
+
+  void addButtonListener(context) {
+      if (_dashboardController.selectedMenuItem>0) {
+        Get.dialog(
+            CustomDialog(previousData: const [], time: "")
+        );
+      }else{
+        Get.defaultDialog(
+            titlePadding: const EdgeInsets.all(16.0),
+            title: "Can not add when in Dashboard Tab",
+            middleText: "Switch Tab and come back.",
+            titleStyle: TextStyle(color: context.theme.appBarTheme.backgroundColor),
+            onConfirm: (){
+              Get.back();
+            },
+            confirmTextColor:  context.theme.iconTheme.color,
+            buttonColor: context.theme.appBarTheme.backgroundColor
+        );
+      }
+  }
+  // <base href="/JOCs/">
+
+  void logoutButtonListener() {
+    _dashboardController.logOut();
   }
 
   List<Widget> getMenuItems(context) {
