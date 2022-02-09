@@ -597,18 +597,6 @@ class CategorySideWidget extends StatelessWidget {
         children: getChildrenList(context.textTheme.bodyText1, context.width),
       );
     }
-    // return SizedBox(
-    //   width: context.width,
-    //   height: 24,
-    //   child: ListView.builder(
-    //     itemBuilder: (BuildContext context, int index) {
-    //       return Text('Abc De');
-    //     },
-    //     controller: ScrollController(),
-    //     scrollDirection: Axis.horizontal,
-    //     itemCount: 50,
-    //   ),
-    // );
     return Row(
       children: getChildrenList(context.textTheme.bodyText1, context.width),
     );
@@ -616,13 +604,14 @@ class CategorySideWidget extends StatelessWidget {
   }
 
   List<Widget> getChildrenList(style, width){
+    print(_dashboardController.categoryList[0].name);
     return [
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text("CATEGORIES", style: style,),
       ),
       Expanded(
-        child: Obx( ()=> Container(
+        child: Obx( ()=> SizedBox(
           height: 48,
           child: ListView.builder(
             controller: ScrollController(),
@@ -632,7 +621,7 @@ class CategorySideWidget extends StatelessWidget {
               if (width<600) {
                 return Container(
                   width: context.width * 0.5,
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: DropdownSearch<dynamic>(
                     items: _dashboardController.categoryList[index].articles,
                     dropdownSearchDecoration: InputDecoration(

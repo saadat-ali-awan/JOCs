@@ -29,6 +29,7 @@ class ArticleReaderController extends GetxController {
 
   RxString articleString = "".obs;
   getArticles(String articleId) async {
+    print('Get Articles Called ${articleId}');
     var article = await firebaseController.getArticle(articleId);
     articleString.value = article!['article'];
     fileName.value = article!['fileName'];

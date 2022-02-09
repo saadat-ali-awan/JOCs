@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firedart/firedart.dart';
+import 'package:get/get.dart';
+import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
 class DetailedMetadata {
   int ticketsCount = 0;
@@ -16,6 +18,8 @@ class DetailedMetadata {
     problemsCount = snapshot["problemsCount"];
     inventoryCount = snapshot["inventoryCount"];
     articlesCount = snapshot["articlesCount"];
+
+    Get.find<DashboardController>().updateDashboard();
   }
 
   DetailedMetadata.fromDataSnapshotWindows(Document snapshot){
@@ -24,6 +28,7 @@ class DetailedMetadata {
     problemsCount = snapshot["problemsCount"];
     inventoryCount = snapshot["inventoryCount"];
     articlesCount = snapshot["articlesCount"];
+    Get.find<DashboardController>().updateDashboard();
   }
 
 }

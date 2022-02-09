@@ -1,6 +1,6 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:jocs/FirebaseCustomControllers/firebase_controller.dart';
@@ -11,21 +11,31 @@ class LoginController extends LoginControllerInterface{
   /// registration process
   final FirebaseController firebaseController = Get.find<FirebaseController>();
 
+  LoginController();
+
   @override
-  initializeLogin(){
-    var path = Directory.current.path;
-    Hive
-        .init(path);
+  initializeLogin() async {
+    await firebaseController.initializeFirebase();
+    if (!kIsWeb){
+      var path = Directory.current.path;
+      Hive.init(path);
+    }
+
     FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
       } else {
+        print('User is currently signed in!');
         Get.toNamed("/dashboard");
       }
     });
     firebaseController.initializeLoginController();
+
+    // if (firebaseController.checkFirebaseLoggedIn()) {
+    //   Get.toNamed('/dashboard');
+    // }
   }
 
  @override

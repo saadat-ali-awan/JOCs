@@ -96,6 +96,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   bool checkFirebaseLoggedIn() {
+    auth = FirebaseAuth.instance;
     if (auth.isSignedIn){
       return true;
     }
@@ -191,13 +192,15 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   Future<Document> getArticle(String documentId) {
     var reference = firestore.collection('articles');
     var snapshot = reference.document(documentId).get();
+    print('getArticles() => ${snapshot}');
     return snapshot;
   }
 
   @override
-  Future getArticleByTime(time) {
-    // TODO: implement getArticleByTime
-    throw UnimplementedError();
+  Future getArticleByTime(time) async {
+    var reference = firestore.collection('articles');
+    List<Document> snapshot = await reference.where('time', isEqualTo: time).get();
+    return snapshot.first;
   }
 
   @override
@@ -206,8 +209,10 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     return reference.stream.map((List<Document> documents){
       List<ArticleCategory> retVal = [];
       for (Document document in documents){
-        retVal.add(ArticleCategory(document["category-name"], document["description"]));
+        print('Category Document: ${document["category-name"]}');
+        retVal.add(ArticleCategory(document["category-name"], document["description"], List.from(document["articles"])));
       }
+      print(documents.length);
       return retVal;
     });
   }
@@ -220,7 +225,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
           .collection("messages")
           .where("time", isLessThan:lastMessage.timeStamp)
           .orderBy("time", descending: true)
-          .limit(2)
+          .limit(20)
           .get()
           .then((documents){
             for (var element in documents) {
@@ -232,7 +237,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
       await collectionReference.document(chatId)
           .collection("messages")
           .orderBy("time", descending: true)
-          .limit(2)
+          .limit(20)
           .get()
           .then((documents){
             for (var element in documents) {
@@ -247,10 +252,9 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   Future<int> getDashboardData(String documentName, {String filter = ""}) async {
-    getCurrentUserData();
     var collectionReference = firestore.collection("tickets");
     List<Document> tempData;
-    if (filter == ""){
+    if (filter.isNotEmpty){
       tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
     }else{
       tempData = await collectionReference.orderBy(documentName, descending: true).get();
@@ -359,7 +363,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   initializeLoginController(){
     _loginController = Get.find<LoginControllerWindows>();
-    _loginController.initializeLogin();
+    //_loginController.initializeLogin();
   }
 
   @override
@@ -384,6 +388,12 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     if (FirebaseAuth.instance.isSignedIn){
       Get.toNamed("/dashboard");
     }
+  }
+
+  @override
+  void logOut() {
+    Get.toNamed("/login");
+    auth.signOut();
   }
 
   @override
@@ -492,13 +502,8 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   void updateUserData(Map<String, dynamic> data) {
-    if (data["email"] != null && data["email"] != ""){
-      // TODO: Change Email Using Firedart
-      Get.defaultDialog(title:  "Cannot Change Email From Windows");
-      //auth.updateProfile(email: data["email"]);
-    }
-    // var ref = firestore.collection("Users");
-    // ref.document(getCurrentUserId()).update(data);
+    var ref = firestore.collection("Users");
+    ref.document(getCurrentUserId()).update(data);
   }
 
   @override

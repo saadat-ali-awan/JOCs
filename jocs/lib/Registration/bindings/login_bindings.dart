@@ -12,9 +12,11 @@ class LoginBindings implements Bindings{
 
     if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb) {
       Get.put<LoginControllerWindows>(LoginControllerWindows());
+      Get.find<LoginControllerWindows>().initializeLogin();
     }
     else {
       Get.put<LoginController>(LoginController());
+      Get.find<LoginController>().initializeLogin();
     }
   }
 

@@ -28,6 +28,12 @@ class TopMenu extends StatelessWidget {
                   )),
             ),
             getAddButton(context),
+            InkWell(
+              child: const Icon(Icons.logout),
+              onTap: () {
+                _dashboardController.logOut();
+              },
+            ),
             // _dashboardController.mobileDisplay.value ? PopupMenuButton(
             //     color: context.theme.appBarTheme.backgroundColor,
             //     itemBuilder: (context) {

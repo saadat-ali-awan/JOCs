@@ -7,6 +7,7 @@ import 'package:collection/src/list_extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
@@ -39,9 +40,7 @@ class FirebaseController implements FirebaseControllerInterface{
   @override
   List<StreamSubscription> chatScreenMainStreams = [];
 
-  FirebaseController(){
-    initializeFirebase();
-  }
+  FirebaseController();
 
   @override
   void addArticleCategory(Map<String, dynamic> data, String collectionName) {
@@ -228,11 +227,9 @@ class FirebaseController implements FirebaseControllerInterface{
   @override
   Stream<List<ArticleCategory>> getCategoryData() {
     collectionReference = FirebaseFirestore.instance.collection("category");
-    print("Called on getCategory");
     return collectionReference.snapshots().map((QuerySnapshot snapshot){
       List<ArticleCategory> retVal = [];
       for (var category in snapshot.docs){
-        print(category.id);
         retVal.add(ArticleCategory.fromDocumentSnapshot(documentSnapshot: category));
       }
       return retVal;
@@ -244,7 +241,7 @@ class FirebaseController implements FirebaseControllerInterface{
     List<MessageModel> temp = [];
     collectionReference = FirebaseFirestore.instance.collection("Chat");
     if (lastMessage!=null){
-      await collectionReference.doc(chatId).collection("messages").where("time", isLessThan:lastMessage.timeStamp).orderBy("time", descending: true).limit(2).get().then((value){
+      await collectionReference.doc(chatId).collection("messages").where("time", isLessThan:lastMessage.timeStamp).orderBy("time", descending: true).limit(20).get().then((value){
         for (var element in value.docs) {
           print(element["message"]);
           temp.add(MessageModel(element["message"], element["sender"], element["time"], element["senderName"]));
@@ -253,7 +250,7 @@ class FirebaseController implements FirebaseControllerInterface{
       }
       );
     }else{
-      await collectionReference.doc(chatId).collection("messages").orderBy("time", descending: true).limit(2).get().then((value){
+      await collectionReference.doc(chatId).collection("messages").orderBy("time", descending: true).limit(20).get().then((value){
         for (var element in value.docs) {
           print(element["message"]);
           temp.add(MessageModel(element["message"], element["sender"], element["time"], element["senderName"]));
@@ -268,11 +265,10 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   Future<int> getDashboardData(String documentName, {String filter= ""}) async {
-    getCurrentUserData();
     collectionReference = FirebaseFirestore.instance.collection("tickets");
     QuerySnapshot<Object?> tempData;
 
-    if (filter != ""){
+    if (filter.isNotEmpty){
       tempData = await collectionReference.where(documentName, isEqualTo: filter).get();
     }else{
       tempData = await collectionReference.orderBy(documentName, descending: true).get();
@@ -314,10 +310,10 @@ class FirebaseController implements FirebaseControllerInterface{
   /// MetaData For Document Queries
   @override
   Stream<DetailedMetadata> getMetaDataFromDatabase(){
-    DashboardController _dashboardController = Get.find<DashboardController>();
+    // DashboardController _dashboardController = Get.find<DashboardController>();
     collectionReference = FirebaseFirestore.instance.collection("metadata");
     return collectionReference.doc("data").snapshots().map((DocumentSnapshot snapshot) {
-      _dashboardController.getUpdatedTableData();
+      // _dashboardController.getUpdatedTableData();
       return DetailedMetadata.fromDataSnapshot(snapshot);
     });
   }
@@ -375,7 +371,7 @@ class FirebaseController implements FirebaseControllerInterface{
   @override
   initializeLoginController(){
     _loginController = Get.find<LoginController>();
-    _loginController.initializeLogin();
+    // _loginController.initializeLogin();
   }
 
   @override
@@ -407,6 +403,12 @@ class FirebaseController implements FirebaseControllerInterface{
         _loginController.loginErrorMessage.value = 'Wrong password provided for that user.';
       }
     }
+  }
+
+  @override
+  void logOut() {
+    Get.toNamed('/login');
+    auth.signOut();
   }
 
   @override
@@ -587,6 +589,9 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void downloadFile(String fileName)  async {
+    // if (kIsWeb) {
+    //   Directory appDocDir = Directory.current.path;
+    // }
     Directory appDocDir = await getApplicationDocumentsDirectory();
     File downloadToFile = File('${appDocDir.path}/$fileName');
 

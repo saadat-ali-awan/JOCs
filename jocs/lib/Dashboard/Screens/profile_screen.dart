@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
@@ -39,12 +40,13 @@ class ProfileScreen extends StatelessWidget {
                   Obx((){
                     return Text("Email: ${_dashboardController.firebaseController.currentUserDetails.value.email}", style: context.theme.textTheme.bodyText2,);
                   }),
+                  defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android ?
                   IconButton(
                     onPressed: (){
                       Get.dialog(ChangeUserDetailsDialog(selectedDialog: 2));
                     },
                     icon: Icon(Icons.edit, color: _dashboardController.tileColor.value,),
-                  )
+                  ) : Container(),
                 ],
               ),
             ),
@@ -66,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
+            defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android ? Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -112,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
                   )
                 ],
               ),
-            )
+            ) : Container(),
           ],
         ),
       ),

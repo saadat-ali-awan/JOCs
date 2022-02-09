@@ -85,7 +85,7 @@ Future<void> main() async {
           ),
         ],
         initialRoute: '/login',
-        initialBinding: LoginBindings(),
+        //initialBinding: LoginBindings(),
       )
   );
 }

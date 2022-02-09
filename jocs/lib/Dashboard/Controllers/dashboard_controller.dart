@@ -167,7 +167,7 @@ class DashboardController extends GetxController {
 
     getDashboardData();
     initializeStream();
-
+    firebaseController.getCurrentUserData();
   }
 
   Rx<Widget> body = Stack(
@@ -196,13 +196,18 @@ class DashboardController extends GetxController {
   }
 
   /// Dashboard Screen Getx Logic
-  getDashboardData() async{
-    openTickets.value = await firebaseController.getDashboardData("status", filter:"OPEN");
+  getDashboardData() {
     metadata.bindStream(firebaseController.getMetaDataFromDatabase());
+  }
+
+  updateDashboard() async {
+    openTickets.value = await firebaseController.getDashboardData("status", filter:"OPEN");
     unresolvedTickets.value = await firebaseController.getDashboardData("status", filter: "RESOLVED");
+    print('TicletsCount: ${metadata.value.ticketsCount}, Resloved Tickets: ${unresolvedTickets.value}');
     unresolvedTickets.value = metadata.value.ticketsCount - unresolvedTickets.value;
     unassignedTickets.value = await firebaseController.getDashboardData("assigned_to");
     unassignedTickets.value = metadata.value.ticketsCount - unassignedTickets.value;
+    ticketsAssignedToMe.value = await firebaseController.getDashboardData("assigned_to", filter: firebaseController.currentUserDetails.value.email);
   }
 
   /// Tickets Screen Getx Logic
@@ -493,6 +498,10 @@ class DashboardController extends GetxController {
       bytesTransfered.value = snapshot.bytesTransferred.toString();
       totalBytes.value = '/'+snapshot.totalBytes.toString();
     });
+  }
+
+  void logOut() {
+    firebaseController.logOut();
   }
 
 }

@@ -373,17 +373,17 @@ class NavItems extends StatelessWidget {
           padding: const EdgeInsets.only(top: 32.0),
           child: ListTile(
             title: Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.white,
-                child: ClipOval(
-                  child: InkWell(
-                    onTap: (){
-                      if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
-                      _dashboardController.menuIcon.value = const Icon(Icons.menu);
+              child: InkWell(
+                onTap: (){
+                  if(_dashboardController.mobileDisplay.value) _dashboardController.showMenu.value = false;
+                  _dashboardController.menuIcon.value = const Icon(Icons.menu);
 
-                      _dashboardController.selectedMenuItem.value = 7;
-                    },
+                  _dashboardController.selectedMenuItem.value = 7;
+                },
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
+                  child: ClipOval(
                     child: Obx(() => _dashboardController.firebaseController.currentUserDetails.value.downloadUrl == "" ?
                     Text(_dashboardController.firebaseController.currentUserDetails.value.email.isEmpty? "J": _dashboardController.firebaseController.currentUserDetails.value.email[0], style: context.textTheme.headline3,): Image.network(_dashboardController.firebaseController.currentUserDetails.value.downloadUrl.value),
                     ),

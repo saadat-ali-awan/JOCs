@@ -10,7 +10,6 @@ class ArticleCategory {
     name = documentSnapshot["category-name"];
     description = documentSnapshot["description"];
     articles = List.from(documentSnapshot["articles"]);
-    print(articles);
   }
 
   factory ArticleCategory.fromJson(Map<String, dynamic> json){

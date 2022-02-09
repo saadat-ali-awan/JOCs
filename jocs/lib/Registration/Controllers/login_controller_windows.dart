@@ -16,8 +16,11 @@ class LoginControllerWindows extends LoginControllerInterface {
 
   final FirebaseControllerWindows firebaseController = Get.find<FirebaseControllerWindows>();
 
+  LoginControllerWindows();
+
   @override
   initializeLogin() async {
+    await firebaseController.initializeFirebase();
     var path = Directory.current.path;
     Hive
         .init(path);
@@ -44,6 +47,10 @@ class LoginControllerWindows extends LoginControllerInterface {
       print("Listen Stream Created Already");
     }
     firebaseController.initializeLoginController();
+
+    if (firebaseController.checkFirebaseLoggedIn()) {
+      Get.toNamed('/dashboard');
+    }
 
   }
 
