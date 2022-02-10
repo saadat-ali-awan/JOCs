@@ -168,7 +168,7 @@ class _ProblemsItemState extends State<ProblemsItem> {
                       ),
                     ),
                     validator: (String? value) {
-                      if (assigned) {
+                      if (value != null && value.isNotEmpty && assigned) {
                         return null;
                       }
                       return 'Assign The Ticket First.';

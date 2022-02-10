@@ -576,7 +576,7 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void updateTableData(String collectionName, String time, Map<String, String> newData) {
-    collectionReference = FirebaseFirestore.instance.collection("Users");
+    collectionReference = FirebaseFirestore.instance.collection(collectionName);
     collectionReference.where("time", isEqualTo: time).get().then((QuerySnapshot snapshot) {
       for (var element in snapshot.docs) {
         element.reference.update(newData);

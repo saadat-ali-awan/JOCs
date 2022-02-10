@@ -183,7 +183,7 @@ class _TicketItemState extends State<TicketItem> {
                       ),
                     ),
                     validator: (String? value) {
-                      if (assigned) {
+                      if (value != null && value.isNotEmpty && assigned) {
                         return null;
                       }
                       return 'Assign The Ticket First.';
@@ -211,6 +211,7 @@ class _TicketItemState extends State<TicketItem> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()){
+                  print(widget.time.isEmpty);
                   if (widget.time.isEmpty) {
                     _dashboardController.addDataToFirebase({
                       'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
