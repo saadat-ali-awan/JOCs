@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/ArticleReader/Bindings/article_reader_binding.dart';
@@ -18,6 +19,8 @@ import 'Registration/login.dart';
 import 'Theme/custom_theme.dart';
 import 'package:flutter/foundation.dart';
 
+import 'firebase_options.dart';
+
 Future<void> main() async {
   /// First to make sure Flutter is Initialized [WidgetsFlutterBinding.ensureInitialized()] will be called
   /// It is required for Firebase Initialization
@@ -28,17 +31,20 @@ Future<void> main() async {
   /// firebase_options.dart is generated automatically by flutterfire configure command
   /// It contains all the details to connect with Firebase
 
-  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
-    Get.put(FirebaseController());
-  }else {
-    if (defaultTargetPlatform == TargetPlatform.windows){
-      Get.put(FirebaseControllerWindows());
-    }
-  }
+  // if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
+  //   Get.put(FirebaseController());
+  // }else {
+  //   if (defaultTargetPlatform == TargetPlatform.windows){
+  //     Get.put(FirebaseControllerWindows());
+  //   }
+  // }
+  //
+  // bool isDarkTheme = await ThemeColors.getThemeMode();
+  // print("Is Dark? ${isDarkTheme}");
 
-  bool isDarkTheme = await ThemeColors.getThemeMode();
-  print("Is Dark? ${isDarkTheme}");
-
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   /// Entry Point For App
   /// Firebase will go to Login Page initially
@@ -72,6 +78,7 @@ Future<void> main() async {
           GetPage(
             name: "/htmlTest",
             page: ()=> HtmlEditorTest(),
+            binding: TestBinding(),
           ),
           GetPage(
             name: '/articleReader',
@@ -84,7 +91,7 @@ Future<void> main() async {
             binding: ReviewScreenBinding(),
           ),
         ],
-        initialRoute: '/login',
+        initialRoute: '/htmlTest',
         //initialBinding: LoginBindings(),
       )
   );

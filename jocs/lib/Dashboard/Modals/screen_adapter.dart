@@ -23,7 +23,6 @@ class ScreenAdapter {
     dataTableSource = CustomDataTableSource(screenName, RxList()).obs;
   }
 
-  /**
   getScreenData(FirebaseControllerInterface firebaseController, {String filter = "", Map<String, String> customFilter = const <String, String>{}, bool nextPage = false}) async {
     DashboardController _dashboardController = Get.find<DashboardController>();
     if (customFilter.isNotEmpty && !nextPage){
@@ -166,39 +165,6 @@ class ScreenAdapter {
     // if (filter == ""){
     //   getNextPage(firebaseController);
     // }
-  } */
-
-  getScreenData(FirebaseControllerInterface firebaseController, {String filter = "", Map<String, String> customFilter = const <String, String>{}, bool nextPage = false}) async {
-    DashboardController _dashboardController = Get.find<DashboardController>();
-    if (customFilter.isNotEmpty && !nextPage){
-      currentPage.value = 1;
-      currentPaginatedPage = 1;
-      //lastId.value = 0;
-      adapterData.clear();
-    }
-    if (adapterData.length < (10 * currentPage.value)) {
-      var data = await firebaseController.getData(
-          screenName, currentPage.value, articlesOnOnePage,
-          filter: filter, customFilter: customFilter);
-      if (data.length == 0) {
-        currentPage -= 1;
-      } else {
-        data.forEach((res) {
-          //adapterData[currentPage.value-1].add(res);
-          //print(res.data());
-          bool valueNotPresent = true;
-
-          for (var d in adapterData){
-            if (d["time"] == res["time"]){
-              valueNotPresent = false;
-            }
-          }
-          if (valueNotPresent) {
-            adapterData.add(res);
-          }
-        });
-      }
-    }
   }
 
   getNextPage(firebaseController, Map<String , String> customFilter) {
