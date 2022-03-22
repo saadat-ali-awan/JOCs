@@ -78,7 +78,7 @@ class MobileChatScreen extends StatelessWidget {
                                         _dashboardController
                                             .friendsList[index];
                                         _dashboardController
-                                            .startChatStream(
+                                            .getLatestChatMessages(
                                             _dashboardController
                                                 .openChat!.chatId);
                                         selectedChat.value =
@@ -160,7 +160,7 @@ class MobileChatScreen extends StatelessWidget {
                                         _dashboardController
                                             .groupList[index];
                                         _dashboardController
-                                            .startChatStream(
+                                            .getLatestChatMessages(
                                             _dashboardController
                                                 .openChat!.chatId);
                                       },
@@ -283,7 +283,7 @@ class DesktopChatScreen extends StatelessWidget {
                                                   _dashboardController
                                                       .friendsList[index];
                                               _dashboardController
-                                                  .startChatStream(
+                                                  .getLatestChatMessages(
                                                       _dashboardController
                                                           .openChat!.chatId);
                                               selectedChat.value =
@@ -373,7 +373,7 @@ class DesktopChatScreen extends StatelessWidget {
                                                   _dashboardController
                                                       .groupList[index];
                                               _dashboardController
-                                                  .startChatStream(
+                                                  .getLatestChatMessages(
                                                       _dashboardController
                                                           .openChat!.chatId);
                                             },
@@ -625,7 +625,7 @@ class ChatWidget extends StatelessWidget {
                   child: InkWell(
                       child: Text("Load More"),
                     onTap: (){
-                        _dashboardController.startChatStream(_dashboardController.openChat!.chatId);
+                        _dashboardController.getLatestChatMessages(_dashboardController.openChat!.chatId);
                     },
                   )
               ),

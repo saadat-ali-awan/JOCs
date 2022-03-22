@@ -1,8 +1,8 @@
 import 'package:collection/src/list_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'Controllers/review_screen_controller.dart';
+import 'package:intl/intl.dart';
 
 class ReviewScreen extends GetView<ReviewScreenController> {
   ReviewScreen({Key? key}) : super(key: key);
@@ -90,8 +90,21 @@ class ReviewScreen extends GetView<ReviewScreenController> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(controller.reviews[index]),
+                              child: Text(controller.reviews[index]['review']),
                             ),
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(controller.reviews[index]['sender'], style: context.textTheme.bodyText2!.copyWith(fontSize: 12),),
+                              Row(
+                                children: [
+                                  Text('${DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(int.parse(controller.reviews[index]["time"])).toLocal())} - ', style: context.textTheme.bodyText2!.copyWith(fontSize: 12),),
+                                  Text(DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(int.parse(controller.reviews[index]['time'])).toLocal()), style: context.textTheme.bodyText2!.copyWith(fontSize: 12),),
+                                ],
+                              )
+
+                            ],
                           ),
                         );
                       },

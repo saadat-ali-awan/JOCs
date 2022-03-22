@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a form to Add or Update Problems Item
 class ProblemsItem extends StatefulWidget {
   const ProblemsItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
@@ -168,10 +169,10 @@ class _ProblemsItemState extends State<ProblemsItem> {
                       ),
                     ),
                     validator: (String? value) {
-                      if (assigned) {
-                        return null;
+                      if (value != null && value.isNotEmpty && !assigned) {
+                        return 'Assign The Ticket First.';
                       }
-                      return 'Assign The Ticket First.';
+                      return null;
                     },
                   ),
                 )),

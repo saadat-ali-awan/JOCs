@@ -4,9 +4,10 @@ import 'package:get/get.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller_windows.dart';
 
-/// A widget that paints the Register Screen
+/// A widget that paints the [Register] Screen
 /// It contains simple form with two input fields
-/// When Login is pressed User is Registered to Firebase
+/// When Register is pressed User is Registered to Firebase
+/// and Logged into The Dashboard
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
 
@@ -14,6 +15,9 @@ class Register extends StatefulWidget {
   _RegisterState createState() => _RegisterState();
 }
 
+/// The State of [Register] Screen is Controlled By [RegisterControllerInterface]
+/// The [Register] Controller for Windows is [RegisterControllerWindows]
+/// The [Register] Controller for Other Devices is [RegisterController]
 class _RegisterState extends State<Register> {
   TextEditingController emailController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
@@ -24,6 +28,7 @@ class _RegisterState extends State<Register> {
 
   late var _registerController;
 
+  /// The [RegisterControllerInterface] is initialized based on the Platform
   @override
   void initState() {
     super.initState();
@@ -34,6 +39,7 @@ class _RegisterState extends State<Register> {
     }
   }
 
+  /// The [TextEditingController]s are disposed to prevent any memory leak
   @override
   void dispose() {
     emailController.dispose();
@@ -57,6 +63,8 @@ class _RegisterState extends State<Register> {
             child: Form(
               key: _formKey,
               child: Center(
+                /// The [SingleChildScrollView] make sure that the Login
+                /// Form Always remain in the view even if screen is very small.
                 child: SingleChildScrollView(
                   controller: ScrollController(),
                   scrollDirection: Axis.vertical,
@@ -69,17 +77,16 @@ class _RegisterState extends State<Register> {
                         child: SizedBox(
                           width: 350,
                           child: TextFormField(
-                            obscureText: true,
-                            enableSuggestions: false,
-                            autocorrect: false,
                             controller: usernameController,
                             decoration: const InputDecoration(
                                 labelText: 'Username',
                                 hintText: 'Username'
                             ),
+                            /// Validator Checks if User entered a
+                            /// Valid Username
                             validator: (value){
                               if (value!.isEmpty) {
-                                return 'Please enter password';
+                                return 'Please enter Username';
                               }
                               return null;
                             },
@@ -96,6 +103,8 @@ class _RegisterState extends State<Register> {
                               labelText: 'Email',
                               hintText: 'Enter Your Email',
                             ),
+                            /// Validator Checks if User entered a Valid Email
+                            /// The [GetUtils.isEmail] is a GetX Library Function
                             validator: (value){
                               if (GetUtils.isEmail(value!)){
                                 return null;
@@ -118,6 +127,9 @@ class _RegisterState extends State<Register> {
                                 labelText: 'Password',
                                 hintText: 'Enter Password'
                             ),
+                            /// Validator Checks if User entered a Valid Password
+                            /// If Password Length is Greater than or Equal to 8
+                            /// than user can login
                             validator: (value){
                               if (value!.isEmpty) {
                                 return 'Please enter password';
@@ -145,6 +157,9 @@ class _RegisterState extends State<Register> {
                                 labelText: 'Password',
                                 hintText: 'Confirm Password',
                             ),
+                            /// Validator Checks if User entered a Valid Password
+                            /// If Confirm Password Length is Equal to Password
+                            /// Field than user can login
                             validator: (value){
                               if (value != passwordController.text){
                                 return 'Password do not match';
@@ -158,13 +173,23 @@ class _RegisterState extends State<Register> {
                       Container(
                         margin: const EdgeInsets.only(top: 32.0),
                         child: TextButton(
-
+                          /// The [onPressed] parameter controls the register after
+                          /// getting user Details.
                           onPressed: () {
                             String username = usernameController.text;
                             String email = emailController.text;
                             String password = passwordController.text;
                             String confirmPassword = confirmPasswordController.text;
+                            /// The details entered by the user are First
+                            /// Validated.
+                            /// [_formKey.currentState!.validate()] run
+                            /// validator for each [TextFormField]
                             if (_formKey.currentState!.validate()){
+
+                              /// To Register [register] defined in
+                              /// [RegisterController] or [RegisterControllerWindows]
+                              /// is called passing the necessary
+                              /// details
                               _registerController.register(username, email, password);
                               emailController.clear();
                               passwordController.clear();
@@ -190,11 +215,11 @@ class _RegisterState extends State<Register> {
                               child: Text("Have an account?", style: Theme.of(context).textTheme.bodyText2,),
                             ),
                             TextButton(
-
-                                onPressed: (){
-                                  Get.offNamed("/login");
-                                },
-                                child: Text("Login", style: Theme.of(context).textTheme.bodyText1,)
+                              /// If a User want to create a new account than
+                              /// [Get.offNamed('/login')] will take the user
+                              /// to Registration Screen
+                              onPressed: () => Get.offNamed("/login"),
+                              child: Text("Login", style: Theme.of(context).textTheme.bodyText1,),
                             )
                           ],
                         ),

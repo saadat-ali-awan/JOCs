@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'change_user_email_dialog.dart';
 import 'change_username_dialog.dart';
+
+/// ## Show Dialog on Chat Screen
+/// Depending on the value of [selectedDialog] a dialog is displayed on the
+/// Profile Screen.
+///
+/// The Dialogs That will be displayed based on [selectedDialog] are:
+/// * [selectedDialog] = 1 => [ChangeUsernameDialog]
+/// * [selectedDialog] = 2 => [ChangeUserEmailDialog]
 class ChangeUserDetailsDialog extends StatelessWidget {
   const ChangeUserDetailsDialog({Key? key, required this.selectedDialog}) : super(key: key);
 

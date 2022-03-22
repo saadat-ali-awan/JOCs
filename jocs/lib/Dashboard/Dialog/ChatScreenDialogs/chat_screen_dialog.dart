@@ -5,6 +5,14 @@ import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/search_user_dialog.dart'
 
 import 'create_group_dialog.dart';
 
+/// ## Show Dialog on Chat Screen
+/// Depending on the value of [selectedDialog] a dialog is displayed on the Chat
+/// Screen.
+///
+/// The Dialogs That will be displayed based on [selectedDialog] are:
+/// * [selectedDialog] = 1 => [CreateGroupDialog]
+/// * [selectedDialog] = 2 => [SearchUserDialog]
+/// * [selectedDialog] = 3 => [SearchGroupUserDialog]
 class ChatScreenDialog extends StatelessWidget {
   ChatScreenDialog({Key? key, required this.selectedDialog}) : super(key: key);
 

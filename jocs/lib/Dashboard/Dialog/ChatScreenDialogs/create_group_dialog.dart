@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a dialog to add the group to the database
 class CreateGroupDialog extends StatefulWidget {
   CreateGroupDialog({Key? key}) : super(key: key);
 

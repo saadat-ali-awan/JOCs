@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/ChatScreenDialogs/search_user_dialog.dart';
 
+/// Show a form to Add or Update Ticket Item
 class TicketItem extends StatefulWidget {
   const TicketItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
@@ -183,10 +184,10 @@ class _TicketItemState extends State<TicketItem> {
                       ),
                     ),
                     validator: (String? value) {
-                      if (assigned) {
-                        return null;
+                      if (value != null && value.isNotEmpty && !assigned) {
+                        return 'Assign The Ticket First.';
                       }
-                      return 'Assign The Ticket First.';
+                      return null;
                     },
                   ),
                 )),
@@ -211,6 +212,7 @@ class _TicketItemState extends State<TicketItem> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()){
+                  print(widget.time.isEmpty);
                   if (widget.time.isEmpty) {
                     _dashboardController.addDataToFirebase({
                       'issued_by': _dashboardController.firebaseController.currentUserDetails.value.email, // John Doe
@@ -235,16 +237,6 @@ class _TicketItemState extends State<TicketItem> {
                       },
                     );
 
-                    _dashboardController.ticketAdapter.value.adapterData.forEachIndexed((index, ticket) {
-                      if (ticket['time'] == widget.time) {
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['issued_by'] = widget.previousData[0];
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['topic'] = topicController.text;
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['status'] = statusValue;
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['priority'] = priorityValue;
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['assigned_to'] = assignedToController.text;
-                        // _dashboardController.ticketAdapter.value.adapterData[index]['comments'] = commentsController.text;
-                      }
-                    });
                   }
 
                   setState(() {

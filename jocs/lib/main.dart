@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/ArticleReader/Bindings/article_reader_binding.dart';
@@ -17,6 +18,8 @@ import 'Registration/bindings/login_bindings.dart';
 import 'Registration/login.dart';
 import 'Theme/custom_theme.dart';
 import 'package:flutter/foundation.dart';
+
+import 'firebase_options.dart';
 
 Future<void> main() async {
   /// First to make sure Flutter is Initialized [WidgetsFlutterBinding.ensureInitialized()] will be called
@@ -36,9 +39,8 @@ Future<void> main() async {
     }
   }
 
-  bool isDarkTheme = await ThemeColors.getThemeMode();
-  print("Is Dark? ${isDarkTheme}");
-
+  /// Initializes Theme of The Application
+  await ThemeColors.getThemeMode();
 
   /// Entry Point For App
   /// Firebase will go to Login Page initially
@@ -72,6 +74,7 @@ Future<void> main() async {
           GetPage(
             name: "/htmlTest",
             page: ()=> HtmlEditorTest(),
+            binding: TestBinding(),
           ),
           GetPage(
             name: '/articleReader',
@@ -90,6 +93,7 @@ Future<void> main() async {
   );
 }
 
+/// [MyCustomScrollBehavior] adds the Scroll Behaviour for Touch and Mouse
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override

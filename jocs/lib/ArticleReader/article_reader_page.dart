@@ -50,6 +50,17 @@ class ArticleReaderPage extends StatelessWidget {
         ),
         body: Column(
           children: [
+            Tooltip(
+              message: 'Click to Download',
+              child: InkWell(
+                child: Obx(()=> Text(_readerController.fileName.value)),
+                onTap: () {
+                  if (_readerController.fileName.value.isNotEmpty) {
+                    _readerController.downloadFile(_readerController.fileName.value);
+                  }
+                },
+              ),
+            ),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(8.0),

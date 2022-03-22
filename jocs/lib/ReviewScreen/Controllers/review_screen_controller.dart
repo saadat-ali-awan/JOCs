@@ -9,7 +9,7 @@ class ReviewScreenController extends GetxController {
   late List<String> dataTitle = <String>[];
   late String time = "";
   late String screenName = "";
-  RxList<String> reviews = RxList();
+  RxList<Map<String, dynamic>> reviews = RxList();
 
   late FirebaseControllerInterface firebaseController;
 
@@ -89,11 +89,13 @@ class ReviewScreenController extends GetxController {
 
   }
 
+  /// Get Reviews of the [screenName] From The Database
   getReviews() async {
     var rev = await firebaseController.getReviews(time, screenName);
     reviews.bindStream(rev);
   }
 
+  /// Send Review for [screenName] to the Database
   sendReview(String review) {
     firebaseController.sendReview(review, time, screenName);
   }

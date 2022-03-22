@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a dialog to search user to add in a group
 class SearchGroupUserDialog extends StatefulWidget {
   SearchGroupUserDialog({Key? key}) : super(key: key);
 
@@ -76,6 +77,7 @@ class _SearchGroupUserDialogState extends State<SearchGroupUserDialog> {
           child: InkWell(
               onTap: (){
                 _dashboardController.addFriendToGroup(foundFriend.value, _dashboardController.openChat!.chatId, _dashboardController.openChat!.modelName);
+                Get.back();
               },
               child: Text(
                 foundFriend.value[0],

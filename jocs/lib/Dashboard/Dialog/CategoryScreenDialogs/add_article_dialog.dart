@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/FirebaseCustomControllers/DataModels/article_category.dart';
 
+/// Show a dialog to add or Update the article to the database
+/// 1. [previousData] is the article Data that would be used to update the article.
+/// 2. [time] is the identity of the article that would be modified
 class AddArticleDialog extends StatefulWidget {
   const AddArticleDialog({Key? key, required this.previousData, required this.time}) : super(key: key);
 
@@ -19,7 +22,7 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
 
   ArticleCategory categorySelected = ArticleCategory("");
 
-  var _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   TextEditingController articleTopicController = TextEditingController();
   TextEditingController articleAuthorController = TextEditingController();
   TextEditingController articleCommentsController = TextEditingController();
@@ -67,7 +70,7 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
                   .backgroundColor, // Button color
               child: InkWell( // Splash color
                 onTap: () {
-                  Get.back();
+                  Get.back(result: false);
                 },
                 child: Icon(Icons.clear,
                   color: Get.theme.iconTheme.color,),
@@ -170,6 +173,7 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
 
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
+                  String currentTime = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
                   if (updateData) {
                     _dashboardController.updateTableData(
                       "articles",
@@ -189,6 +193,7 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
                       'comment': articleCommentsController.text,
                       'article': Get.arguments['article'],
                       'fileName': Get.arguments['fileName'],
+                      'time': currentTime,
                     });
                   }
                   setState(() {
@@ -196,7 +201,10 @@ class _AddArticleDialogState extends State<AddArticleDialog> {
                     articleAuthorController.clear();
                     articleCommentsController.clear();
                   });
-                  Get.back();
+                  if (!updateData) {
+                    Get.back(result: true);
+                    // Get.toNamed('/articleReader', arguments: {'time': currentTime});
+                  }
                 }
 
               },

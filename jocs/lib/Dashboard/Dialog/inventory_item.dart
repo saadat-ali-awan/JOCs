@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a form to Add or Update Inventory Item
 class InventoryItem extends StatefulWidget {
   const InventoryItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 

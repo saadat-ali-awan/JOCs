@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a dialog to change User Email
 class ChangeUserEmailDialog extends StatefulWidget {
   const ChangeUserEmailDialog({Key? key}) : super(key: key);
 
