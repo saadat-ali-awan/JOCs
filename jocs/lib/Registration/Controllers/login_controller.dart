@@ -13,6 +13,9 @@ class LoginController extends LoginControllerInterface{
 
   LoginController();
 
+  /// To Initialize all the variables of Login Screen and Check if a User is
+  /// Logged In [initializeLogin] is used which is called Just After Login
+  /// Controller is up and Running.
   @override
   initializeLogin() async {
     await firebaseController.initializeFirebase();
@@ -32,12 +35,11 @@ class LoginController extends LoginControllerInterface{
       }
     });
     firebaseController.initializeLoginController();
-
-    // if (firebaseController.checkFirebaseLoggedIn()) {
-    //   Get.toNamed('/dashboard');
-    // }
   }
 
+  /// When user Press Login In Button the Button calls [login] function
+  /// passing it Email And Password of the User
+  /// If Credentials are correct the User Would be Logged In
  @override
   login(String email, String password){
    firebaseController.login(email, password);

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller_windows.dart';
 
-/// [RegisterBindings] is GetX Binding For Login Screen
+/// [RegisterBindings] is GetX Binding For [Register] Screen
 /// It would load required controller based on the Platform
 class RegisterBindings extends Bindings {
   @override

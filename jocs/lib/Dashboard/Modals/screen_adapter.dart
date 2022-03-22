@@ -1,178 +1,256 @@
+import 'dart:async';
+import 'dart:collection';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/CategoryScreenDialogs/add_article_dialog.dart';
 import 'package:jocs/Dashboard/Dialog/custom_dialog.dart';
 import 'package:jocs/Dashboard/Screens/tickets_screen.dart';
-import 'package:jocs/FirebaseCustomControllers/DataModels/detailed_metadata.dart';
 import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_controller_interface.dart';
 
+
+/// **Screen Adapter is a Common Adapter for Tickets, Problems, Inventory,**
+/// **Purchase and Articles Tables.**
 class ScreenAdapter {
+  /// Current Page of the table according to the Database
+  /// It is different from [currentPaginatedPage] because it only deals with
+  /// getting data from the database.
   RxInt currentPage = 1.obs;
+
+  /// Current Paginated Page is the Page A [PaginatedDataTable] is currently showing.
   int currentPaginatedPage = 1;
-  //RxInt lastId = 0.obs;
+
+  /// Number of Values to Get from Firebase Database at one time
   int articlesOnOnePage = 10;
-  RxList adapterData = RxList();
+
+  /// Screen Name of the Current Screen That is being Displayed
+  /// This [screenName] is used to specify the Screen for which adapter has
+  /// been deployed.
   String screenName = "";
 
+  /// ## [mapList] is the list of Maps
+  /// For Each Page of the table the Firebase Controller will have a Stream.
+  /// The return Value of each Stream is a Map of all the values the Stream is
+  /// listening to. All these values of the Maps will be stored in a single
+  /// list [mapList] to deal with them as one complete Data.
+  List<Map<String, dynamic>> mapList = <Map<String, dynamic>>[];
+
+  //RxMap<String, dynamic> rowMap = <String, dynamic>{}.obs;
+  SplayTreeMap rowMapSorted = SplayTreeMap((a, b) => b.compareTo(a));
+
+  String latestTimeStamp = "";
+
+  /// [dataTableSource] is the [CustomDataTableSource] of the Screen referred by
+  /// the ScreenName. This would be used to populate the table with the values
+  /// from the FirebaseDatabase
   late Rx<CustomDataTableSource> dataTableSource;
 
+  /// [lastTime] is used to get the last Item that was returned from Firebase
+  /// Database. This is used to get the old items from the database.
+  String lastTime = '';
 
+  /// All The Streams that were used to populate [mapList] are stored in
+  /// [tableSourceStreams].
+  ///
+  /// For Each Page of the table the Firebase Controller will have a Stream.
+  /// The return Value of each Stream is a Map of all the values the Stream is
+  /// listening to. This Stream is stored in [tableSourceStream] which makes it
+  /// easy to remove the streams when it is not required.
+  List<StreamSubscription> tableSourceStreams = <StreamSubscription>[];
 
   ScreenAdapter(this.screenName) {
-    dataTableSource = CustomDataTableSource(screenName, RxList()).obs;
+    dataTableSource = CustomDataTableSource(screenName).obs;
   }
 
-  getScreenData(FirebaseControllerInterface firebaseController, {String filter = "", Map<String, String> customFilter = const <String, String>{}, bool nextPage = false}) async {
-    DashboardController _dashboardController = Get.find<DashboardController>();
+  Future<void> getLatestTimeStamp( FirebaseControllerInterface firebaseController ) async {
+    latestTimeStamp = await firebaseController.getLatestTimeStamp(screenName);
+  }
+
+  /// ## Get Data For the Screen and save it in a [mapList].
+  ///
+  /// This functions calls getData function on firebaseController to get the
+  /// required page data from the database.
+  /// The firebase.getData returns a Stream of the items whose time is less than
+  /// the filter. This stream is stored in [tableSourceStream] and the data is
+  /// saved in [mapList] on the index equal to the index of respective stream
+  /// in the list.
+  ///
+  /// Finally the [dataTableSource] is notified about the changes in the mapList.
+  ///
+  /// 1. [firebaseController] is reference to the FirebaseController that is used
+  /// to get data from Firebase Database.
+  /// 2. [filter] is an optional parameter used to Provide the time(which is
+  /// identifier of the elements) so that if there was some data already fetched
+  /// we can fetched the older data. It helps in pagination.
+  /// 3. [customFilter] is the filter that a user can customise. It is present
+  /// in Tickets Screen and problems Screen Named as Status and Priority.
+  /// 4. [nextPage] specifies if a user is demanding Next Page or Not.
+  getDataForScreen(FirebaseControllerInterface firebaseController
+      , {String filter = ""
+        , Map<String
+        , String> customFilter = const <String, String>{}
+        , bool nextPage = false}
+        ) {
     if (customFilter.isNotEmpty && !nextPage){
       currentPage.value = 1;
       currentPaginatedPage = 1;
-      //lastId.value = 0;
-      adapterData.clear();
+      mapList.clear();
     }
-    if (adapterData.length < (10 * currentPage.value)) {
-      var data = await firebaseController.getData(
+
+    if (mapList.length < (10 * currentPage.value)) {
+      var dataStream = firebaseController.getData(
           screenName, currentPage.value, articlesOnOnePage,
           filter: filter, customFilter: customFilter);
-      if (data.length == 0) {
-        currentPage -= 1;
-      } else {
-        data.forEach((res) {
-          //adapterData[currentPage.value-1].add(res);
-          //print(res.data());
-          bool valueNotPresent = true;
 
-          for (var d in adapterData){
-            if (d["time"] == res["time"]){
-              valueNotPresent = false;
-            }
+      int streamIndex = tableSourceStreams.length;
+
+      tableSourceStreams.add(
+        dataStream.map((snapshot) {
+          List notCheckedKeys = [];
+          bool reVisit = false;
+          if (mapList.length > streamIndex) {
+            notCheckedKeys = mapList[streamIndex].keys.toList();
+            reVisit = true;
           }
-          if (valueNotPresent) {
-            adapterData.add(res);
-          }
-        });
-      }
-    }
-
-    RxList<DataRow> tempRows = <DataRow>[].obs;
-
-    String metadataKey = "";
-    int metadataValue = 0;
-
-    for (var d in adapterData) {
-      var tempData;
-      if (screenName == "inventory"){
-        tempData = [
-          d["item_name"],
-          d["item_type"],
-          d["location"],
-          d["used_by"],
-          d["processed_by"],
-          d["comments"]
-        ];
-        metadataKey = "inventoryCount";
-        metadataValue = _dashboardController.metadata.value.inventoryCount;
-      }else {
-        if (screenName == "purchase"){
-          tempData = [
-            d["order_no"],
-            d["order_name"],
-            d["description"],
-            d["expected_delivery"],
-            d["status"],
-            d["comments"]
-          ];
-          metadataKey = "purchaseCount";
-          metadataValue = _dashboardController.metadata.value.purchaseCount;
-        }else {
-          print("Screen Name: ${screenName}");
-          if (screenName == "articles") {
-            tempData = [
-              d['author'],
-              d['category-name'],
-              d['comment'],
-              d['topic']
-            ];
-            metadataKey = "articlesCount";
-            metadataValue = _dashboardController.metadata.value.articlesCount;
-          }else {
-            tempData = [
-              d["issued_by"],
-              d["topic"],
-              d["status"],
-              d["priority"],
-              d["assigned_to"],
-            ];
-            if (screenName == "tickets") {
-              tempData.add(d["comments"]);
-              metadataKey = "ticketsCount";
-              metadataValue = _dashboardController.metadata.value.ticketsCount;
-            } else {
-              if (screenName == "problems") {
-                tempData.add(d["department"]);
-                metadataKey = "problemsCount";
-                metadataValue = _dashboardController.metadata.value.problemsCount;
+          if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb){
+            for (var document in snapshot) {
+              if (!notCheckedKeys.contains(document["time"]) && reVisit) {
+                continue;
               }
+              if (mapList.length > streamIndex) {
+                mapList[streamIndex][document["time"]] = document;
+              } else {
+                mapList.add({document["time"]: document});
+              }
+
+              rowMapSorted[int.parse(document["time"])] = document;
+
+              notCheckedKeys.removeWhere((key) => key == document["time"]);
+            }
+          } else {
+            for (var document in snapshot.docs) {
+              if (!notCheckedKeys.contains(document["time"]) && reVisit) {
+                continue;
+              }
+              if (mapList.length > streamIndex) {
+                mapList[streamIndex][document["time"]] = document;
+              } else {
+                mapList.add({document["time"]: document});
+              }
+
+              rowMapSorted[int.parse(document["time"])] = document;
+
+              notCheckedKeys.removeWhere((key) => key == document["time"]);
             }
           }
 
-        }
-      }
-      int index = tempRows.length;
-      tempRows.add(createRow(tempData, (){
-        Get.defaultDialog(
-          title: "Caution",
-          titleStyle: TextStyle(color: Get.theme.errorColor),
-          middleText: "Want to delete the row from Database?",
-          confirm: TextButton(
-            onPressed: () {
-              adapterData.removeAt(index);
-              dataTableSource.value.data.removeAt(index);
-              dataTableSource.value.data.refresh();
-              dataTableSource.value.notifyListeners();
-              firebaseController.removeDataFromTable(screenName, d["time"], {metadataKey: metadataValue - 1});
-              if (screenName == "articles") {
-                firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
-              }
-              Get.back();
-              },
-            child: Text("DELETE", style: Get.textTheme.bodyText1,),
-            style: Get.theme.textButtonTheme.style!.copyWith(backgroundColor: MaterialStateProperty.all(Get.theme.errorColor)),
-          ),
-
-          cancel: TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child: Text("Cancel", style: Get.textTheme.bodyText1,),
-          ),
-
-          onCancel: () {
-            Get.back();
+          for (String key in notCheckedKeys) {
+            mapList[streamIndex].remove(key);
+            rowMapSorted.remove(int.parse(key));
           }
-        );
-      }, false, screenName, d["time"]
-      )
+
+          if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb) {
+            if (snapshot.isNotEmpty) {
+              lastTime = snapshot.last["time"];
+            }
+          } else {
+            if (snapshot.docs.isNotEmpty) {
+              lastTime = snapshot.docs.last["time"];
+            }
+          }
+
+          dataTableSource.value.notifyListeners();
+        }).listen((event) { })
       );
     }
-
-    //print("DataTable Source Before: ${dataTableSource.value.data.value.first.cells.length}");
-    dataTableSource.value = CustomDataTableSource(screenName, tempRows);
-    //print("DataTable Source After: ${dataTableSource.value.data.value.first.cells.length}");
-    //dataTableSource.refresh();
-    //print("DataTable Source Refresh: ${dataTableSource.value.data.value.first.cells.length}");
-    // if (filter == ""){
-    //   getNextPage(firebaseController);
-    // }
   }
 
+  getNewDataForScreen(FirebaseControllerInterface firebaseController
+      , String time ) {
+    if (time.isNotEmpty) {
+      var streamForNewData = firebaseController.getNewData(time, screenName);
+      int streamIndex = tableSourceStreams.length;
+
+      tableSourceStreams.add(
+          streamForNewData.map((snapshot) {
+            List notCheckedKeys = [];
+            bool reVisit = false;
+            if (mapList.length > streamIndex) {
+              notCheckedKeys = mapList[streamIndex].keys.toList();
+              reVisit = true;
+            }
+
+            if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb){
+              for (var document in snapshot) {
+                if (!notCheckedKeys.contains(document["time"]) && reVisit) {
+                  continue;
+                }
+                if (mapList.length > streamIndex) {
+                  mapList[streamIndex][document["time"]] = document;
+                } else {
+                  mapList.add({document["time"]: document});
+                }
+
+                rowMapSorted[int.parse(document["time"])] = document;
+
+                notCheckedKeys.removeWhere((key) => key == document["time"]);
+              }
+            } else {
+              for (var document in snapshot.docs) {
+                if (!notCheckedKeys.contains(document["time"]) && reVisit) {
+                  continue;
+                }
+                if (mapList.length > streamIndex) {
+                  mapList[streamIndex][document["time"]] = document;
+                } else {
+                  mapList.add({document["time"]: document});
+                }
+
+                rowMapSorted[int.parse(document["time"])] = document;
+
+                notCheckedKeys.removeWhere((key) => key == document["time"]);
+              }
+            }
+
+            for (String key in notCheckedKeys) {
+              mapList[streamIndex].remove(key);
+              rowMapSorted.remove(int.parse(key));
+            }
+
+            if (defaultTargetPlatform == TargetPlatform.windows && !kIsWeb) {
+              if (snapshot.isNotEmpty) {
+                lastTime = snapshot.last["time"];
+              }
+            } else {
+              if (snapshot.docs.isNotEmpty) {
+                lastTime = snapshot.docs.last["time"];
+              }
+            }
+
+            dataTableSource.value.notifyListeners();
+          }).listen((event) { })
+      );
+    }
+  }
+
+  /// Get The Next Paginated Page From The Database
+  ///
+  /// It increments [currentPage] value by one an calls [getDataForScreen]
+  /// passing appropriate Parameters.
+  ///
+  /// 1. [firebaseController] is reference to the FirebaseController that is used
+  /// to get data from Firebase Database.
+  /// 2. [customFilter] is the filter that a user can customise. It is present
+  /// in Tickets Screen and problems Screen Named as Status and Priority.
   getNextPage(firebaseController, Map<String , String> customFilter) {
     currentPage.value += 1;
-    getScreenData(firebaseController,
-        filter: adapterData[adapterData.length-1]["time"], customFilter: customFilter, nextPage: true);
+    getDataForScreen(firebaseController,
+        filter: lastTime, customFilter: customFilter, nextPage: true);
   }
 
+  /// Get Previous Page Just decrements the value of current page by one which
+  /// Notifies the PaginatedDataTable to go to the Previous Screen.
   getPreviousPage(firebaseController) {
     currentPage.value -= 1;
     if (currentPage.value < 1) {
@@ -180,13 +258,17 @@ class ScreenAdapter {
     }
   }
 
-  refreshCurrentPage(firebaseController) async {
-    adapterData = RxList();
-    currentPage.value = 1;
-    //lastId.value = await firebaseController.getLastId(screenName);
-    getScreenData(firebaseController);
-  }
-
+  /// Using the Data Provided Create a Data Row That can be inserted in the
+  /// [PaginatedDataTable]
+  ///
+  /// 1. [data] is the array of items that should be shown in a row.
+  /// 2. [remove] is the function that would be called when remove button is
+  /// pressed.
+  /// 3. [empty] is used to notfy if empty row was required.
+  /// 4. [screenName] tells the name of Screen for which DataRow is need to be
+  /// developed.
+  /// 5. [time] is the identifier for the data inside the DataRow that would be used
+  /// to update and delete the data.
   static DataRow createRow(data, Function() remove, bool empty, String screenName, String time) {
     List<DataCell> cellList = <DataCell>[];
     for (var i=0; i<data.length; i++){
@@ -255,6 +337,8 @@ class ScreenAdapter {
     return DataRow(cells: cellList);
   }
 
+  /// Show The [CustomDialog] or [AddArticleDialog] to update the values
+  /// when edit Button is pressed.
   static Widget updateDataDialog(data,String screenName, String time) {
     if (screenName == 'articles') {
       return AddArticleDialog(previousData: data.cast<String>(), time: time);

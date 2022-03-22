@@ -122,7 +122,7 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
 
   @override
   void createNewArticle(Map<String, dynamic> data, int lastId) async {
-    data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
+    // data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
     //data["id"] = lastId;
     var reference = firestore.collection('articles');
     reference.add(data).then((value) {
@@ -259,41 +259,50 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     }else{
       tempData = await collectionReference.orderBy(documentName, descending: true).get();
     }
-    print(documentName+ "${tempData.length}");
     return tempData.length;
   }
 
   @override
-  getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}}) async {
+  Stream<dynamic> getData(
+      String collectionName
+      , int page
+      , int length
+      , {String filter = ""
+        , Map<String, String> customFilter = const <String, String>{}}
+        ) {
     var collectionReference = firestore.collection(collectionName);
     QueryReference ref;
     if (page > 1) {
-      ref = await collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length+10);
+      ref = collectionReference
+          .orderBy("time", descending: true)
+          .where("time", isLessThanOrEqualTo: filter)
+          .limit(length+10);
     } else {
-      ref = await collectionReference.orderBy("time", descending: true).limit(length+10);
+      ref = collectionReference
+          .orderBy("time", descending: true)
+          .limit(length+10);
     }
 
     customFilter.forEach((key, value) {
-      print("Custom Filter: ${key}, ${value}");
       if (key != "S" && key != "P"){
         ref = ref.where(key, isEqualTo: value);
       }
     });
 
-    List<Document> data = await ref.get();
-
-    var returnData = [];
-    for (var element in data) {
-      returnData.add(element.map);
-    }
-    return returnData;
+    // List<Document> data = ref.get();
+    //
+    // var returnData = [];
+    // for (var element in data) {
+    //   returnData.add(element.map);
+    // }
+    // return returnData;
+    return ref.get().asStream();
   }
 
   @override
-  Future<List<Document>> getNewData(ScreenAdapter adapter) async {
-    var ref = firestore.collection(adapter.screenName);
-    List<Document> snapshot = await ref.where("time", isEqualTo: adapter.adapterData.first["time"]).get();
-    return snapshot;
+  Stream<dynamic> getNewData(String timeStamp, String screenName) {
+    var ref = firestore.collection(screenName).where("time", isGreaterThan: timeStamp);
+    return ref.get().asStream();
   }
 
   @override
@@ -396,12 +405,12 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
     auth.signOut();
   }
 
-  @override
-  void newChatListener() {
-    var collectionReference = firestore.collection("Users");
-    createChatListener("Friends");
-    createChatListener("Groups");
-  }
+  // @override
+  // void newChatListener() {
+  //   var collectionReference = firestore.collection("Users");
+  //   createChatListener("Friends");
+  //   createChatListener("Groups");
+  // }
 
   @override
   register(String username, String email, String password) async {
@@ -519,14 +528,18 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   }
 
   @override
-  Future<Stream<List<String>>> getReviews(String time, String collectionName) {
+  Future<Stream<List<Map<String, dynamic>>>> getReviews(String time, String collectionName) {
     var ref = firestore.collection(collectionName);
     ref.where('time', isEqualTo: time).get().then((List<Document> snapshot) {
       for (var doc in snapshot) {
         return doc.reference.collection('reviews').stream.map((List<Document> snapshot) {
-          List<String> reviewsList = <String>[];
+          List<Map<String, dynamic>> reviewsList = [];
           for (var doc in snapshot) {
-            reviewsList.add(doc['review']);
+            reviewsList.add({
+              'review': doc['review'],
+              'sender': doc['sender'],
+              'time': doc['time'],
+            });
           }
           return reviewsList;
         });
@@ -558,6 +571,13 @@ class FirebaseControllerWindows implements FirebaseControllerInterface{
   @override
   void downloadFile(String fileName) {
     // TODO: implement downloadFile
+  }
+
+  @override
+  Future<String> getLatestTimeStamp(String screenName) async {
+    var ref = firestore.collection(screenName);
+    var data = await ref.orderBy('time', descending: true).limit(1).get();
+    return data.first['time'];
   }
 
 }

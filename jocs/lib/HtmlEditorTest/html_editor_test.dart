@@ -50,11 +50,11 @@ class CustomDataTableSource extends DataTableSource {
 
   CustomDataTableSource(this.screenName);
 
-  final TestController _testController =
-  Get.find<TestController>();
-
   @override
   DataRow? getRow(int index) {
+    TestController _testController =
+    Get.find<TestController>();
+
     int currentIndex = 0;
     DataRow row = const DataRow(
       cells: [
@@ -121,6 +121,9 @@ class CustomDataTableSource extends DataTableSource {
 
   @override
   int get rowCount {
+    TestController _testController =
+    Get.find<TestController>();
+
     int totalElem = _testController.mapList.length;
     for (var list in _testController.mapList) {
       totalElem += list.length;
@@ -194,7 +197,7 @@ class TestController extends GetxController {
   List<Map<String, Ticket>> mapList = <Map<String, Ticket>>[];
   String lastTime = '';
 
-  late CustomDataTableSource dataSource;
+  CustomDataTableSource dataSource = CustomDataTableSource("");
 
   List<StreamSubscription> streams = <StreamSubscription>[];
 
@@ -258,11 +261,5 @@ class TestController extends GetxController {
       stream.cancel();
     }
     super.onClose();
-  }
-
-  @override
-  void onReady() {
-    dataSource = CustomDataTableSource("");
-    super.onReady();
   }
 }

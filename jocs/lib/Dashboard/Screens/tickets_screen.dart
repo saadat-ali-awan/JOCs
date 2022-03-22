@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -188,35 +190,202 @@ class _TicketsScreenState extends State<TicketsScreen> {
   }
 }
 
+/// The [DataTableSource] for all the Tables in the Application is implemented
+/// using [CustomDataTableSource].
 class CustomDataTableSource extends DataTableSource {
-  RxList<DataRow> data = RxList();
+  /// Screen Name of the Screen that requires data for the table
   String screenName = "";
 
-  CustomDataTableSource(this.screenName, List<DataRow> list){
-    data.value = list;
-  }
+  CustomDataTableSource(this.screenName);
+
+  final DashboardController _dashboardController =
+  Get.find<DashboardController>();
 
   @override
   DataRow? getRow(int index) {
-    final DashboardController _dashboardController =
-        Get.find<DashboardController>();
-    try {
-      return data[index];
-    } on RangeError catch (e) {
-      if (screenName == "articles") {
-        return ScreenAdapter.createRow(["","","",""], (){},  true, screenName, "");
-      }
-      return ScreenAdapter.createRow(["","","","","",""], (){}, true, screenName, "");
+    print('getRow($index)');
+    int currentIndex = 0;
+
+    DataRow row = DataRow(
+      cells: [
+        DataCell(Container()),
+        DataCell(Container()),
+        DataCell(Container()),
+        DataCell(Container()),
+        DataCell(Container()),
+        DataCell(Container()),
+        DataCell(Container()),
+      ]
+    );
+
+    if (screenName == "articles") {
+      row = DataRow(
+          cells: [
+            DataCell(Container()),
+            DataCell(Container()),
+            DataCell(Container()),
+            DataCell(Container()),
+            DataCell(Container()),
+          ]
+      );
     }
+
+    switch (screenName) {
+      case 'tickets':
+        _dashboardController.ticketAdapter.value.rowMapSorted.forEach((key, data) {
+          if (currentIndex == index) {
+            row = getRowFromData(data);
+          }
+          currentIndex += 1;
+        });
+        break;
+      case 'inventory':
+        _dashboardController.inventoryAdapter.value.rowMapSorted.forEach((key, data) {
+          if (currentIndex == index) {
+            row = getRowFromData(data);
+          }
+          currentIndex += 1;
+        });
+        break;
+      case 'purchase':
+        _dashboardController.purchaseAdapter.value.rowMapSorted.forEach((key, data) {
+          if (currentIndex == index) {
+            row = getRowFromData(data);
+          }
+          currentIndex += 1;
+        });
+        break;
+      case 'problems':
+        _dashboardController.problemAdapter.value.rowMapSorted.forEach((key, data) {
+          if (currentIndex == index) {
+            row = getRowFromData(data);
+          }
+          currentIndex += 1;
+        });
+        break;
+      case 'articles':
+        _dashboardController.kbsAdapter.value.rowMapSorted.forEach((key, data) {
+          if (currentIndex == index) {
+            row = getRowFromData(data);
+          }
+          currentIndex += 1;
+        });
+        break;
+    }
+
+
+
+    return row;
+  }
+
+  /// [getRowFromData] creates the row from the Data provided as the array
+  DataRow getRowFromData(d) {
+    final DashboardController _dashboardController =
+    Get.find<DashboardController>();
+
+    /// [metadataKey] is the key used to update the total number of records of
+    /// [screenName] in the firebase database.
+    String metadataKey = "";
+
+    /// [metadataValue] is the key used to update the total number of records of
+    /// [screenName] in the firebase database.
+    int metadataValue = 0;
+    var tempData;
+    if (screenName == "inventory"){
+      tempData = [
+        d["item_name"],
+        d["item_type"],
+        d["location"],
+        d["used_by"],
+        d["processed_by"],
+        d["comments"]
+      ];
+      metadataKey = "inventoryCount";
+      metadataValue = _dashboardController.metadata.value.inventoryCount;
+    }else {
+      if (screenName == "purchase") {
+        tempData = [
+          d["order_no"],
+          d["order_name"],
+          d["description"],
+          d["expected_delivery"],
+          d["status"],
+          d["comments"]
+        ];
+        metadataKey = "purchaseCount";
+        metadataValue = _dashboardController.metadata.value.purchaseCount;
+      } else {
+        print("Screen Name: ${screenName}");
+        if (screenName == "articles") {
+          tempData = [
+            d['topic'],
+            d['author'],
+            d['category-name'],
+            d['comment'],
+          ];
+          metadataKey = "articlesCount";
+          metadataValue = _dashboardController.metadata.value.articlesCount;
+        } else {
+          tempData = [
+            d["issued_by"],
+            d["topic"],
+            d["status"],
+            d["priority"],
+            d["assigned_to"],
+          ];
+          if (screenName == "tickets") {
+            tempData.add(d["comments"]);
+            metadataKey = "ticketsCount";
+            metadataValue = _dashboardController.metadata.value.ticketsCount;
+          } else {
+            if (screenName == "problems") {
+              tempData.add(d["department"]);
+              metadataKey = "problemsCount";
+              metadataValue = _dashboardController.metadata.value.problemsCount;
+            }
+          }
+        }
+      }
+    }
+
+    return ScreenAdapter.createRow(tempData, (){
+      Get.defaultDialog(
+          title: "Caution",
+          titleStyle: TextStyle(color: Get.theme.errorColor),
+          middleText: "Want to delete the row from Database?",
+          confirm: TextButton(
+            onPressed: () {
+              _dashboardController.firebaseController.removeDataFromTable(screenName, d["time"], {metadataKey: metadataValue - 1});
+              if (screenName == "articles") {
+                _dashboardController.firebaseController.removeArticleFromCategory(d["category-name"], d.reference);
+              }
+              Get.back();
+            },
+            child: Text("DELETE", style: Get.textTheme.bodyText1,),
+            style: Get.theme.textButtonTheme.style!.copyWith(backgroundColor: MaterialStateProperty.all(Get.theme.errorColor)),
+          ),
+
+          cancel: TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text("Cancel", style: Get.textTheme.bodyText1,),
+          ),
+
+          onCancel: () {
+            Get.back();
+          }
+      );
+    }, false, screenName, d["time"]
+    );
   }
 
   @override
-  bool get isRowCountApproximate => false;
+  bool get isRowCountApproximate => true;
 
   @override
   int get rowCount {
-    final DashboardController _dashboardController =
-        Get.find<DashboardController>();
+
     print("SCREEN NAME rowCount() => ${screenName} , Row => ${_dashboardController.metadata.value.articlesCount}");
     switch (screenName){
       case "tickets":

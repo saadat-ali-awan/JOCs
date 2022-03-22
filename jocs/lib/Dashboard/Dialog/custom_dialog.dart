@@ -8,6 +8,17 @@ import 'package:jocs/Dashboard/Screens/eternal_kbs_screen.dart';
 
 import 'inventory_item.dart';
 
+/// Show Dialogs on Ticket Screen, Inventory Screen, Problem Screen and Purchase
+/// Screen.
+///
+/// Depending on the value of [_dashboardController.selectedMenuItem.value] a dialog is displayed.
+///
+/// The Dialogs That will be displayed based on [_dashboardController.selectedMenuItem.value] are:
+/// * [_dashboardController.selectedMenuItem.value] = 1 => [TicketItem]
+/// * [_dashboardController.selectedMenuItem.value] = 2 => [ProblemsItem]
+/// * [_dashboardController.selectedMenuItem.value] = 32 => [InventoryItem]
+/// * [_dashboardController.selectedMenuItem.value] = 33 => [PurchaseItem]
+/// * [_dashboardController.selectedMenuItem.value] = 5 => [CategoryFormWidget]
 class CustomDialog extends StatelessWidget {
   CustomDialog({Key? key, required this.previousData, required this.time}) : super(key: key);
 

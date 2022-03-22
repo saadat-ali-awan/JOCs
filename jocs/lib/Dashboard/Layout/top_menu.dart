@@ -3,6 +3,11 @@ import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 import 'package:jocs/Dashboard/Dialog/custom_dialog.dart';
 
+/// Top Menu is the menu that resides vertically at the top of [MainScreen]
+/// * On the left it contains the name of the Screen that is opened inside
+/// [MainScreen]
+/// * On the Right Most side it contains buttons for the creation of the item
+/// and for Logging Out of the Application
 class TopMenu extends StatelessWidget {
   TopMenu({Key? key}) : super(key: key);
 

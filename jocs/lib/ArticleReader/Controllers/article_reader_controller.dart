@@ -43,6 +43,7 @@ class ArticleReaderController extends GetxController {
   Future<void> getArticleByTime(String time) async {
     var article = await firebaseController.getArticleByTime(time);
     articleString.value = article!['article'];
+    fileName.value = article!['fileName'];
     print(articleString);
     var myJSON = jsonDecode(articleString.value);
     controller.value = QuillController(

@@ -31,20 +31,16 @@ Future<void> main() async {
   /// firebase_options.dart is generated automatically by flutterfire configure command
   /// It contains all the details to connect with Firebase
 
-  // if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
-  //   Get.put(FirebaseController());
-  // }else {
-  //   if (defaultTargetPlatform == TargetPlatform.windows){
-  //     Get.put(FirebaseControllerWindows());
-  //   }
-  // }
-  //
-  // bool isDarkTheme = await ThemeColors.getThemeMode();
-  // print("Is Dark? ${isDarkTheme}");
+  if (defaultTargetPlatform != TargetPlatform.windows || kIsWeb || defaultTargetPlatform == TargetPlatform.android) {
+    Get.put(FirebaseController());
+  }else {
+    if (defaultTargetPlatform == TargetPlatform.windows){
+      Get.put(FirebaseControllerWindows());
+    }
+  }
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  /// Initializes Theme of The Application
+  await ThemeColors.getThemeMode();
 
   /// Entry Point For App
   /// Firebase will go to Login Page initially
@@ -91,12 +87,13 @@ Future<void> main() async {
             binding: ReviewScreenBinding(),
           ),
         ],
-        initialRoute: '/htmlTest',
+        initialRoute: '/login',
         //initialBinding: LoginBindings(),
       )
   );
 }
 
+/// [MyCustomScrollBehavior] adds the Scroll Behaviour for Touch and Mouse
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override

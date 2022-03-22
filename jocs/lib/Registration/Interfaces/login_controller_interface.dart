@@ -10,6 +10,13 @@ import 'package:get/get.dart';
 abstract class LoginControllerInterface extends GetxController {
   RxString loginErrorMessage = "".obs;
 
+  /// To Initialize all the variables of Login Screen and Check if a User is
+  /// Logged In [initializeLogin] is used which is called Just After Login
+  /// Controller is up and Running.
   initializeLogin();
+
+  /// When user Press Login In Button the Button calls [login] function
+  /// passing it Email And Password of the User
+  /// If Credentials are correct the User Would be Logged In
   login(String email, String password);
 }

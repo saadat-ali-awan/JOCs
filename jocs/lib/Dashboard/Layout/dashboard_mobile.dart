@@ -5,6 +5,9 @@ import 'package:jocs/Dashboard/Layout/screens_layout.dart';
 
 import 'navigation_menu.dart';
 
+/// [DashboardMobile] will have stack of Navigation Menu Above the Rest of the
+/// Items. When The Navigation Menu is opened it covers the whole screen and
+/// the rest of widgets are hidden.
 class DashboardMobile extends StatefulWidget {
   const DashboardMobile({Key? key}) : super(key: key);
 

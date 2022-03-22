@@ -7,11 +7,17 @@ class RegisterControllerWindows extends RegisterControllerInterface{
   /// registration process
   final FirebaseControllerWindows _firebaseController = Get.find<FirebaseControllerWindows>();
 
+  /// To Initialize all the variables of [Register] Screen
+  /// [initializeRegister] is used which is called Just After Register
+  /// Controller is up and Running.
   @override
   initializeRegister(){
     _firebaseController.initializeRegisterController();
   }
 
+  /// When user Press Login In Button the Button calls [register] function
+  /// passing it Username, Email And Password of the User
+  /// Based on Credentials an Account is created for the User
   @override
   register(String username, String email, String password) {
     _firebaseController.register(username, email, password);

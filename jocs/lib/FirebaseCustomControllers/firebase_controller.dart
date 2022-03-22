@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/src/list_extensions.dart';
+import 'package:download/download.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -22,6 +24,8 @@ import 'package:jocs/FirebaseCustomControllers/FirebaseInterface/firebase_contro
 import 'package:jocs/Registration/Controllers/login_controller.dart';
 import 'package:jocs/Registration/Controllers/register_controller.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 import '../firebase_options.dart';
 
@@ -138,12 +142,9 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void createNewArticle(Map<String, dynamic> data, int lastId) async {
-    print("NEW ARTICLE DATA: ${data}");
-    data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
-    //data["id"] = lastId;
+    // data['time'] = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
     collectionReference = FirebaseFirestore.instance.collection("articles");
     collectionReference.add(data).then((value) {
-      print("Article Added");
 
       setMetadataInDatabase({'articlesCount': lastId + 1});
 
@@ -156,7 +157,6 @@ class FirebaseController implements FirebaseControllerInterface{
             'id': value.id
           };
           articles.add(tempArticle);
-          print(element.id);
           collectionReference = FirebaseFirestore.instance.collection("category");
           element.reference.update({"articles": articles});
         }
@@ -278,42 +278,48 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  getData(String collectionName, int page, int length, {String filter = "", Map<String, String> customFilter = const <String, String>{}}) async {
+  Stream<dynamic> getData(
+      String collectionName
+      , int page
+      , int length
+      , {String filter = ""
+        , Map<String, String> customFilter = const <String, String>{}}
+        ) {
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
 
     Query ref;
     if (page > 1) {
-      ref = collectionReference.orderBy("time", descending: true).where("time", isLessThan: filter).limit(length+10);
+      ref = collectionReference.orderBy("time", descending: true)
+          .where("time", isLessThan: filter)
+          .limit(length+10);
     } else {
-      ref = collectionReference.orderBy("time", descending: true).limit(length+10);
+      ref = collectionReference.orderBy("time", descending: true)
+          .where("time", isLessThanOrEqualTo: filter)
+          .limit(length+10);
     }
 
     customFilter.forEach((key, value) {
-      print("Custom Filter: ${key}, ${value}");
       if (key != "S" && key != "P"){
         ref = ref.where(key, isEqualTo: value);
       }
     });
 
-    QuerySnapshot tempData = await ref.get();
-
-    return tempData.docs;
+    return ref.snapshots();
   }
 
   @override
-  Future<QuerySnapshot<Object?>> getNewData(ScreenAdapter adapter) async {
-    collectionReference = FirebaseFirestore.instance.collection(adapter.screenName);
-    QuerySnapshot snapshot = await collectionReference.where("time", isGreaterThan: adapter.adapterData.first["time"]).get();
+  Stream<dynamic> getNewData(String timeStamp, String screenName) {
+    collectionReference = FirebaseFirestore.instance.collection(screenName);
+    Stream<QuerySnapshot> snapshot = collectionReference.where("time", isGreaterThan: timeStamp).snapshots();
     return snapshot;
   }
 
-  /// MetaData For Document Queries
   @override
   Stream<DetailedMetadata> getMetaDataFromDatabase(){
-    // DashboardController _dashboardController = Get.find<DashboardController>();
+    //DashboardController _dashboardController = Get.find<DashboardController>();
     collectionReference = FirebaseFirestore.instance.collection("metadata");
     return collectionReference.doc("data").snapshots().map((DocumentSnapshot snapshot) {
-      // _dashboardController.getUpdatedTableData();
+      //_dashboardController.getUpdatedTableData();
       return DetailedMetadata.fromDataSnapshot(snapshot);
     });
   }
@@ -412,12 +418,12 @@ class FirebaseController implements FirebaseControllerInterface{
     auth.signOut();
   }
 
-  @override
-  void newChatListener(){
-    collectionReference = FirebaseFirestore.instance.collection("Users");
-    createChatListener("Friends");
-    createChatListener("Groups");
-  }
+  // @override
+  // void newChatListener(){
+  //   collectionReference = FirebaseFirestore.instance.collection("Users");
+  //   createChatListener("Friends");
+  //   createChatListener("Groups");
+  // }
 
   @override
   register(String username, String email, String password) async {
@@ -449,7 +455,6 @@ class FirebaseController implements FirebaseControllerInterface{
     collectionReference = FirebaseFirestore.instance.collection(screenName);
     await collectionReference.where("time", isEqualTo: time).get().then((QuerySnapshot snapshot) {
       snapshot.docs.forEach((element) async {
-        print("Element Reference ${element.reference}");
         await element.reference.delete();
       });
       setMetadataInDatabase(map);
@@ -485,6 +490,10 @@ class FirebaseController implements FirebaseControllerInterface{
     return ["", ""];
   }
 
+  /// 1. To a send a message to friend or a group [sendMessage] reference the chat
+  /// using [chatId].
+  /// 2. A [uniqueMessageId] is created which refer the current time in milliseconds.
+  /// 3. The message using the [uniqueMessageId] is added to the database.
   @override
   sendMessage(String chatId, String messageText){
     String uniqueMessageId = DateTime.now().toUtc().millisecondsSinceEpoch.toString();
@@ -513,19 +522,22 @@ class FirebaseController implements FirebaseControllerInterface{
   }
 
   @override
-  Future<Stream<List<String>>> getReviews(String time, String collectionName) async {
+  Future<Stream<List<Map<String, dynamic>>>> getReviews(String time, String collectionName) async {
     collectionReference = FirebaseFirestore.instance.collection(collectionName);
     QuerySnapshot ref = await collectionReference.where('time', isEqualTo: time).get();
     return ref.docs.first.reference.collection('reviews').snapshots().map((QuerySnapshot snapshot) {
-      List<String> reviewsList = <String>[];
+      List<Map<String, dynamic>> reviewsList = [];
       for (var doc in snapshot.docs) {
-        reviewsList.add(doc['review']);
+        reviewsList.add({
+          'review': doc['review'],
+          'sender': doc['sender'],
+          'time': doc['time'],
+        });
       }
       return reviewsList;
     });
   }
 
-  /// Update Metadata
   @override
   void setMetadataInDatabase(Map<String, int> metaDataMap) {
     collectionReference = FirebaseFirestore.instance.collection("metadata");
@@ -539,6 +551,10 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   StreamSubscription? currentUserStream;
+
+  /// Get The User Data from Users Collection
+  /// The Email, UserName and User Profile image are fetched and stored in
+  /// [currentUserDetails] using [CurrentUserDetails.fromDocumentSnapshot]
   @override
   void getCurrentUserData() {
     collectionReference = FirebaseFirestore.instance.collection("Users");
@@ -591,19 +607,62 @@ class FirebaseController implements FirebaseControllerInterface{
 
   @override
   void downloadFile(String fileName)  async {
-    // if (kIsWeb) {
-    //   Directory appDocDir = Directory.current.path;
-    // }
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    File downloadToFile = File('${appDocDir.path}/$fileName');
+    String downloadUrl = await FirebaseStorage.instance
+        .ref('uploads/articles/$fileName').getDownloadURL();
 
-    try {
-      await FirebaseStorage.instance
-          .ref('uploads/articles/$fileName')
-          .writeToFile(downloadToFile);
-    } on FirebaseException catch (e) {
-      // e.g, e.code == 'canceled'
+    if (kIsWeb) {
+      var response = await http.get(Uri.parse(downloadUrl));
+      download(Stream.fromIterable(response.bodyBytes.toList()), fileName);
+    } else {
+      var status = await Permission.storage.status;
+      if (status.isDenied) {
+        await Permission.storage.request();
+      }
+      if (await Permission.storage.isGranted) {
+
+        Directory? appDocDir = await getExternalStorageDirectory();
+        if (appDocDir != null) {
+          Directory dir = Directory('/storage/emulated/0/Download/JocIt');
+          if (! await dir.exists()) {
+            dir.create();
+          }
+          File downloadToFile = File('${dir.path}/$fileName');
+
+          if (! await downloadToFile.exists()) {
+            downloadToFile.create();
+          }
+
+          try {
+            await FirebaseStorage.instance
+                .ref('uploads/articles/$fileName')
+                .writeToFile(downloadToFile);
+          } on FirebaseException catch (e) {
+            // e.g, e.code == 'canceled'
+          }
+        }
+
+      }
     }
+
+
+
+    // Directory appDocDir = await getApplicationDocumentsDirectory();
+    // File downloadToFile = File('${appDocDir.path}/$fileName');
+    //
+    // try {
+    //   await FirebaseStorage.instance
+    //       .ref('uploads/articles/$fileName')
+    //       .writeToFile(downloadToFile);
+    // } on FirebaseException catch (e) {
+    //   // e.g, e.code == 'canceled'
+    // }
+  }
+
+  @override
+  Future<String> getLatestTimeStamp(String screenName) async {
+    collectionReference = FirebaseFirestore.instance.collection(screenName);
+    var data = await collectionReference.orderBy('time', descending: true).limit(1).get();
+    return data.docs.first['time'];
   }
 
 }

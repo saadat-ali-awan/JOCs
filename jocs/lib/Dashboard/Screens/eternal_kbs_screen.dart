@@ -28,10 +28,7 @@ import 'package:jocs/universal_ui/universal_ui.dart';
 class EternalKbsScreen extends StatelessWidget {
   EternalKbsScreen({Key? key}) : super(key: key);
 
-  final DashboardController _dashboardController =
-  Get.find<DashboardController>();
-
-  RxInt sub_category = 1.obs;
+  static RxInt sub_category = 1.obs;
 
 
   @override
@@ -83,7 +80,7 @@ class EternalKbsScreen extends StatelessWidget {
 }
 
 class ArticleWriter extends StatefulWidget {
-  ArticleWriter({Key? key}) : super(key: key);
+  const ArticleWriter({Key? key}) : super(key: key);
 
   @override
   State<ArticleWriter> createState() => _ArticleWriterState();
@@ -186,77 +183,99 @@ class _ArticleWriterState extends State<ArticleWriter> {
         Container(
           padding: const EdgeInsets.all(8.0),
           alignment: Alignment.centerRight,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _isDesktop() ? Container() : TextButton(
-                child: Text("Upload File", style: context.textTheme.bodyText1),
-                onPressed: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles(
-                    type: FileType.any,
-                  );
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            controller: ScrollController(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _isDesktop() ? Container() : Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: TextButton(
+                    child: Text("Upload File", style: context.textTheme.bodyText1),
+                    onPressed: () async {
+                      FilePickerResult? result = await FilePicker.platform.pickFiles(
+                        type: FileType.any,
+                      );
 
-                  if (result != null) {
-                    PlatformFile file = result.files.first;
+                      if (result != null) {
+                        PlatformFile file = result.files.first;
 
-                    fileBytes = result.files.first.bytes!;
-                    String fileName = result.files.first.name;
-                    this.fileName.value = fileName;
-                    fileCanUpload.value = true;
+                        fileBytes = result.files.first.bytes!;
+                        String fileName = result.files.first.name;
+                        this.fileName.value = fileName;
+                        fileCanUpload.value = true;
 
-                    // Upload file
-                    //_dashboardController.firebaseController.uploadImage(fileBytes, file.extension!);
-                  } else {
-                    // User canceled the picker
-                  }
-                },
-              ),
-              Obx(()=> Text(fileName.value)),
-              Obx(()=> fileCanUpload.value ? Row(
-                children: [
-                  Tooltip(
-                    message: 'Upload Now',
-                    child: InkWell(
-                        child: Icon(Icons.check, color: context.theme.appBarTheme.backgroundColor,),
-                        onTap: () {
-                          if (fileBytes != null && fileCanUpload.value) {
-                            _dashboardController.uploadFile(fileBytes!, fileName.value);
+                        // Upload file
+                        //_dashboardController.firebaseController.uploadImage(fileBytes, file.extension!);
+                      } else {
+                        // User canceled the picker
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: Obx(()=> Text(fileName.value)),
+                ),
+                Obx(()=> fileCanUpload.value ? Row(
+                  children: [
+                    Tooltip(
+                      message: 'Upload Now',
+                      child: InkWell(
+                          child: Icon(Icons.check, color: context.theme.appBarTheme.backgroundColor,),
+                          onTap: () {
+                            if (fileBytes != null && fileCanUpload.value) {
+                              _dashboardController.uploadFile(fileBytes!, fileName.value);
+                            }
                           }
-                        }
+                      ),
                     ),
-                  ),
-                  Tooltip(
-                    message: 'Remove',
-                    child: InkWell(
-                        child: Icon(Icons.close, color: context.theme.appBarTheme.backgroundColor,),
-                        onTap: () {
-                          fileName.value = "";
-                          fileCanUpload.value = false;
-                          fileBytes = Uint8List.fromList([]);
-                        }
+                    Tooltip(
+                      message: 'Remove',
+                      child: InkWell(
+                          child: Icon(Icons.close, color: context.theme.appBarTheme.backgroundColor,),
+                          onTap: () {
+                            fileName.value = "";
+                            fileCanUpload.value = false;
+                            fileBytes = Uint8List.fromList([]);
+                          }
+                      ),
                     ),
-                  ),
 
-                  Tooltip(
-                    message: 'Bytes Transferred',
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(_dashboardController.bytesTransfered.value),
+                    Tooltip(
+                      message: 'Bytes Transferred',
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(_dashboardController.bytesTransferred.value),
+                      ),
                     ),
+                    Tooltip(
+                      message: 'Total Bytes',
+                      child: Text(_dashboardController.totalBytes.value),
+                    ),
+                  ],
+                ): Container()),
+                Tooltip(
+                  message: 'Add Article in Eternal KBS',
+                  child: TextButton(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Text("Add Article", style: context.textTheme.bodyText1),
+                    ),
+                    onPressed: () async {
+                      bool res = await Get.dialog(const AddArticleDialog(time: '', previousData: [],), arguments: {'article': jsonEncode(_controller.document.toDelta().toJson()), 'fileName': fileName.value});
+                      if (res) {
+                        EternalKbsScreen.sub_category.value = 1;
+                        fileName = "".obs;
+                        fileCanUpload = false.obs;
+                        fileBytes = null;
+                      }
+                    },
                   ),
-                  Tooltip(
-                    message: 'Total Bytes',
-                    child: Text(_dashboardController.totalBytes.value),
-                  ),
-                ],
-              ): Container()),
-              TextButton(
-                child: Text("NEXT", style: context.textTheme.bodyText1),
-                onPressed: () {
-                  Get.dialog(const AddArticleDialog(time: '', previousData: [],), arguments: {'article': jsonEncode(_controller.document.toDelta().toJson()), 'fileName': fileName.value});
-                },
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
         Expanded(
@@ -558,6 +577,7 @@ class CategoryFormWidget extends StatelessWidget {
                                     _dashboardController
                                         .addArticleCategory({ 'category-name': _categoryController.text, 'description': _descriptionController.text, 'articles': []
                                     });
+                                    Get.back();
                                   }else {
                                     error.value = "Category Already Exists";
                                   }

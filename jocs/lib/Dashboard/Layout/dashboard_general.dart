@@ -5,6 +5,7 @@ import 'package:jocs/Dashboard/Layout/screens_layout.dart';
 
 import 'navigation_menu.dart';
 
+/// In [DashboardGeneral] Navigation Items are on the left side of the Screen
 class DashboardGeneral extends StatefulWidget {
   const DashboardGeneral({Key? key}) : super(key: key);
 

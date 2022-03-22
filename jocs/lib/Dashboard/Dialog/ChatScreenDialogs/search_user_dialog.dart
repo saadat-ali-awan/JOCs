@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show Dialog to search a user and Message to the User
 class SearchUserDialog extends StatefulWidget {
   SearchUserDialog({Key? key}) : super(key: key);
 
@@ -76,6 +77,7 @@ class _SearchUserDialogState extends State<SearchUserDialog> {
           child: InkWell(
               onTap: (){
                 _dashboardController.addFriend(foundFriend.value);
+                Get.back();
               },
               child: Text(
                 foundFriend.value[0],

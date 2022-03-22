@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jocs/Dashboard/Controllers/dashboard_controller.dart';
 
+/// Show a form to Add or Update Purchase Item
 class PurchaseItem extends StatefulWidget {
   const PurchaseItem({Key? key, required this.previousData, required this.time}) : super(key: key);
 
